@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    
+    <title>Anaconda 那些事 - 及时当勉励，岁月不待人！@iNuo</title>
+    
+    <meta name="description" content="【声明】本篇博客为个人笔记整理，笔记来源各个技术博客/书籍/个人编撰，如有侵权，必删之！
+快速访问区    描述 操作     Py库 https://www.lfd.uci.edu/~gohlke/pythonlibs/   路径 pip install -i https://pypi.tuna.tsinghua.edu.cn/simple pygame   超时 pip &ndash;default-timeout=100 install tensorflow   镜像    清华 https://pypi.tuna.tsinghua.edu.cn/simple   豆瓣 https://pypi.douban.com/simple    ​
+Python 一种面向对象的解释型计算机程序设计语言
+python环境 一个解释器和一个包集合.
+【python解释器】即python.exe，这才是python的本体。解释器根据python的版本大概分为2和3. python2和3之间无法互相兼容。
+【Lib】即python包文件，包括自带的包和第三方包；自带的包,如：日志包logging, 异步包 concurrent；第三方包都放在site-packages文件夹里面，第三方包通过pip/conda install来下载。
+Python的强大之处在于它的应用领域范围之广，遍及人工智能、科学计算、Web开发、系统运维、大数据及云计算、金融、游戏开发等。实现其强大功能的前提，就是Python具有数量庞大且功能相对完善的标准库和第三方库。通过对库的引用，能够实现对不同领域业务的开发。然而，正是由于库的数量庞大，对于管理这些库以及对库作及时的维护成为既重要但复杂度又高的事情。那么接下来我们要引入这款神器——Anaconda。
+Anaconda 一种可便捷获取包且对包进行管理，同时对环境可以统一管理的发行版本，其包含了conda、Python在内的超过180个科学包及依赖项。Anaconda具有如下特点：开源\安装过程简单\高性能使用Python和R语言\免费的社区支持，其特点的实现主要基于Anaconda拥有的：conda包\环境管理器\1,000&#43;开源库。
+Anaconda、conda、pip、virtualenv的区别 ① Anaconda
+Anaconda是一个包含180&#43;的科学包及其依赖项的发行版本，其包含的科学包包括：conda, numpy, scipy, ipython notebook等。
+② conda
+conda是包及其依赖项和环境的管理工具，适用语言：Python, R, Ruby, Lua, Scala, Java, JavaScript, C/C&#43;&#43;, FORTRAN，适用平台：Windows, macOS, Linux。">
+    <meta name="author" content="">
+    
+    <link href="https://xShi000.github.io/an-old-hope.min.css" rel="stylesheet">
+    <link href="https://xShi000.github.io/style.css" rel="stylesheet">
+    <link href="https://xShi000.github.io/custom.css" rel="stylesheet">
+    
+    <link rel="apple-touch-icon" href="https://xShi000.github.io/apple-touch-icon.png">
+    <link rel="icon" href="https://xShi000.github.io/favicon.ico">
+    <meta name="generator" content="Hugo 0.65.3" />
+    
+    
+    
+    <script>
+      function setTheme() {
+        const time = new Date();
+
+        const prev = localStorage.getItem('date');
+        const date = String(time.getMonth() + 1) + '.' + String(time.getDate());
+
+        const now = time.getTime();
+        let sunrise;
+        let sunset;
+
+        function setBodyClass() {
+          if (now > sunrise && now < sunset) return;
+          document.body.classList.add('dark');
+        }
+
+        if (date !== prev) {
+          fetch('https://api.ipgeolocation.io/astronomy?apiKey=5ed37d85103e4defa5df4c5298ed5215')
+            .then(res => res.json())
+            .then(data => {
+              sunrise = data.sunrise.split(':').map(Number);
+              sunset = data.sunset.split(':').map(Number);
+            })
+            .catch(() => {
+              sunrise = [7, 0];
+              sunset = [19, 0];
+            })
+            .finally(() => {
+              sunrise = time.setHours(sunrise[0], sunrise[1], 0);
+              sunset = time.setHours(sunset[0], sunset[1], 0);
+              setBodyClass();
+              localStorage.setItem('sunrise', sunrise);
+              localStorage.setItem('sunset', sunset);
+            });
+          localStorage.setItem('date', date);
+        } else {
+          sunrise = Number(localStorage.getItem('sunrise'));
+          sunset = Number(localStorage.getItem('sunset'));
+          setBodyClass();
+        }
+      }
+    </script>
+  </head>
+  <body class="single">
+    <script>
+      setTheme();
+    </script>
+    <header class="header">
+      <nav class="nav">
+        <p class="logo"><a href="https://xShi000.github.io">及时当勉励，岁月不待人！@iNuo</a></p>
+      </nav>
+    </header>
+    <main class="main">
+
+
+<article class="post-single">
+  <header class="post-header">
+    <h1 class="post-title">Anaconda 那些事</h1>
+    <div class="post-meta">July 20, 2020</div>
+  </header>
+  <div class="post-content"><p>【声明】本篇博客为个人笔记整理，笔记来源各个技术博客/书籍/个人编撰，如有侵权，必删之！</p>
+<h4 id="快速访问区">快速访问区</h4>
+<table>
+<thead>
+<tr>
+<th>描述</th>
+<th>操作</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Py库</td>
+<td><a href="https://www.lfd.uci.edu/~gohlke/pythonlibs/">https://www.lfd.uci.edu/~gohlke/pythonlibs/</a></td>
+</tr>
+<tr>
+<td>路径</td>
+<td>pip install -i <a href="https://pypi.tuna.tsinghua.edu.cn/simple">https://pypi.tuna.tsinghua.edu.cn/simple</a> pygame</td>
+</tr>
+<tr>
+<td>超时</td>
+<td>pip &ndash;default-timeout=100 install  tensorflow</td>
+</tr>
+<tr>
+<td>镜像</td>
+<td></td>
+</tr>
+<tr>
+<td>清华</td>
+<td><a href="https://pypi.tuna.tsinghua.edu.cn/simple">https://pypi.tuna.tsinghua.edu.cn/simple</a></td>
+</tr>
+<tr>
+<td>豆瓣</td>
+<td><a href="https://pypi.douban.com/simple">https://pypi.douban.com/simple</a></td>
+</tr>
+</tbody>
+</table>
+<p>​</p>
+<h3 id="python">Python</h3>
+<p>一种面向对象的解释型计算机程序设计语言</p>
+<h4 id="python环境">python环境</h4>
+<p>一个解释器和一个包集合.</p>
+<p>【python解释器】即python.exe，这才是python的本体。解释器根据python的版本大概分为2和3. python2和3之间无法互相兼容。</p>
+<p>【Lib】即python包文件，包括自带的包和第三方包；自带的包,如：日志包logging, 异步包 concurrent；第三方包都放在site-packages文件夹里面，第三方包通过pip/conda install来下载。</p>
+<p>Python的强大之处在于它的应用领域范围之广，遍及人工智能、科学计算、Web开发、系统运维、大数据及云计算、金融、游戏开发等。实现其强大功能的前提，就是Python具有数量庞大且功能相对完善的标准库和第三方库。通过对库的引用，能够实现对不同领域业务的开发。然而，正是由于库的数量庞大，对于管理这些库以及对库作及时的维护成为既重要但复杂度又高的事情。那么接下来我们要引入这款神器——Anaconda。</p>
+<h3 id="anaconda">Anaconda</h3>
+<p>一种可便捷获取包且对包进行管理，同时对环境可以统一管理的发行版本，其包含了conda、Python在内的超过180个科学包及依赖项。Anaconda具有如下特点：开源\安装过程简单\高性能使用Python和R语言\免费的社区支持，其特点的实现主要基于Anaconda拥有的：conda包\环境管理器\1,000+开源库。</p>
+<h4 id="anacondacondapipvirtualenv的区别">Anaconda、conda、pip、virtualenv的区别</h4>
+<p>① Anaconda</p>
+<p>Anaconda是一个包含180+的科学包及其依赖项的发行版本，其包含的科学包包括：conda, numpy, scipy, ipython notebook等。</p>
+<p>② conda</p>
+<p>conda是包及其依赖项和环境的管理工具，适用语言：Python, R, Ruby, Lua, Scala, Java, JavaScript, C/C++, FORTRAN，适用平台：Windows, macOS, Linux。</p>
+<p>用途：</p>
+<ol>
+<li>
+<p>快速安装、运行和升级包及其依赖项。</p>
+</li>
+<li>
+<p>在计算机中便捷地创建、保存、加载和切换环境。</p>
+</li>
+</ol>
+<p>如果你需要的包要求不同版本的Python，你无需切换到不同的环境，因为conda同样是一个环境管理器。仅需要几条命令，你可以创建一个完全独立的环境来运行不同的Python版本，同时继续在你常规的环境中使用你常用的Python版本。此外，conda为Python项目而创造，但可适用于上述的多种语言；conda包和环境管理器包含于Anaconda的所有版本当中。</p>
+<p>③ pip</p>
+<p>pip是用于安装和管理软件包的包管理器；pip编写语言：Python。</p>
+<ul>
+<li>Python 2.7.9及后续版本：默认安装，命令为pip</li>
+<li>Python 3.4及后续版本：默认安装，命令为pip3</li>
+</ul>
+<p>pip名称的由来：pip采用的是递归缩写进行命名的。其名字被普遍认为来源于2处：</p>
+<ul>
+<li>
+<p>“Pip installs Packages”（“pip安装包”）</p>
+</li>
+<li>
+<p>“Pip installs Python”（“pip安装Python”）</p>
+</li>
+</ul>
+<p>④ virtualenv</p>
+<p>virtualenv：用于创建一个独立的Python环境的工具。</p>
+<p>解决问题：</p>
+<ol>
+<li>
+<p>当一个程序需要使用Python 2.7版本，而另一个程序需要使用Python 3.6版本，如何同时使用这两个程序？</p>
+</li>
+<li>
+<p>如果将所有程序都安装在系统下的默认路径，如：/usr/lib/python2.7/site-packages，当不小心升级了本不该升级的程序时，将会对其他的程序造成影响。</p>
+</li>
+<li>
+<p>如果想要安装程序并在程序运行时对其库或库的版本进行修改，都会导致程序的中断。</p>
+</li>
+<li>
+<p>在共享主机时，无法在全局site-packages目录中安装包。</p>
+</li>
+</ol>
+<p>virtualenv将会为它自己的安装目录创建一个环境，这并不与其他virtualenv环境共享库；同时也可以选择性地不连接已安装的全局库。</p>
+<h5 id="pip-与-conda-比较">pip 与 conda 比较</h5>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>pip</th>
+<th>conda</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>依赖项检查</td>
+<td>1.不一定会展示所需其他依赖包  <!-- raw HTML omitted -->2.安装包时或许会直接忽略依赖项而安装，仅在结果中提示错误。</td>
+<td>1.列出所需其他依赖包  <!-- raw HTML omitted -->2.安装包时自动安装其依赖项  <!-- raw HTML omitted -->3.可以便捷地在包的不同版本中自由切换。</td>
+</tr>
+<tr>
+<td>环境管理</td>
+<td>维护多个环境难度较大</td>
+<td>比较方便地在不同环境之间进行切换，环境管理较为简单</td>
+</tr>
+<tr>
+<td>对系统自带Python的影响</td>
+<td>在系统自带Python中包的**更新/回退版本/卸载将影响其他程序</td>
+<td>不会影响系统自带Python</td>
+</tr>
+<tr>
+<td>适用语言</td>
+<td>仅适用于Python</td>
+<td>适用于Python, R, Ruby, Lua, Scala, Java, JavaScript, C/C++, FORTRAN</td>
+</tr>
+</tbody>
+</table>
+<h5 id="conda与pipvirtualenv的关系">conda与pip、virtualenv的关系</h5>
+<blockquote>
+<p>conda结合了pip和virtualenv的功能。</p>
+</blockquote>
+<h4 id="anaconda应用">Anaconda应用</h4>
+<table>
+<thead>
+<tr>
+<th>应用</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Anaconda Navigtor</td>
+<td>用于管理工具包和环境的图形用户界面，众多管理命令也可以在 Navigator 中手工实现</td>
+</tr>
+<tr>
+<td>Jupyter notebook</td>
+<td>基于web的交互式计算环境，可以编辑易于人们阅读的文档，用于展示数据分析的过程</td>
+</tr>
+<tr>
+<td>qtconsole</td>
+<td>一个可执行 IPython 的仿终端图形界面程序，相比 Python Shell 界面，qtconsole 可以直接显示代码生成的图形，实现多行代码输入执行，以及内置许多有用的功能和函数</td>
+</tr>
+<tr>
+<td>spyder</td>
+<td>一个使用Python语言、跨平台的、科学运算集成开发环境</td>
+</tr>
+</tbody>
+</table>
+<h3 id="anaconda操作">Anaconda操作</h3>
+<h4 id="配置环境变量">配置环境变量</h4>
+<p>控制面板\系统和安全\系统\高级系统设置\环境变量\用户变量\PATH 中添加 anaconda的安装目录的Scripts文件夹</p>
+<p>输入测试配置是否成功： conda &ndash;version</p>
+<h4 id="管理conda">管理conda</h4>
+<table>
+<thead>
+<tr>
+<th align="left">指令</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left">conda update conda</td>
+<td>更新</td>
+</tr>
+<tr>
+<td align="left">conda &ndash;help<!-- raw HTML omitted -->conda -h</td>
+<td>查看conda帮助信息</td>
+</tr>
+</tbody>
+</table>
+<h4 id="管理环境">管理环境</h4>
+<table>
+<thead>
+<tr>
+<th>指令</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>activate</td>
+<td>切换到base环境</td>
+</tr>
+<tr>
+<td>activate learn</td>
+<td>切换到learn环境</td>
+</tr>
+<tr>
+<td>conda info &ndash;envs<!-- raw HTML omitted -->conda info -e<!-- raw HTML omitted -->conda env list</td>
+<td>显示已创建环境（结果中星号“*”所在行即为当前所在环境）</td>
+</tr>
+<tr>
+<td>conda env export &gt; environment.yaml</td>
+<td>导出当前环境的包信息</td>
+</tr>
+<tr>
+<td>conda env create -f environment.yaml</td>
+<td>用配置文件创建新的虚拟环境</td>
+</tr>
+<tr>
+<td>conda create -n python3 python=3.5 numpy pandas</td>
+<td>创建一个名为“python3”的环境，python的版本为3.5，同时也安装了numpy和pandas</td>
+</tr>
+<tr>
+<td>conda create &ndash;name py2 &ndash;clone python2</td>
+<td>克隆名为“python2”的环境，克隆后的新环境名为“py2”。此时，环境中将同时存在“python2”和“py2”环境，且两个环境的配置相同</td>
+</tr>
+<tr>
+<td>Conda deactivate</td>
+<td>退出当前环境，回到root环境(开头的字符将不再显示)</td>
+</tr>
+</tbody>
+</table>
+<h4 id="管理包">管理包</h4>
+<table>
+<thead>
+<tr>
+<th>指令</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>conda list</td>
+<td>列出当前环境的所有包</td>
+</tr>
+<tr>
+<td>conda install requests</td>
+<td>安装requests包</td>
+</tr>
+<tr>
+<td>&gt;&gt;python</td>
+<td>进入解释器</td>
+</tr>
+<tr>
+<td>import requests</td>
+<td>导入包</td>
+</tr>
+<tr>
+<td>&gt;&gt;exit()</td>
+<td>退出</td>
+</tr>
+<tr>
+<td>conda search &ndash;full-name python</td>
+<td>精确查找全名为“python”的包</td>
+</tr>
+<tr>
+<td>conda search py</td>
+<td>模糊查找，查找含有“py”字段的包</td>
+</tr>
+<tr>
+<td>conda install &ndash;name python2 pandas</td>
+<td>在名为“python2”的环境中安装pandas包</td>
+</tr>
+<tr>
+<td>conda install pandas</td>
+<td>在当前环境中安装pandas包</td>
+</tr>
+<tr>
+<td><strong>卸载包</strong></td>
+<td></td>
+</tr>
+<tr>
+<td>conda remove &ndash;name python2 pandas</td>
+<td>卸载名为“python2”中的pandas包</td>
+</tr>
+<tr>
+<td>conda remove pandas</td>
+<td>在当前环境中卸载pandas包</td>
+</tr>
+<tr>
+<td>conda remove requests</td>
+<td>卸载requets包</td>
+</tr>
+<tr>
+<td>conda remove -n learn &ndash;all</td>
+<td>删除learn环境及下属所有包</td>
+</tr>
+<tr>
+<td><strong>更新包</strong></td>
+<td></td>
+</tr>
+<tr>
+<td>conda update &ndash;all<!-- raw HTML omitted -->conda upgrade &ndash;all</td>
+<td>建议：在安装Anaconda之后执行上述命令更新Anaconda中的所有包至最新版本，便于使用</td>
+</tr>
+<tr>
+<td>conda update &lt;package_name&gt;<!-- raw HTML omitted -->conda upgrade &lt;package_name&gt;</td>
+<td>更新指定包</td>
+</tr>
+<tr>
+<td>conda update pandas numpy matplotlib</td>
+<td>更新pandas、numpy、matplotlib包</td>
+</tr>
+</tbody>
+</table>
+<h5 id="使用pip安装包">使用pip安装包</h5>
+<p>当使用conda install无法进行安装时，可用pip进行安装。例：pip install see。</p>
+<p><strong>→ 注意</strong></p>
+<ol>
+<li>
+<p>pip只是包管理器，无法对环境进行管理。因此如果想在指定环境中使用pip进行安装包，则需要先切换到指定环境中，再使用pip命令安装包。</p>
+</li>
+<li>
+<p>pip无法更新python，因为pip并不将python视为包。</p>
+</li>
+<li>
+<p>pip可以安装一些conda无法安装的包；conda也可以安装一些pip无法安装的包。因此当使用一种命令无法安装包时，可以尝试用另一种命令。</p>
+</li>
+</ol>
+<h5 id="使用anacondaorg安装包">使用Anaconda.org安装包</h5>
+<p>当conda install无法安装时，可以从Anaconda.org中获取安装包的命令，并进行安装。</p>
+<p><strong>→ 注意</strong></p>
+<ol>
+<li>
+<p>从Anaconda.org安装包时，无需注册。</p>
+</li>
+<li>
+<p>在当前环境中安装来自于Anaconda.org的包时，需要通过输入要安装的包在Anaconda.org中的路径作为获取途径（channel）。查询路径的方式如下：</p>
+<ol>
+<li>在浏览器中输入：<a href="https://link.jianshu.com?t=http://anaconda.org">http://anaconda.org</a>，或直接点击<a href="https://link.jianshu.com?t=http://anaconda.org">Anaconda.org</a></li>
+<li>在新页面“Anaconda Cloud”的上方搜索框中输入要安装的包名，然后点击右边“放大镜”标志。</li>
+<li>搜索结果中有数以千计的包可供选择，此时点击“Downloads”可根据下载量进行排序，最上面的为下载最多的包。（图中以搜索bottleneck包为例）</li>
+<li>选择满足需求的包或下载量最多的包，点击包名。</li>
+<li>复制“To install this package with conda run:”下方的命令，并粘贴在终端中执行。</li>
+<li>完成安装。</li>
+</ol>
+</li>
+</ol>
+<h4 id="anaconda构造">Anaconda构造</h4>
+<p>base环境（即anaconda的安装目录）里面有着一个基本的python解释器,Lib里面也有base环境下的各种包文件，envs是自己创建的各种虚拟环境的入口。anaconda所谓的创建虚拟环境其实就是安装了一个真实的python环境, 只不过我们可以通过activate,conda等命令去随意的切换我们当前的python环境, 用不同版本的解释器和不同的包环境去运行python脚本.</p>
+<h4 id="链接pycharm">链接PyCharm</h4>
+<p>在Setting =&gt; Project =&gt; Project Interpreter 里面修改 Project Interpreter</p>
+<p>点击齿轮标志再点击Add Local为你某个环境的python.exe解释器就行了</p>
+</div>
+  
+</article></main>
+<footer class="footer">
+  <span>&copy; 2020 <a href="https://xShi000.github.io">及时当勉励，岁月不待人！@iNuo</a></span>
+  <span>&middot;</span>
+  <span>Powered by <a href="https://gohugo.io/" rel="noopener" target="_blank">Hugo️️</a>️</span>
+  <span>&middot;</span>
+  <span>Theme️ <a href="https://github.com/nanxiaobei/hugo-paper" rel="noopener" target="_blank">Paper</a></span>
+</footer>
+<script src="https://xShi000.github.io/highlight.min.js"></script>
+<script>
+  hljs.initHighlightingOnLoad();
+</script>
+</body>
+</html>
+

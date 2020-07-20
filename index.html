@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    
+    <title>及时当勉励，岁月不待人！@iNuo - 及时当勉励，岁月不待人！@iNuo</title>
+    
+    <meta name="description" content="">
+    <meta name="author" content="">
+    
+    <link href="https://xShi000.github.io/an-old-hope.min.css" rel="stylesheet">
+    <link href="https://xShi000.github.io/style.css" rel="stylesheet">
+    <link href="https://xShi000.github.io/custom.css" rel="stylesheet">
+    
+    <link rel="apple-touch-icon" href="https://xShi000.github.io/apple-touch-icon.png">
+    <link rel="icon" href="https://xShi000.github.io/favicon.ico">
+    <meta name="generator" content="Hugo 0.65.3" />
+    
+    <link rel="alternate" type="application/rss+xml" href="https://xShi000.github.io/index.xml" title="及时当勉励，岁月不待人！@iNuo" />
+    
+    
+    <script>
+      function setTheme() {
+        const time = new Date();
+
+        const prev = localStorage.getItem('date');
+        const date = String(time.getMonth() + 1) + '.' + String(time.getDate());
+
+        const now = time.getTime();
+        let sunrise;
+        let sunset;
+
+        function setBodyClass() {
+          if (now > sunrise && now < sunset) return;
+          document.body.classList.add('dark');
+        }
+
+        if (date !== prev) {
+          fetch('https://api.ipgeolocation.io/astronomy?apiKey=5ed37d85103e4defa5df4c5298ed5215')
+            .then(res => res.json())
+            .then(data => {
+              sunrise = data.sunrise.split(':').map(Number);
+              sunset = data.sunset.split(':').map(Number);
+            })
+            .catch(() => {
+              sunrise = [7, 0];
+              sunset = [19, 0];
+            })
+            .finally(() => {
+              sunrise = time.setHours(sunrise[0], sunrise[1], 0);
+              sunset = time.setHours(sunset[0], sunset[1], 0);
+              setBodyClass();
+              localStorage.setItem('sunrise', sunrise);
+              localStorage.setItem('sunset', sunset);
+            });
+          localStorage.setItem('date', date);
+        } else {
+          sunrise = Number(localStorage.getItem('sunrise'));
+          sunset = Number(localStorage.getItem('sunset'));
+          setBodyClass();
+        }
+      }
+    </script>
+  </head>
+  <body class="list home">
+    <script>
+      setTheme();
+    </script>
+    <header class="header">
+      <nav class="nav">
+        <h1 class="logo"><a href="https://xShi000.github.io">及时当勉励，岁月不待人！@iNuo</a></h1>
+      </nav>
+    </header>
+    <main class="main">
+
+<header class="page-header"><h1>及时当勉励，岁月不待人！@iNuo</h1></header>
+
+<article class="first-entry">
+  <header class="entry-header">
+    <h2>Anaconda 那些事</h2>
+  </header>
+  <section class="entry-content">
+   <p>【声明】本篇博客为个人笔记整理，笔记来源各个技术博客/书籍/个人编撰，如有侵权，必删之！
+快速访问区    描述 操作     Py库 https://www.lfd.uci.edu/~gohlke/pythonlibs/   路径 pip install -i https://pypi.tuna.tsinghua.edu.cn/simple pygame   超时 pip –default-timeout=100 install tensorflow   镜像    清华 https://pypi.tuna.tsinghua.edu.cn/simple   豆瓣 https://pypi.douban.com/simple    ​
+Python 一种面向对象的解释型计算机程序设计语言
+python环境 一个解释器和一个包集合.
+【python解释器】即python.exe，这才是python的本体。解释器根据python的版本大概分为2和3. python2和3之间无法互相兼容。
+【Lib】即python包文件，包括自带的包和第三方包；自带的包,如：日志包logging, 异步包 concurrent；第三方包都放在site-packages文件夹里面，第三方包通过pip/conda install来下载。
+Python的强大之处在于它的应用领域范围之广，遍及人工智能、科学计算、Web开发、系统运维、大数据及云计算、金融、游戏开发等。实现其强大功能的前提，就是Python具有数量庞大且功能相对完善的标准库和第三方库。通过对库的引用，能够实现对不同领域业务的开发。然而，正是由于库的数量庞大，对于管理这些库以及对库作及时的维护成为既重要但复杂度又高的事情。那么接下来我们要引入这款神器——Anaconda。
+Anaconda 一种可便捷获取包且对包进行管理，同时对环境可以统一管理的发行版本，其包含了conda、Python在内的超过180个科学包及依赖项。Anaconda具有如下特点：开源\安装过程简单\高性能使用Python和R语言\免费的社区支持，其特点的实现主要基于Anaconda拥有的：conda包\环境管理器\1,000&#43;开源库。
+Anaconda、conda、pip、virtualenv的区别 ① Anaconda
+Anaconda是一个包含180&#43;的科学包及其依赖项的发行版本，其包含的科学包包括：conda, numpy, scipy, ipython notebook等。
+② conda
+conda是包及其依赖项和环境的管理工具，适用语言：Python, R, Ruby, Lua, Scala, Java, JavaScript, C/C&#43;&#43;, FORTRAN，适用平台：Windows, macOS, Linux。...</p>
+  </section>
+  <footer class="entry-footer">
+    <time>July 20, 2020</time>
+  </footer>
+  <a class="entry-link" href="https://xShi000.github.io/anaconda/"></a>
+</article></main>
+<footer class="footer">
+  <span>&copy; 2020 <a href="https://xShi000.github.io">及时当勉励，岁月不待人！@iNuo</a></span>
+  <span>&middot;</span>
+  <span>Powered by <a href="https://gohugo.io/" rel="noopener" target="_blank">Hugo️️</a>️</span>
+  <span>&middot;</span>
+  <span>Theme️ <a href="https://github.com/nanxiaobei/hugo-paper" rel="noopener" target="_blank">Paper</a></span>
+</footer>
+<script src="https://xShi000.github.io/highlight.min.js"></script>
+<script>
+  hljs.initHighlightingOnLoad();
+</script>
+</body>
+</html>
+
