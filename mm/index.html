@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    
+    <title>数学建模算法汇总 - 及时当勉励，岁月不待人！@iNuo</title>
+    
+    <meta name="description" content="评价类问题：层次分析法、优劣解距离法、模糊综合评价法、灰色关联分析等
+预测类问题：拟合、回归、灰色预测、时间序列预测、神经网络预测等
+优化类问题：非线性规划、整数规划、模拟退火、遗传算法等
+   算法 应用 特点 步骤     层次分析法 评价类问题 无数据，主观性强 1.建立系统的递阶层次结构；2. 构造判断矩阵；3. 计算权重并一致性检验；4 . 计算得分，并进行排序。   优劣解距离法 综合评价 有数据，客观 1.将原始矩阵正向化；2.正向化矩阵标准化；3.计算得分并归一化。   灰色关联分析 系统分析、综合评价 基于曲线形状的相似程度 1.画统计图；2.确定分析数列；3.变量预处理；4.计算关联系数；5.计算灰色关联度。   模糊综合评价 综合评价 把论域中的对象对应评语集中一个评语；将方案作为评语集并选择一个最优方案 1.确定因素集；2.确定评语集；3.确定各因素的权重；4.确定模糊综合判断矩阵；5.综合评判。         插值 补充数据、短期预测 数据量少/缺少数据 常用：三次埃尔米特插值；三次样条插值。   拟合 拟合曲线、数据预测 一条确定的曲线 最小化损失函数 VS拟合函数尽可能简单   时间序列分析 描述过去、分析规律、预测未来 时间序列分解、指数平滑模型(7种)、ARIMA/SARIMA模型 扩展：ARCH/GARCH模型   预测 预测 灰色预测-GM模型、神经网络-nftool ①作时序图，分析趋势；②拆分数据集，挑选模型；指数平滑/ARIMA/灰色预测/神经网络等；指标：SSE③建模预测；④做时序图（预测前后）。         相关系数 变量间的相关性 衡量线性相关程度、spss应用、相关系数 &#43; 显著性、皮尔逊&amp;斯皮尔曼相关系数 先画散点图确定线性关系再求解线性相关系数比较；计算相关系数并假设检验；前提：服从正太分布；(JB检验/威尔克检验/QQ图)；扩展：正态分布均值假设检验。   典型相关分析 两组变量的相关性 基本思想：与主成分分析相似找代表(变量的线性组合) 1.">
+    <meta name="author" content="">
+    
+    <link href="https://xshi000.github.io/an-old-hope.min.css" rel="stylesheet">
+    <link href="https://xshi000.github.io/style.css" rel="stylesheet">
+    <link href="https://xshi000.github.io/custom.css" rel="stylesheet">
+    
+    <link rel="apple-touch-icon" href="https://xshi000.github.io/apple-touch-icon.png">
+    <link rel="icon" href="https://xshi000.github.io/favicon.ico">
+    <meta name="generator" content="Hugo 0.65.3" />
+    
+    
+    
+    <script>
+      function setTheme() {
+        const time = new Date();
+
+        const prev = localStorage.getItem('date');
+        const date = String(time.getMonth() + 1) + '.' + String(time.getDate());
+
+        const now = time.getTime();
+        let sunrise;
+        let sunset;
+
+        function setBodyClass() {
+          if (now > sunrise && now < sunset) return;
+          document.body.classList.add('dark');
+        }
+
+        if (date !== prev) {
+          fetch('https://api.ipgeolocation.io/astronomy?apiKey=5ed37d85103e4defa5df4c5298ed5215')
+            .then(res => res.json())
+            .then(data => {
+              sunrise = data.sunrise.split(':').map(Number);
+              sunset = data.sunset.split(':').map(Number);
+            })
+            .catch(() => {
+              sunrise = [7, 0];
+              sunset = [19, 0];
+            })
+            .finally(() => {
+              sunrise = time.setHours(sunrise[0], sunrise[1], 0);
+              sunset = time.setHours(sunset[0], sunset[1], 0);
+              setBodyClass();
+              localStorage.setItem('sunrise', sunrise);
+              localStorage.setItem('sunset', sunset);
+            });
+          localStorage.setItem('date', date);
+        } else {
+          sunrise = Number(localStorage.getItem('sunrise'));
+          sunset = Number(localStorage.getItem('sunset'));
+          setBodyClass();
+        }
+      }
+    </script>
+  </head>
+  <body class="single">
+    <script>
+      setTheme();
+    </script>
+    <header class="header">
+      <nav class="nav">
+        <p class="logo"><a href="https://xshi000.github.io">及时当勉励，岁月不待人！@iNuo</a></p>
+      </nav>
+    </header>
+    <main class="main">
+
+
+<article class="post-single">
+  <header class="post-header">
+    <h1 class="post-title">数学建模算法汇总</h1>
+    <div class="post-meta">September 28, 2020</div>
+  </header>
+  <div class="post-content"><p>评价类问题：层次分析法、优劣解距离法、模糊综合评价法、灰色关联分析等</p>
+<p>预测类问题：拟合、回归、灰色预测、时间序列预测、神经网络预测等</p>
+<p>优化类问题：非线性规划、整数规划、模拟退火、遗传算法等</p>
+<table>
+<thead>
+<tr>
+<th>算法</th>
+<th>应用</th>
+<th align="left">特点</th>
+<th>步骤</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>层次分析法</strong></td>
+<td>评价类问题</td>
+<td align="left">无数据，主观性强</td>
+<td>1.建立系统的递阶层次结构；<!-- raw HTML omitted -->2. 构造判断矩阵；<!-- raw HTML omitted -->3. 计算权重并一致性检验；<!-- raw HTML omitted -->4 . 计算得分，并进行排序。</td>
+</tr>
+<tr>
+<td><strong>优劣解距离法</strong></td>
+<td>综合评价</td>
+<td align="left">有数据，客观</td>
+<td>1.将原始矩阵正向化；<!-- raw HTML omitted -->2.正向化矩阵标准化；<!-- raw HTML omitted -->3.计算得分并归一化。</td>
+</tr>
+<tr>
+<td><strong>灰色关联分析</strong></td>
+<td>系统分析、<!-- raw HTML omitted -->综合评价</td>
+<td align="left">基于曲线形状的<!-- raw HTML omitted -->相似程度</td>
+<td>1.画统计图；<!-- raw HTML omitted -->2.确定分析数列；<!-- raw HTML omitted -->3.变量预处理；<!-- raw HTML omitted -->4.计算关联系数；<!-- raw HTML omitted -->5.计算灰色关联度。</td>
+</tr>
+<tr>
+<td><strong>模糊综合评价</strong></td>
+<td>综合评价</td>
+<td align="left">把论域中的对象对应<!-- raw HTML omitted -->评语集中一个评语；<!-- raw HTML omitted --><!-- raw HTML omitted -->将方案作为评语集并<!-- raw HTML omitted -->选择一个最优方案</td>
+<td>1.确定因素集；<!-- raw HTML omitted -->2.确定评语集；<!-- raw HTML omitted -->3.确定各因素的权重；<!-- raw HTML omitted -->4.确定模糊综合判断矩阵；<!-- raw HTML omitted -->5.综合评判。</td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td align="left"></td>
+<td></td>
+</tr>
+<tr>
+<td><strong>插值</strong></td>
+<td>补充数据、<!-- raw HTML omitted -->短期预测</td>
+<td align="left">数据量少/缺少数据</td>
+<td>常用：<!-- raw HTML omitted -->三次埃尔米特插值；<!-- raw HTML omitted -->三次样条插值。</td>
+</tr>
+<tr>
+<td><strong>拟合</strong></td>
+<td>拟合曲线、<!-- raw HTML omitted -->数据预测</td>
+<td align="left">一条确定的曲线</td>
+<td>最小化损失函数  VS<!-- raw HTML omitted -->拟合函数尽可能简单</td>
+</tr>
+<tr>
+<td><strong>时间序列分析</strong></td>
+<td>描述过去、<!-- raw HTML omitted -->分析规律、<!-- raw HTML omitted -->预测未来</td>
+<td align="left">时间序列分解、<!-- raw HTML omitted -->指数平滑模型(7种)、<!-- raw HTML omitted -->ARIMA/SARIMA模型</td>
+<td>扩展：<!-- raw HTML omitted -->ARCH/GARCH模型</td>
+</tr>
+<tr>
+<td><strong>预测</strong></td>
+<td>预测</td>
+<td align="left">灰色预测-GM模型、<!-- raw HTML omitted -->神经网络-nftool</td>
+<td>①作时序图，分析趋势；<!-- raw HTML omitted -->②拆分数据集，挑选模型；<!-- raw HTML omitted --> 指数平滑/ARIMA/灰色<!-- raw HTML omitted --> 预测/神经网络等；<!-- raw HTML omitted --> 指标：SSE<!-- raw HTML omitted -->③建模预测；<!-- raw HTML omitted -->④做时序图（预测前后）。</td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td align="left"></td>
+<td></td>
+</tr>
+<tr>
+<td><strong>相关系数</strong></td>
+<td>变量间的相关性</td>
+<td align="left">衡量线性相关程度、<!-- raw HTML omitted -->spss应用、<!-- raw HTML omitted --><!-- raw HTML omitted -->相关系数 + 显著性、<!-- raw HTML omitted --><!-- raw HTML omitted -->皮尔逊&amp;斯皮尔曼相关系数</td>
+<td>先画散点图确定线性关系<!-- raw HTML omitted -->再求解线性相关系数比较；<!-- raw HTML omitted --><!-- raw HTML omitted -->计算相关系数并假设检验；<!-- raw HTML omitted -->前提：服从正太分布；<!-- raw HTML omitted -->(JB检验/威尔克检验/QQ图)；<!-- raw HTML omitted -->扩展：正态分布均值假设检验。</td>
+</tr>
+<tr>
+<td><strong>典型相关分析</strong></td>
+<td>两组变量的相关性</td>
+<td align="left">基本思想：<!-- raw HTML omitted -->与主成分分析相似<!-- raw HTML omitted -->找代表(变量的线性组合)</td>
+<td>1.假设数据分析；<!-- raw HTML omitted -->2.检验变量相关性；<!-- raw HTML omitted -->3.确定典型相关变量个数；<!-- raw HTML omitted -->4.典型相关变量分析；<!-- raw HTML omitted -->5.典型载荷分析；<!-- raw HTML omitted -->6.典型变量方差贡献分析。</td>
+</tr>
+<tr>
+<td><strong>回归分析</strong></td>
+<td>XY相关性分析、<!-- raw HTML omitted -->通过X去预测Y</td>
+<td align="left">分类:<!-- raw HTML omitted -->线性/0-1/定序/计数/生存；<!-- raw HTML omitted -->回归系数的解释；<!-- raw HTML omitted -->Stata应用<!-- raw HTML omitted --></td>
+<td>问题：<!-- raw HTML omitted -->扰动项-异方差；<!-- raw HTML omitted -->导致：<!-- raw HTML omitted -->假设检验无法使用、<!-- raw HTML omitted -->估计量非最优；<!-- raw HTML omitted -->检验：BP/怀特检验；<!-- raw HTML omitted -->处理方法：<!-- raw HTML omitted -->OLS＋稳健标准误／GLS；<!-- raw HTML omitted --><!-- raw HTML omitted -->问题：<!-- raw HTML omitted -->变量-多重共线性；<!-- raw HTML omitted -->导致：<!-- raw HTML omitted -->回归系数不显著；<!-- raw HTML omitted -->检验：VIF；<!-- raw HTML omitted -->处理方法：<!-- raw HTML omitted -->逐步回归分析、<!-- raw HTML omitted -->岭回归、<!-- raw HTML omitted -->lasso回归。</td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td align="left"></td>
+<td></td>
+</tr>
+<tr>
+<td><strong>分类</strong></td>
+<td>分类预测</td>
+<td align="left">二分类：<!-- raw HTML omitted -->逻辑回归、<!-- raw HTML omitted -->LDA线性判别分析</td>
+<td>多分类：<!-- raw HTML omitted -->多分类线性判别分析、<!-- raw HTML omitted -->多分类逻辑回归；<!-- raw HTML omitted --><!-- raw HTML omitted -->spss应用</td>
+</tr>
+<tr>
+<td><strong>聚类</strong></td>
+<td>分类预测</td>
+<td align="left">基于距离：<!-- raw HTML omitted -->1. K-means算法；<!-- raw HTML omitted -->2. K-means++算法；<!-- raw HTML omitted -->3. 系统(层次)聚类算法；<!-- raw HTML omitted -->基于密度：<!-- raw HTML omitted -->DBSCAN算法</td>
+<td>扩展3.<!-- raw HTML omitted -->谱系图、肘部法则</td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td align="left"></td>
+<td></td>
+</tr>
+<tr>
+<td><strong>图论</strong></td>
+<td>最短路径问题</td>
+<td align="left">有向图、<!-- raw HTML omitted -->无向图、<!-- raw HTML omitted -->带权图</td>
+<td>迪杰斯特拉算法、<!-- raw HTML omitted -->贝尔曼‐福特算法、<!-- raw HTML omitted -->弗洛伊德算法</td>
+</tr>
+<tr>
+<td><strong>蒙特卡罗模拟</strong></td>
+<td>模拟求近似解</td>
+<td align="left">一种思想/方法；<!-- raw HTML omitted --><!-- raw HTML omitted -->建概率模型<!-- raw HTML omitted -->多次模拟得近似解</td>
+<td>应用:<!-- raw HTML omitted -->布丰投针实验、<!-- raw HTML omitted -->三门问题、<!-- raw HTML omitted -->排队问题、<!-- raw HTML omitted -->约束非线性规划问题、<!-- raw HTML omitted -->书店买书问题、<!-- raw HTML omitted -->导弹追踪问题、<!-- raw HTML omitted -->旅行商问题</td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td align="left"></td>
+<td></td>
+</tr>
+<tr>
+<td><strong>数学规划模型</strong></td>
+<td>一定条件下<!-- raw HTML omitted -->求极值问题</td>
+<td align="left">分类：<!-- raw HTML omitted -->① 线性规划；<!-- raw HTML omitted -->②非线性规划；<!-- raw HTML omitted -->③整数规划(0-1)</td>
+<td>应用：<!-- raw HTML omitted -->①生产决策/投料问题；<!-- raw HTML omitted -->②选址/飞行管理问题；<!-- raw HTML omitted -->③背包/指派/钢管切割。<!-- raw HTML omitted --><!-- raw HTML omitted -->扩展：<!-- raw HTML omitted -->最大最小化模型；<!-- raw HTML omitted -->多目标规划模型；</td>
+</tr>
+<tr>
+<td><strong>模拟退火算法</strong></td>
+<td>目标函数最值</td>
+<td align="left">智能算法<!-- raw HTML omitted -->核心：新解的构造！</td>
+<td>函数最值问题<!-- raw HTML omitted -->旅行商问题<!-- raw HTML omitted -->书店买书问题<!-- raw HTML omitted -->背包问题</td>
+</tr>
+<tr>
+<td><strong>粒子群算法</strong></td>
+<td>解空间搜索最优解、<!-- raw HTML omitted -->求解目标函数最值</td>
+<td align="left">改进：<!-- raw HTML omitted -->递减惯性权重、<!-- raw HTML omitted -->自适应惯性权重、<!-- raw HTML omitted -->随机惯性权重、<!-- raw HTML omitted -->压缩因子法、<!-- raw HTML omitted -->非对称学习因子</td>
+<td>应用：<!-- raw HTML omitted -->函数最值问题、<!-- raw HTML omitted -->求解方程组、<!-- raw HTML omitted -->多元函数拟合、<!-- raw HTML omitted -->拟合微分方程、</td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td align="left"></td>
+<td></td>
+</tr>
+<tr>
+<td><strong>SVD奇异值分解</strong></td>
+<td>数据降维、<!-- raw HTML omitted -->图像压缩</td>
+<td align="left">Matlab对于图形和视频的处理</td>
+<td>扩展：<!-- raw HTML omitted -->潜在语义索引、<!-- raw HTML omitted -->推荐系统</td>
+</tr>
+<tr>
+<td><strong>PCA主成分分析</strong></td>
+<td>数据降维；<!-- raw HTML omitted --><!-- raw HTML omitted -->主成分：<!-- raw HTML omitted -->各指标的线性组合</td>
+<td align="left">1.标准化；<!-- raw HTML omitted -->2.计算协方差矩阵；<!-- raw HTML omitted -->3.计算特征值&amp;向量；<!-- raw HTML omitted -->4.计算贡献率；<!-- raw HTML omitted -->5.主成分解析；<!-- raw HTML omitted -->6.后续扩展分析。</td>
+<td>应用于：<!-- raw HTML omitted -->聚类分析(方便画图)、<!-- raw HTML omitted -->回归分析(多重共线性)</td>
+</tr>
+<tr>
+<td><strong>因子分析</strong></td>
+<td>数据降维；<!-- raw HTML omitted --><!-- raw HTML omitted -->原指标：<!-- raw HTML omitted -->各因子的线性组合</td>
+<td align="left">PCA的扩展<!-- raw HTML omitted -->比PCA更易解释</td>
+<td>①KMO/球形检验；<!-- raw HTML omitted -->②分析定因子个数；<!-- raw HTML omitted -->③因子分析旋转因子？；<!-- raw HTML omitted -->④因子得分。<!-- raw HTML omitted --><!-- raw HTML omitted -->应用同上</td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td align="left"></td>
+<td></td>
+</tr>
+<tr>
+<td><strong>微分方程模型</strong></td>
+<td><strong>建立动态模型</strong>、<!-- raw HTML omitted -->分析变化规律、<!-- raw HTML omitted -->预测未来形态、<!-- raw HTML omitted -->研究控制手段</td>
+<td align="left">解析解、<!-- raw HTML omitted -->数值解</td>
+<td>人口预测模型、<!-- raw HTML omitted -->捕食者猎物模型、<!-- raw HTML omitted -->种群相互竞争模型、<!-- raw HTML omitted -->种群相互依存模型、<!-- raw HTML omitted -->传染病模型</td>
+</tr>
+<tr>
+<td><strong>传染病模型</strong></td>
+<td>病毒传染类</td>
+<td align="left">传染病微分方程模型:<!-- raw HTML omitted -->SI、<!-- raw HTML omitted -->SIS、<!-- raw HTML omitted -->SIR、<!-- raw HTML omitted -->SIRS、<!-- raw HTML omitted -->SEIR</td>
+<td>1.收集数据；<!-- raw HTML omitted -->2.选择模型(时间分段？)；<!-- raw HTML omitted -->3.确定优化的约束条件；<!-- raw HTML omitted -->4.确定优化的目标函数；<!-- raw HTML omitted -->5.求解规划问题最优值。</td>
+</tr>
+</tbody>
+</table>
+</div>
+  
+</article></main>
+<footer class="footer">
+  <span>&copy; 2020 <a href="https://xshi000.github.io">及时当勉励，岁月不待人！@iNuo</a></span>
+  <span>&middot;</span>
+  <span>Powered by <a href="https://gohugo.io/" rel="noopener" target="_blank">Hugo️️</a>️</span>
+  <span>&middot;</span>
+  <span>Theme️ <a href="https://github.com/nanxiaobei/hugo-paper" rel="noopener" target="_blank">Paper</a></span>
+</footer>
+<script src="https://xshi000.github.io/highlight.min.js"></script>
+<script>
+  hljs.initHighlightingOnLoad();
+</script>
+</body>
+</html>
+
