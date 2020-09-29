@@ -6,10 +6,22 @@
     <description>Recent content on 及时当勉励，岁月不待人！@iNuo</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-cn</language>
-    <lastBuildDate>Mon, 28 Sep 2020 21:03:24 +0800</lastBuildDate>
+    <lastBuildDate>Mon, 28 Sep 2020 22:26:11 +0800</lastBuildDate>
     
 	<atom:link href="https://xshi000.github.io/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>向《经济学人》学图表</title>
+      <link>https://xshi000.github.io/excel/</link>
+      <pubDate>Mon, 28 Sep 2020 22:26:11 +0800</pubDate>
+      
+      <guid>https://xshi000.github.io/excel/</guid>
+      <description>图表规范 经济学人主题 结合以上规范及图表对比，进一步设置自己Excel的主题
+结合设置好的Excel主题，完成一次模拟
+利用单元格作图
+自我风格 基础图表 </description>
+    </item>
     
     <item>
       <title>数学建模算法汇总</title>
