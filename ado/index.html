@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    
+    <title>ADO.NET - 及时当勉励，岁月不待人！@iNuo</title>
+    
+    <meta name="description" content="ADO.NET是数据库访问的方法和技术
+ADO.NET由两部分组成：DataSet（数据集）和.NET Framework数据提供程序
+  DataSet数据集——能临时保存各种类型数据库中的数据；
+  .Net framework数据提供程序——它由几个组件组成，分别负责连接、操作和访问数据库，其中负责访问数据的组件是只读只进式的，也就是只读不修改、只能往前读不能后退
+  ADO.NET主要通过以下对象操作数据库：
+  Connection对象，负责连接数据库。
+  Command对象，对数据库进行增删改的操作。
+  Datareader对象，读取数据（只读只进）。
+  DataAdapter对象，从数据库获取对象后填充给DataSet临时数据库。
+  使用connection对象的步骤
+示例1
+private void button1_Click(object sender, EventArgs e) { //1.创建链接对象 SqlConnection con = new SqlConnection(); //2.给对象添加属性 con.ConnectionString = &quot;data source=.; initial catalog=TestDB; integrated security=true&quot;; try //将可能出现异常的代码，放在try里 { //3.打开数据库连接 con.Open(); MessageBox.Show(&quot;打开数据库连接成功&quot;); } catch (Exception ex)//如果出现异常，则允许catch里的代码 { MessageBox.Show(ex.Message);//以消息框形式，输出异常消息 } finally //不管程序错误与否，都会执行的代码 { con.Close(); MessageBox.Show(&quot;关闭数据库连接成功&quot;); } } 使用Command对象">
+    <meta name="author" content="">
+    
+    <link href="https://xshi000.github.io/an-old-hope.min.css" rel="stylesheet">
+    <link href="https://xshi000.github.io/style.css" rel="stylesheet">
+    <link href="https://xshi000.github.io/custom.css" rel="stylesheet">
+    
+    <link rel="apple-touch-icon" href="https://xshi000.github.io/apple-touch-icon.png">
+    <link rel="icon" href="https://xshi000.github.io/favicon.ico">
+    <meta name="generator" content="Hugo 0.65.3" />
+    
+    
+    
+    <script>
+      function setTheme() {
+        const time = new Date();
+
+        const prev = localStorage.getItem('date');
+        const date = String(time.getMonth() + 1) + '.' + String(time.getDate());
+
+        const now = time.getTime();
+        let sunrise;
+        let sunset;
+
+        function setBodyClass() {
+          if (now > sunrise && now < sunset) return;
+          document.body.classList.add('dark');
+        }
+
+        if (date !== prev) {
+          fetch('https://api.ipgeolocation.io/astronomy?apiKey=5ed37d85103e4defa5df4c5298ed5215')
+            .then(res => res.json())
+            .then(data => {
+              sunrise = data.sunrise.split(':').map(Number);
+              sunset = data.sunset.split(':').map(Number);
+            })
+            .catch(() => {
+              sunrise = [7, 0];
+              sunset = [19, 0];
+            })
+            .finally(() => {
+              sunrise = time.setHours(sunrise[0], sunrise[1], 0);
+              sunset = time.setHours(sunset[0], sunset[1], 0);
+              setBodyClass();
+              localStorage.setItem('sunrise', sunrise);
+              localStorage.setItem('sunset', sunset);
+            });
+          localStorage.setItem('date', date);
+        } else {
+          sunrise = Number(localStorage.getItem('sunrise'));
+          sunset = Number(localStorage.getItem('sunset'));
+          setBodyClass();
+        }
+      }
+    </script>
+  </head>
+  <body class="single">
+    <script>
+      setTheme();
+    </script>
+    <header class="header">
+      <nav class="nav">
+        <p class="logo"><a href="https://xshi000.github.io/">及时当勉励，岁月不待人！@iNuo</a></p>
+      </nav>
+    </header>
+    <main class="main">
+
+
+<article class="post-single">
+  <header class="post-header">
+    <h1 class="post-title">ADO.NET</h1>
+    <div class="post-meta">September 29, 2020</div>
+  </header>
+  <div class="post-content"><h3 id="heading"></h3>
+<p><strong>ADO.NET是数据库访问的方法和技术</strong></p>
+<p>ADO.NET由两部分组成：DataSet（数据集）和.NET Framework数据提供程序</p>
+<ul>
+<li>
+<p>DataSet数据集——能临时保存各种类型数据库中的数据；</p>
+</li>
+<li>
+<p>.Net framework数据提供程序——它由几个组件组成，分别负责连接、操作和访问数据库，其中负责访问数据的组件是只读只进式的，也就是只读不修改、只能往前读不能后退</p>
+</li>
+</ul>
+<p><strong>ADO.NET主要通过以下对象操作数据库：</strong></p>
+<ul>
+<li>
+<p>Connection对象，负责连接数据库。</p>
+</li>
+<li>
+<p>Command对象，对数据库进行增删改的操作。</p>
+</li>
+<li>
+<p>Datareader对象，读取数据（只读只进）。</p>
+</li>
+<li>
+<p>DataAdapter对象，从数据库获取对象后填充给DataSet临时数据库。</p>
+</li>
+</ul>
+<p><strong>使用connection对象的步骤</strong></p>
+<p><strong>示例1</strong></p>
+<pre><code>private void button1_Click(object sender, EventArgs e)
+{
+
+    //1.创建链接对象
+    SqlConnection con = new SqlConnection();
+
+    //2.给对象添加属性
+    con.ConnectionString = &quot;data source=.; initial catalog=TestDB; integrated security=true&quot;;
+
+    try  //将可能出现异常的代码，放在try里
+    {
+        //3.打开数据库连接
+        con.Open();
+        MessageBox.Show(&quot;打开数据库连接成功&quot;);
+    }
+    catch (Exception ex)//如果出现异常，则允许catch里的代码
+    {
+    	MessageBox.Show(ex.Message);//以消息框形式，输出异常消息
+    }
+    finally //不管程序错误与否，都会执行的代码
+
+    {
+        con.Close();
+        MessageBox.Show(&quot;关闭数据库连接成功&quot;);
+    }
+}
+</code></pre><p><strong>使用Command对象</strong></p>
+<p>Command（命令）对象可以对数据表中的数据进行增删改查操作</p>
+<p>ExecuteNonQuery  返回受影响的行数，如UPDATE等 <strong>（非查询。增删改）</strong></p>
+<p>ExecuteScalar   返回单个值，如执行COUNT(*) <strong>（标量。读单值）</strong></p>
+<p>ExecuteReader   返回DataReader对象（多个数据） <strong>(读多值。一条记录)</strong></p>
+<p><strong>示例2  ExecuteScalar（标量。读单值）</strong></p>
+<pre><code>//1、创建链接对象
+SqlConnection con = new SqlConnection();
+
+//2、给对象添加属性
+con.ConnectionString = &quot;data source=.; initial catalog=TestDB; integrated security=true&quot;;
+
+try  
+
+{
+    //3、打开数据库连接
+    con.Open();
+
+    //4、创建查询用的SQL语句
+    string sql = &quot;select count(*) from Stu&quot;;
+
+    //5、创建Command对象
+    SqlCommand  cmd = new SqlCommand(sql, con);
+
+    //6、调用Command对象的方法，
+    int count = Convert.ToInt32(cmd.ExecuteScalar());
+
+    //7、显示结果
+
+    string message = string.Format(&quot;Stu表中共有{0}条学员信息！&quot;, count);
+    MessageBox.Show(message);
+
+}
+
+catch (Exception ex)//如果出现异常，则允许catch里的代码
+{
+	MessageBox.Show(ex.Message);//以消息框形式，输出错误消息
+}
+
+finally //不管程序错误与否，都会执行的代码
+{
+    con.Close();
+    MessageBox.Show(&quot;关闭数据库连接成功&quot;);
+}
+
+
+</code></pre><p><strong>示例3  ExecuteNonQuery（非查询。增删改）</strong></p>
+<pre><code>//3、打开数据库
+con.Open();
+
+//4、创建sql语句字符串（注意插入语句时，列的值如果是字符，要用单引号引起来）
+string sql = string.Format(&quot;insert into stu(names,pwd) values('{0}','{1}')&quot;, name, pwd);
+
+//5、创建Command对象
+SqlCommand cmd = new SqlCommand(sql, con);
+
+//6、执行command对象
+cmd.ExecuteNonQuery();
+MessageBox.Show(&quot;注册成功&quot;);  //提示消息框
+</code></pre><p><strong>DataReader</strong>只读只进的读取器</p>
+<p>只能读取数据而不能修改数据，并且只能从前往后读取，每次读取一行数据。</p>
+<p>DataReader的特点是：读取数据比较快，但是需要一直保持数据库连接。</p>
+<p><strong>示例4</strong>  <strong>DataReader(读多值。一条记录)</strong></p>
+<pre><code>//3.调用Connection对象Open()方法打开数据库
+con.Open();//打开数据库
+MessageBox.Show(&quot;数据库连接成功&quot;);
+
+//4.创建sql语句字符串
+string sql = &quot;select * from StudentInfo;&quot;;
+
+//5.创建Command对象
+SqlCommand com = new SqlCommand(sql, con);
+
+//6.执行命令，获得DataReader对象
+SqlDataReader reader = com.ExecuteReader();
+
+//7.使用循环，调用DataReader对象的Read方法，逐行读取数据
+while (reader.Read())
+{
+    //8.获取数据库表行中的某一列数据
+    string shuchu = Convert.ToString(reader[0]+&quot;,&quot; + reader[1] + &quot;,&quot; + reader[2] + &quot;,&quot; + reader[3]);
+    //将获取的数据输出，赋值给label对象的Text属性
+    label1.Text += shuchu+&quot;\n&quot;;          
+}
+
+//9.关闭DataReader对象
+reader.Close();
+</code></pre><p><strong>DataSet</strong>（数据集）是一个临时的数据库，它的数据是保存在内存中的，它独立于任何数据库，可以保存所有类型数据库的数据。</p>
+<p>DataSet特点是可以在断开连接的情况下<strong>查询和修改大量的数据</strong></p>
+<p>DataAdapter的主要作用就是负责给数据集填充数据了。</p>
+<p><strong>示例5  DataSet &amp; DataAdapte</strong>r</p>
+<pre><code>//1.创建链接对象
+SqlConnection con = new SqlConnection();
+
+//2.给对象添加属性
+con.ConnectionString = &quot;data source=.; initial catalog=StudentDB; integrated security=true&quot;;
+
+//3.打开数据库
+con.Open();
+MessageBox.Show(&quot;sucess&quot;);//消息提示框
+
+//4.创建sql语句
+string sql = &quot;select * from StudentInfo&quot;;
+
+//5.创建临时仓库，用以存储数据
+DataSet dataSet = new DataSet();
+
+//6.创建运输车，获取数据（从数据库对象con，采用sql语句获取数据）
+SqlDataAdapter da = new SqlDataAdapter(sql, con);
+
+//7.将运输车获取到的数据填充到临时仓库
+da.Fill(dataSet);
+
+//8.将临时仓库里的数据，填充到控件里
+dataGridView1.DataSource = dataSet.Tables[0];//获取到的数据以table形式存储
+</code></pre></div>
+  
+</article></main>
+<footer class="footer">
+  <span>&copy; 2020 <a href="https://xshi000.github.io/">及时当勉励，岁月不待人！@iNuo</a></span>
+  <span>&middot;</span>
+  <span>Powered by <a href="https://gohugo.io/" rel="noopener" target="_blank">Hugo️️</a>️</span>
+  <span>&middot;</span>
+  <span>Theme️ <a href="https://github.com/nanxiaobei/hugo-paper" rel="noopener" target="_blank">Paper</a></span>
+</footer>
+<script src="https://xshi000.github.io/highlight.min.js"></script>
+<script>
+  hljs.initHighlightingOnLoad();
+</script>
+</body>
+</html>
+

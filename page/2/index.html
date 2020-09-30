@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    
+    <title>及时当勉励，岁月不待人！@iNuo - 及时当勉励，岁月不待人！@iNuo</title>
+    
+    <meta name="description" content="">
+    <meta name="author" content="">
+    
+    <link href="https://xshi000.github.io/an-old-hope.min.css" rel="stylesheet">
+    <link href="https://xshi000.github.io/style.css" rel="stylesheet">
+    <link href="https://xshi000.github.io/custom.css" rel="stylesheet">
+    
+    <link rel="apple-touch-icon" href="https://xshi000.github.io/apple-touch-icon.png">
+    <link rel="icon" href="https://xshi000.github.io/favicon.ico">
+    <meta name="generator" content="Hugo 0.65.3" />
+    
+    <link rel="alternate" type="application/rss+xml" href="https://xshi000.github.io/index.xml" title="及时当勉励，岁月不待人！@iNuo" />
+    
+    
+    <script>
+      function setTheme() {
+        const time = new Date();
+
+        const prev = localStorage.getItem('date');
+        const date = String(time.getMonth() + 1) + '.' + String(time.getDate());
+
+        const now = time.getTime();
+        let sunrise;
+        let sunset;
+
+        function setBodyClass() {
+          if (now > sunrise && now < sunset) return;
+          document.body.classList.add('dark');
+        }
+
+        if (date !== prev) {
+          fetch('https://api.ipgeolocation.io/astronomy?apiKey=5ed37d85103e4defa5df4c5298ed5215')
+            .then(res => res.json())
+            .then(data => {
+              sunrise = data.sunrise.split(':').map(Number);
+              sunset = data.sunset.split(':').map(Number);
+            })
+            .catch(() => {
+              sunrise = [7, 0];
+              sunset = [19, 0];
+            })
+            .finally(() => {
+              sunrise = time.setHours(sunrise[0], sunrise[1], 0);
+              sunset = time.setHours(sunset[0], sunset[1], 0);
+              setBodyClass();
+              localStorage.setItem('sunrise', sunrise);
+              localStorage.setItem('sunset', sunset);
+            });
+          localStorage.setItem('date', date);
+        } else {
+          sunrise = Number(localStorage.getItem('sunrise'));
+          sunset = Number(localStorage.getItem('sunset'));
+          setBodyClass();
+        }
+      }
+    </script>
+  </head>
+  <body class="list home">
+    <script>
+      setTheme();
+    </script>
+    <header class="header">
+      <nav class="nav">
+        <h1 class="logo"><a href="https://xshi000.github.io/">及时当勉励，岁月不待人！@iNuo</a></h1>
+      </nav>
+    </header>
+    <main class="main">
+
+<header class="page-header"><h1>及时当勉励，岁月不待人！@iNuo</h1></header>
+
+<article class="post-entry">
+  <header class="entry-header">
+    <h2>Anaconda 那些事</h2>
+  </header>
+  <section class="entry-content">
+   <p>【声明】本篇博客为个人笔记整理，笔记来源各个技术博客/书籍/个人编撰，如有侵权，必删之！
+快速访问区    描述 操作     Py库 https://www.lfd.uci.edu/~gohlke/pythonlibs/   路径 pip install -i https://pypi.tuna.tsinghua.edu.cn/simple pygame   超时 pip –default-timeout=100 install tensorflow   镜像    清华 https://pypi.tuna.tsinghua.edu.cn/simple   豆瓣 https://pypi.douban.com/simple    ​
+手动安装python包  有时候，pip安装python包会失败，提示 “未找到和环境相匹配的包”！此时，可以试试手动安装。
+操作流程如下：
+ 首先，在py库 https://www.lfd.uci.edu/~gohlke/pythonlibs/ 中，下载安装包 然后，解包后，放到 Lib-&gt;site-packages 下面（site-packages放第三方包） 最后，在包目录下有个setup.py，需要在这个目录下打开命令行，运行 “ python setup.py install ” 完成编译。这样就完成安装了。   Python  一种面向对象的解释型计算机程序设计语言
+ python环境  一个解释器和一个包集合....</p>
+  </section>
+  <footer class="entry-footer">
+    <time>July 20, 2020</time>
+  </footer>
+  <a class="entry-link" href="https://xshi000.github.io/anaconda/"></a>
+</article>
+<footer class="page-footer">
+  <nav class="pagination">
+    <a class="prev" href="/">← Prev Page</a>
+  </nav>
+</footer></main>
+<footer class="footer">
+  <span>&copy; 2020 <a href="https://xshi000.github.io/">及时当勉励，岁月不待人！@iNuo</a></span>
+  <span>&middot;</span>
+  <span>Powered by <a href="https://gohugo.io/" rel="noopener" target="_blank">Hugo️️</a>️</span>
+  <span>&middot;</span>
+  <span>Theme️ <a href="https://github.com/nanxiaobei/hugo-paper" rel="noopener" target="_blank">Paper</a></span>
+</footer>
+<script src="https://xshi000.github.io/highlight.min.js"></script>
+<script>
+  hljs.initHighlightingOnLoad();
+</script>
+</body>
+</html>
+

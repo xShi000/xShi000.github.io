@@ -9,16 +9,10 @@
     
     <meta name="description" content="【声明】本篇博客为个人笔记整理，笔记来源各个技术博客/书籍/个人编撰，如有侵权，必删之！
 快速访问区    描述 操作     Py库 https://www.lfd.uci.edu/~gohlke/pythonlibs/   路径 pip install -i https://pypi.tuna.tsinghua.edu.cn/simple pygame   超时 pip &ndash;default-timeout=100 install tensorflow   镜像    清华 https://pypi.tuna.tsinghua.edu.cn/simple   豆瓣 https://pypi.douban.com/simple    ​
-Python 一种面向对象的解释型计算机程序设计语言
-python环境 一个解释器和一个包集合.
-【python解释器】即python.exe，这才是python的本体。解释器根据python的版本大概分为2和3. python2和3之间无法互相兼容。
-【Lib】即python包文件，包括自带的包和第三方包；自带的包,如：日志包logging, 异步包 concurrent；第三方包都放在site-packages文件夹里面，第三方包通过pip/conda install来下载。
-Python的强大之处在于它的应用领域范围之广，遍及人工智能、科学计算、Web开发、系统运维、大数据及云计算、金融、游戏开发等。实现其强大功能的前提，就是Python具有数量庞大且功能相对完善的标准库和第三方库。通过对库的引用，能够实现对不同领域业务的开发。然而，正是由于库的数量庞大，对于管理这些库以及对库作及时的维护成为既重要但复杂度又高的事情。那么接下来我们要引入这款神器——Anaconda。
-Anaconda 一种可便捷获取包且对包进行管理，同时对环境可以统一管理的发行版本，其包含了conda、Python在内的超过180个科学包及依赖项。Anaconda具有如下特点：开源\安装过程简单\高性能使用Python和R语言\免费的社区支持，其特点的实现主要基于Anaconda拥有的：conda包\环境管理器\1,000&#43;开源库。
-Anaconda、conda、pip、virtualenv的区别 ① Anaconda
-Anaconda是一个包含180&#43;的科学包及其依赖项的发行版本，其包含的科学包包括：conda, numpy, scipy, ipython notebook等。
-② conda
-conda是包及其依赖项和环境的管理工具，适用语言：Python, R, Ruby, Lua, Scala, Java, JavaScript, C/C&#43;&#43;, FORTRAN，适用平台：Windows, macOS, Linux。">
+手动安装python包  有时候，pip安装python包会失败，提示 “未找到和环境相匹配的包”！此时，可以试试手动安装。
+操作流程如下：
+ 首先，在py库 https://www.lfd.uci.edu/~gohlke/pythonlibs/ 中，下载安装包 然后，解包后，放到 Lib-&gt;site-packages 下面（site-packages放第三方包） 最后，在包目录下有个setup.py，需要在这个目录下打开命令行，运行 “ python setup.py install ” 完成编译。这样就完成安装了。   Python  一种面向对象的解释型计算机程序设计语言
+ python环境  一个解释器和一个包集合.">
     <meta name="author" content="">
     
     <link href="https://xshi000.github.io/an-old-hope.min.css" rel="stylesheet">
@@ -128,19 +122,44 @@ conda是包及其依赖项和环境的管理工具，适用语言：Python, R, R
 </tbody>
 </table>
 <p>​</p>
+<h4 id="手动安装python包">手动安装python包</h4>
+<blockquote>
+<p>有时候，pip安装python包会失败，提示 “未找到和环境相匹配的包”！此时，可以试试手动安装。</p>
+<p>操作流程如下：</p>
+<ul>
+<li>首先，在py库 <a href="https://www.lfd.uci.edu/~gohlke/pythonlibs/">https://www.lfd.uci.edu/~gohlke/pythonlibs/</a> 中，下载安装包</li>
+<li>然后，解包后，放到  Lib-&gt;site-packages 下面（site-packages放第三方包）</li>
+<li>最后，在包目录下有个setup.py，需要在这个目录下打开命令行，运行 “ python setup.py install ” 完成编译。这样就完成安装了。</li>
+</ul>
+</blockquote>
 <h3 id="python">Python</h3>
+<blockquote>
 <p>一种面向对象的解释型计算机程序设计语言</p>
+</blockquote>
 <h4 id="python环境">python环境</h4>
+<blockquote>
 <p>一个解释器和一个包集合.</p>
-<p>【python解释器】即python.exe，这才是python的本体。解释器根据python的版本大概分为2和3. python2和3之间无法互相兼容。</p>
-<p>【Lib】即python包文件，包括自带的包和第三方包；自带的包,如：日志包logging, 异步包 concurrent；第三方包都放在site-packages文件夹里面，第三方包通过pip/conda install来下载。</p>
-<p>Python的强大之处在于它的应用领域范围之广，遍及人工智能、科学计算、Web开发、系统运维、大数据及云计算、金融、游戏开发等。实现其强大功能的前提，就是Python具有数量庞大且功能相对完善的标准库和第三方库。通过对库的引用，能够实现对不同领域业务的开发。然而，正是由于库的数量庞大，对于管理这些库以及对库作及时的维护成为既重要但复杂度又高的事情。那么接下来我们要引入这款神器——Anaconda。</p>
+<ul>
+<li>
+<p>python解释器，即python.exe，这才是python的本体。解释器根据python的版本大概分为2和3. python2和3之间无法互相兼容。</p>
+</li>
+<li>
+<p>Lib，即python包文件，包括自带的包和第三方包；自带的包,如：日志包logging, 异步包 concurrent；第三方包都放在site-packages文件夹里面，第三方包通过pip/conda install来下载。</p>
+</li>
+</ul>
+<p>​        Python的强大之处在于它的应用领域范围之广，遍及人工智能、科学计算、Web开发、系统运维、大数据及云计算、金融、游戏开发等。实现其强大功能的前提，就是Python具有数量庞大且功能相对完善的标准库和第三方库。通过对库的引用，能够实现对不同领域业务的开发。然而，正是由于库的数量庞大，对于管理这些库以及对库作及时的维护成为既重要但复杂度又高的事情。那么接下来我们要引入这款神器——Anaconda。</p>
+</blockquote>
 <h3 id="anaconda">Anaconda</h3>
-<p>一种可便捷获取包且对包进行管理，同时对环境可以统一管理的发行版本，其包含了conda、Python在内的超过180个科学包及依赖项。Anaconda具有如下特点：开源\安装过程简单\高性能使用Python和R语言\免费的社区支持，其特点的实现主要基于Anaconda拥有的：conda包\环境管理器\1,000+开源库。</p>
+<blockquote>
+<p>​        一种可便捷获取包且对包进行管理，同时对环境可以统一管理的发行版本，其包含了conda、Python在内的超过180个科学包及依赖项。Anaconda具有如下特点：开源\安装过程简单\高性能使用Python和R语言\免费的社区支持，其特点的实现主要基于Anaconda拥有的：conda包\环境管理器\1,000+开源库。</p>
+</blockquote>
 <h4 id="anacondacondapipvirtualenv的区别">Anaconda、conda、pip、virtualenv的区别</h4>
 <p>① Anaconda</p>
+<blockquote>
 <p>Anaconda是一个包含180+的科学包及其依赖项的发行版本，其包含的科学包包括：conda, numpy, scipy, ipython notebook等。</p>
+</blockquote>
 <p>② conda</p>
+<blockquote>
 <p>conda是包及其依赖项和环境的管理工具，适用语言：Python, R, Ruby, Lua, Scala, Java, JavaScript, C/C++, FORTRAN，适用平台：Windows, macOS, Linux。</p>
 <p>用途：</p>
 <ol>
@@ -152,7 +171,9 @@ conda是包及其依赖项和环境的管理工具，适用语言：Python, R, R
 </li>
 </ol>
 <p>如果你需要的包要求不同版本的Python，你无需切换到不同的环境，因为conda同样是一个环境管理器。仅需要几条命令，你可以创建一个完全独立的环境来运行不同的Python版本，同时继续在你常规的环境中使用你常用的Python版本。此外，conda为Python项目而创造，但可适用于上述的多种语言；conda包和环境管理器包含于Anaconda的所有版本当中。</p>
+</blockquote>
 <p>③ pip</p>
+<blockquote>
 <p>pip是用于安装和管理软件包的包管理器；pip编写语言：Python。</p>
 <ul>
 <li>Python 2.7.9及后续版本：默认安装，命令为pip</li>
@@ -167,7 +188,9 @@ conda是包及其依赖项和环境的管理工具，适用语言：Python, R, R
 <p>“Pip installs Python”（“pip安装Python”）</p>
 </li>
 </ul>
+</blockquote>
 <p>④ virtualenv</p>
+<blockquote>
 <p>virtualenv：用于创建一个独立的Python环境的工具。</p>
 <p>解决问题：</p>
 <ol>
@@ -185,6 +208,7 @@ conda是包及其依赖项和环境的管理工具，适用语言：Python, R, R
 </li>
 </ol>
 <p>virtualenv将会为它自己的安装目录创建一个环境，这并不与其他virtualenv环境共享库；同时也可以选择性地不连接已安装的全局库。</p>
+</blockquote>
 <h5 id="pip-与-conda-比较">pip 与 conda 比较</h5>
 <table>
 <thead>
@@ -250,8 +274,10 @@ conda是包及其依赖项和环境的管理工具，适用语言：Python, R, R
 </table>
 <h3 id="anaconda操作">Anaconda操作</h3>
 <h4 id="配置环境变量">配置环境变量</h4>
+<blockquote>
 <p>控制面板\系统和安全\系统\高级系统设置\环境变量\用户变量\PATH 中添加 anaconda的安装目录的Scripts文件夹</p>
 <p>输入测试配置是否成功： conda &ndash;version</p>
+</blockquote>
 <h4 id="管理conda">管理conda</h4>
 <table>
 <thead>
@@ -398,6 +424,7 @@ conda是包及其依赖项和环境的管理工具，适用语言：Python, R, R
 </tbody>
 </table>
 <h5 id="使用pip安装包">使用pip安装包</h5>
+<blockquote>
 <p>当使用conda install无法进行安装时，可用pip进行安装。例：pip install see。</p>
 <p><strong>→ 注意</strong></p>
 <ol>
@@ -411,7 +438,9 @@ conda是包及其依赖项和环境的管理工具，适用语言：Python, R, R
 <p>pip可以安装一些conda无法安装的包；conda也可以安装一些pip无法安装的包。因此当使用一种命令无法安装包时，可以尝试用另一种命令。</p>
 </li>
 </ol>
+</blockquote>
 <h5 id="使用anacondaorg安装包">使用Anaconda.org安装包</h5>
+<blockquote>
 <p>当conda install无法安装时，可以从Anaconda.org中获取安装包的命令，并进行安装。</p>
 <p><strong>→ 注意</strong></p>
 <ol>
@@ -430,11 +459,16 @@ conda是包及其依赖项和环境的管理工具，适用语言：Python, R, R
 </ol>
 </li>
 </ol>
+</blockquote>
 <h4 id="anaconda构造">Anaconda构造</h4>
-<p>base环境（即anaconda的安装目录）里面有着一个基本的python解释器,Lib里面也有base环境下的各种包文件，envs是自己创建的各种虚拟环境的入口。anaconda所谓的创建虚拟环境其实就是安装了一个真实的python环境, 只不过我们可以通过activate,conda等命令去随意的切换我们当前的python环境, 用不同版本的解释器和不同的包环境去运行python脚本.</p>
+<blockquote>
+<p>​        base环境（即anaconda的安装目录）里面有着一个基本的python解释器,Lib里面也有base环境下的各种包文件，envs是自己创建的各种虚拟环境的入口。anaconda所谓的创建虚拟环境其实就是安装了一个真实的python环境, 只不过我们可以通过activate,conda等命令去随意的切换我们当前的python环境, 用不同版本的解释器和不同的包环境去运行python脚本.</p>
+</blockquote>
 <h4 id="链接pycharm">链接PyCharm</h4>
+<blockquote>
 <p>在Setting =&gt; Project =&gt; Project Interpreter 里面修改 Project Interpreter</p>
 <p>点击齿轮标志再点击Add Local为你某个环境的python.exe解释器就行了</p>
+</blockquote>
 </div>
   
 </article></main>

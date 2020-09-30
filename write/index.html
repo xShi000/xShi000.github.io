@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    
+    <title>论文写作技巧 - 及时当勉励，岁月不待人！@iNuo</title>
+    
+    <meta name="description" content="1.降重 代码降重   代码加注释
+  批量改变量（Ctrl&#43;F 查找）改为全称/简称
+  添加透明字符，普通字符变小变白
+  代码变图片（需pdf软件转换）
+  文本降重   文本添加到公式框内，即文字转变为图片
+  算法流程转流程图，常用，降重并且简洁
+  2.三线表？   去除所有格式，边框：无框线
+  添加上下框线，较粗一点
+  选定第一行，添加下框线，线条正常粗细
+    字体格式问题：中文（宋体，小四） 英文&amp;数字（Time New Romance）
+  表格公式占位宽问题：段落，取消勾选两个勾
+  表名问题：表上图下（图不用带标题）字体小一号；表标题上一行文字，进入段落，设置段后（0.5行）
+  表标题：加粗，大小与正文一致
+  打印与预览 可看最终效果！
+  3.公式上浮？ 对于段落中的公式上浮问题：
+  【治标】选中段落 段落 中文版式 文本对齐方式：居中
+  【治本】正文格式 修改 段落 中文版式 文本对齐方式：居中">
+    <meta name="author" content="">
+    
+    <link href="https://xshi000.github.io/an-old-hope.min.css" rel="stylesheet">
+    <link href="https://xshi000.github.io/style.css" rel="stylesheet">
+    <link href="https://xshi000.github.io/custom.css" rel="stylesheet">
+    
+    <link rel="apple-touch-icon" href="https://xshi000.github.io/apple-touch-icon.png">
+    <link rel="icon" href="https://xshi000.github.io/favicon.ico">
+    <meta name="generator" content="Hugo 0.65.3" />
+    
+    
+    
+    <script>
+      function setTheme() {
+        const time = new Date();
+
+        const prev = localStorage.getItem('date');
+        const date = String(time.getMonth() + 1) + '.' + String(time.getDate());
+
+        const now = time.getTime();
+        let sunrise;
+        let sunset;
+
+        function setBodyClass() {
+          if (now > sunrise && now < sunset) return;
+          document.body.classList.add('dark');
+        }
+
+        if (date !== prev) {
+          fetch('https://api.ipgeolocation.io/astronomy?apiKey=5ed37d85103e4defa5df4c5298ed5215')
+            .then(res => res.json())
+            .then(data => {
+              sunrise = data.sunrise.split(':').map(Number);
+              sunset = data.sunset.split(':').map(Number);
+            })
+            .catch(() => {
+              sunrise = [7, 0];
+              sunset = [19, 0];
+            })
+            .finally(() => {
+              sunrise = time.setHours(sunrise[0], sunrise[1], 0);
+              sunset = time.setHours(sunset[0], sunset[1], 0);
+              setBodyClass();
+              localStorage.setItem('sunrise', sunrise);
+              localStorage.setItem('sunset', sunset);
+            });
+          localStorage.setItem('date', date);
+        } else {
+          sunrise = Number(localStorage.getItem('sunrise'));
+          sunset = Number(localStorage.getItem('sunset'));
+          setBodyClass();
+        }
+      }
+    </script>
+  </head>
+  <body class="single">
+    <script>
+      setTheme();
+    </script>
+    <header class="header">
+      <nav class="nav">
+        <p class="logo"><a href="https://xshi000.github.io/">及时当勉励，岁月不待人！@iNuo</a></p>
+      </nav>
+    </header>
+    <main class="main">
+
+
+<article class="post-single">
+  <header class="post-header">
+    <h1 class="post-title">论文写作技巧</h1>
+    <div class="post-meta">September 29, 2020</div>
+  </header>
+  <div class="post-content"><h1 id="heading"></h1>
+<h3 id="1降重">1.降重</h3>
+<h4 id="代码降重">代码降重</h4>
+<ul>
+<li>
+<p>代码加注释</p>
+</li>
+<li>
+<p>批量改变量（Ctrl+F 查找）改为全称/简称</p>
+</li>
+<li>
+<p>添加透明字符，普通字符变小变白</p>
+</li>
+<li>
+<p>代码变图片（需pdf软件转换）</p>
+</li>
+</ul>
+<h4 id="文本降重">文本降重</h4>
+<ul>
+<li>
+<p>文本添加到公式框内，即文字转变为图片</p>
+</li>
+<li>
+<p>算法流程转流程图，常用，降重并且简洁</p>
+</li>
+</ul>
+<h3 id="2三线表">2.三线表？</h3>
+<ol>
+<li>
+<p>去除所有格式，边框：无框线</p>
+</li>
+<li>
+<p>添加上下框线，较粗一点</p>
+</li>
+<li>
+<p>选定第一行，添加下框线，线条正常粗细</p>
+</li>
+</ol>
+<ul>
+<li>
+<p>字体格式问题：中文（宋体，小四）  英文&amp;数字（Time New Romance）</p>
+</li>
+<li>
+<p>表格公式占位宽问题：段落，取消勾选两个勾</p>
+</li>
+<li>
+<p>表名问题：表上图下（图不用带标题）字体小一号；表标题上一行文字，进入段落，设置段后（0.5行）</p>
+</li>
+<li>
+<p>表标题：加粗，大小与正文一致</p>
+</li>
+<li>
+<p>打印与预览  可看最终效果！</p>
+</li>
+</ul>
+<h3 id="3公式上浮">3.公式上浮？</h3>
+<p>对于段落中的公式上浮问题：</p>
+<ol>
+<li>
+<p>【治标】选中段落  段落  中文版式  文本对齐方式：居中</p>
+</li>
+<li>
+<p>【治本】正文格式  修改  段落  中文版式   文本对齐方式：居中</p>
+<p>公式推荐AXmath</p>
+</li>
+</ol>
+<h3 id="4美化代码">4.美化代码？</h3>
+<ol>
+<li>代码美化网站：http://www.planetb.ca/syntax-highlight-word  导入，转化，复制，粘贴即可</li>
+</ol>
+<ul>
+<li>存在的问题：火狐复制后粘贴不行，google可行，wps兼容模式也可以！</li>
+</ul>
+<ol start="2">
+<li>notepad++美化：插件 —&gt; NppExport —&gt; copy html to clipboard —&gt; 粘贴到word文档中即可！</li>
+</ol>
+<h3 id="5行内公式">5.行内公式？</h3>
+<p>公式占位宽问题：段落，取消勾选两个勾。</p>
+<h3 id="6下一页续写">6.下一页续写？</h3>
+<p>Ctrl+Enter：插入分页符；防止 直接按空格 导致的整体下移问题</p>
+<h3 id="7转pdf公式不完整">7.转pdf公式不完整？</h3>
+<p>用第三方软件转换（打印）</p>
+<h3 id="8网页数据提取到excel">8.网页数据提取到Excel？</h3>
+<h4 id="网页数据未加密">网页数据未加密</h4>
+<blockquote>
+<p>复制网址</p>
+<p>Excel  数据  获取外部数据  自Web  粘贴网址</p>
+<p>点击数据区的箭头  点击导入</p>
+<p>数据预处理：</p>
+<p>​	删除无用数据/文本</p>
+<p>​	去除单位（LEFT函数：LEFT（C4，len(lenC4-1)）或用替换功能）</p>
+</blockquote>
+<h4 id="网页数据加密">网页数据加密</h4>
+<blockquote>
+<p>将数据保存为pdf/图片</p>
+<p>使用软件ABBYY识别并转换为Excel</p>
+</blockquote>
+<h3 id="9附录设计">9.附录设计？</h3>
+<p>借助表格，一列多行，将标题置于一行底色变灰，代码表格等置于一行，调整好比例！</p>
+<h3 id="10画物理示意图">10.画物理示意图？</h3>
+<blockquote>
+<p>公式编辑器：AxMath</p>
+<p>矢量绘图：AxGlyph</p>
+</blockquote>
+<h3 id="11插入公式">11.插入公式？</h3>
+<ol>
+<li>
+<p>word自带公式编辑器（快捷键：Alt+=）免费，稍费力</p>
+</li>
+<li>
+<p>第三方公式插件：MythType 和 Axmath  收费，专业  推荐后者</p>
+</li>
+<li>
+<p>文本排版系统：Latex  专业排版软件，需要编程，科研人员常用，对小白不友好</p>
+<p>word学习推荐：和秋叶一起学word</p>
+</li>
+</ol>
+<h3 id="12绘制流程图思维导图">12.绘制流程图&amp;思维导图？</h3>
+<p>在线工具：ProcessOn</p>
+<h3 id="13快捷键">13.快捷键？</h3>
+<p>F4：重复上一次操作</p>
+</div>
+  
+</article></main>
+<footer class="footer">
+  <span>&copy; 2020 <a href="https://xshi000.github.io/">及时当勉励，岁月不待人！@iNuo</a></span>
+  <span>&middot;</span>
+  <span>Powered by <a href="https://gohugo.io/" rel="noopener" target="_blank">Hugo️️</a>️</span>
+  <span>&middot;</span>
+  <span>Theme️ <a href="https://github.com/nanxiaobei/hugo-paper" rel="noopener" target="_blank">Paper</a></span>
+</footer>
+<script src="https://xshi000.github.io/highlight.min.js"></script>
+<script>
+  hljs.initHighlightingOnLoad();
+</script>
+</body>
+</html>
+

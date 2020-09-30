@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    
+    <title>Excel-图表模板大法 - 及时当勉励，岁月不待人！@iNuo</title>
+    
+    <meta name="description" content="主题颜色 经济学人主题色 水蓝系
+商业周刊主题色 黑标系
+华尔街时报主题色 茶色系
+Think-cell主题色 咨询风
+金融日报主题色 粉色系
+第一财经周报主题色 奶色系
+颜色主题库位置：C:\Users\iNuo\AppData\Roaming\Microsoft\Templates\Document Themes\Theme Colors
+图表模板 经济学人图表模板 水蓝系
+商业周刊图表模板 黑标系
+华尔街时报图表模板 茶色系
+Think-cell图表模板 咨询风
+金融日报图表模板 粉色系
+第一财经周报图表模板 奶色系
+图表模板库位置：C:\Users\iNuo\AppData\Roaming\Microsoft\Templates\Charts
+操作技巧 一键出图
+在图表模板中，选中某一模板，右键，设置为默认图表即可！
+按Alt&#43;F1，瞬间出图！
+Office通用
+在Word和PPT中，同样可以调出模板，直接出图！">
+    <meta name="author" content="">
+    
+    <link href="https://xshi000.github.io/an-old-hope.min.css" rel="stylesheet">
+    <link href="https://xshi000.github.io/style.css" rel="stylesheet">
+    <link href="https://xshi000.github.io/custom.css" rel="stylesheet">
+    
+    <link rel="apple-touch-icon" href="https://xshi000.github.io/apple-touch-icon.png">
+    <link rel="icon" href="https://xshi000.github.io/favicon.ico">
+    <meta name="generator" content="Hugo 0.65.3" />
+    
+    
+    
+    <script>
+      function setTheme() {
+        const time = new Date();
+
+        const prev = localStorage.getItem('date');
+        const date = String(time.getMonth() + 1) + '.' + String(time.getDate());
+
+        const now = time.getTime();
+        let sunrise;
+        let sunset;
+
+        function setBodyClass() {
+          if (now > sunrise && now < sunset) return;
+          document.body.classList.add('dark');
+        }
+
+        if (date !== prev) {
+          fetch('https://api.ipgeolocation.io/astronomy?apiKey=5ed37d85103e4defa5df4c5298ed5215')
+            .then(res => res.json())
+            .then(data => {
+              sunrise = data.sunrise.split(':').map(Number);
+              sunset = data.sunset.split(':').map(Number);
+            })
+            .catch(() => {
+              sunrise = [7, 0];
+              sunset = [19, 0];
+            })
+            .finally(() => {
+              sunrise = time.setHours(sunrise[0], sunrise[1], 0);
+              sunset = time.setHours(sunset[0], sunset[1], 0);
+              setBodyClass();
+              localStorage.setItem('sunrise', sunrise);
+              localStorage.setItem('sunset', sunset);
+            });
+          localStorage.setItem('date', date);
+        } else {
+          sunrise = Number(localStorage.getItem('sunrise'));
+          sunset = Number(localStorage.getItem('sunset'));
+          setBodyClass();
+        }
+      }
+    </script>
+  </head>
+  <body class="single">
+    <script>
+      setTheme();
+    </script>
+    <header class="header">
+      <nav class="nav">
+        <p class="logo"><a href="https://xshi000.github.io/">及时当勉励，岁月不待人！@iNuo</a></p>
+      </nav>
+    </header>
+    <main class="main">
+
+
+<article class="post-single">
+  <header class="post-header">
+    <h1 class="post-title">Excel-图表模板大法</h1>
+    <div class="post-meta">September 29, 2020</div>
+  </header>
+  <div class="post-content"><h1 id="heading"></h1>
+<h3 id="主题颜色">主题颜色</h3>
+<p>经济学人主题色 水蓝系</p>
+<p><img src="/img/ExcelPro_ECO_231457.png" alt="pic"></p>
+<!-- raw HTML omitted -->
+<p>商业周刊主题色 黑标系</p>
+<p><img src="/img/ExcelPro_bw.png" alt="pic"></p>
+<!-- raw HTML omitted -->
+<p>华尔街时报主题色 茶色系</p>
+<p><img src="/img/ExcelPro_wsj_colors6.png" alt="pic"></p>
+<!-- raw HTML omitted -->
+<p>Think-cell主题色 咨询风</p>
+<p><img src="/img/thinkcell_smokeblue.png" alt="pic"></p>
+<!-- raw HTML omitted -->
+<p>金融日报主题色 粉色系</p>
+<p><img src="/img/fs.png" alt="pic"></p>
+<!-- raw HTML omitted -->
+<p>第一财经周报主题色 奶色系</p>
+<p><img src="/img/ns.png" alt="pic"></p>
+<!-- raw HTML omitted -->
+<p>颜色主题库位置：C:\Users\iNuo\AppData\Roaming\Microsoft\Templates\Document Themes\Theme Colors</p>
+<h3 id="图表模板">图表模板</h3>
+<p>经济学人图表模板  水蓝系</p>
+<p><img src="/img/ECO1.png" alt="pic"></p>
+<!-- raw HTML omitted -->
+<p>商业周刊图表模板  黑标系</p>
+<p><img src="/img/BW1.png" alt="pic"></p>
+<!-- raw HTML omitted -->
+<p>华尔街时报图表模板 茶色系</p>
+<p><img src="/img/WSJ1.png" alt="pic"></p>
+<!-- raw HTML omitted -->
+<p>Think-cell图表模板  咨询风</p>
+<p><img src="/img/TC1.png" alt="pic"></p>
+<!-- raw HTML omitted -->
+<p>金融日报图表模板  粉色系</p>
+<p><img src="/img/f.png" alt="pic"></p>
+<!-- raw HTML omitted -->
+<p>第一财经周报图表模板  奶色系</p>
+<p><img src="/img/n.png" alt="pic"></p>
+<!-- raw HTML omitted -->
+<p>图表模板库位置：C:\Users\iNuo\AppData\Roaming\Microsoft\Templates\Charts</p>
+<h3 id="操作技巧">操作技巧</h3>
+<p>一键出图</p>
+<p>在图表模板中，选中某一模板，右键，设置为默认图表即可！</p>
+<p>按Alt+F1，瞬间出图！</p>
+<p>Office通用</p>
+<p>在Word和PPT中，同样可以调出模板，直接出图！</p>
+</div>
+  
+</article></main>
+<footer class="footer">
+  <span>&copy; 2020 <a href="https://xshi000.github.io/">及时当勉励，岁月不待人！@iNuo</a></span>
+  <span>&middot;</span>
+  <span>Powered by <a href="https://gohugo.io/" rel="noopener" target="_blank">Hugo️️</a>️</span>
+  <span>&middot;</span>
+  <span>Theme️ <a href="https://github.com/nanxiaobei/hugo-paper" rel="noopener" target="_blank">Paper</a></span>
+</footer>
+<script src="https://xshi000.github.io/highlight.min.js"></script>
+<script>
+  hljs.initHighlightingOnLoad();
+</script>
+</body>
+</html>
+

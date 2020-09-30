@@ -1,0 +1,872 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    
+    <title>Python项目：pygame游戏开发之飞机大战 - 及时当勉励，岁月不待人！@iNuo</title>
+    
+    <meta name="description" content="第一章、编写pygame HelloWorld程序 1. 搭建开发环境
+ Python 、集成开发环境PyCharm 、用于游戏开发的第三方库pygame
+pip install -i https://pypi.tuna.tsinghua.edu.cn/simple pygame //指定下载路径
+ 2. HelloWorld程序的运行效果和实现步骤
+ 实现步骤：
+1、创建并显示一个固定尺寸的窗口
+2、处理用户关闭窗口从而退出程序的事件
+3、设置窗口的标题和背景色
+4、在窗口的底部居中位置绘制一架飞机
+5、让飞机向上匀速移动
+ 3. HelloWorld1创建并显示一个固定尺寸的窗口
+ 创建项目PlaneWar
+添加Main.py
+导入pygame-初始化-调用pygame.display.set_mode()
+编写游戏运行函数run_game()-调用
+ 4. HelloWorld2处理用户关闭窗口以退出程序的事件
+ Main：
+While循环等待关闭事件触发，卸载pygame库，退出程序（sys库）
+ 5. HelloWorld3设置窗体的标题和背景色
+ 标题：调用pygame.display.set_caption()
+图标：加载图片-设置set_icon（）
+背景色：接收窗体对象为window-调用fill（）—刷新flip（）
+ 6. HelloWorld4绘制飞机
+ 新建Directory-导入飞机图片
+Main，加载图片pygame.image.load（）赋予my_plane
+窗体中，绘制window.blit（）
+窗口坐标系：左上角为坐标原点，右向为X轴，下向为Y轴
+本例：窗口（500，700） 飞机（102，126）
+飞机的初始位置：X=（500-102）/2 Y=700-126 即（199，574）
+ 7. HelloWorld5飞机移动
+ 游戏开发帧率至少30帧/秒，常规60帧/秒，75以上，无法分辨！
+时间测试：导入datetime，开始、结束时间打点datetime.datetime.now()，相减
+创建时钟对象clock-设置动画最大帧率clock.tick(30)
+飞机移动过程，只Y改变，抽取Y为pos_y 并替换初始位置的Y坐标
+将绘制飞机和刷新置于while中，并将Y坐标作为循环变量，减少一个值
+将绘制背景颜色置于while中，绘制飞机之前！（消除残影）">
+    <meta name="author" content="">
+    
+    <link href="https://xshi000.github.io/an-old-hope.min.css" rel="stylesheet">
+    <link href="https://xshi000.github.io/style.css" rel="stylesheet">
+    <link href="https://xshi000.github.io/custom.css" rel="stylesheet">
+    
+    <link rel="apple-touch-icon" href="https://xshi000.github.io/apple-touch-icon.png">
+    <link rel="icon" href="https://xshi000.github.io/favicon.ico">
+    <meta name="generator" content="Hugo 0.65.3" />
+    
+    
+    
+    <script>
+      function setTheme() {
+        const time = new Date();
+
+        const prev = localStorage.getItem('date');
+        const date = String(time.getMonth() + 1) + '.' + String(time.getDate());
+
+        const now = time.getTime();
+        let sunrise;
+        let sunset;
+
+        function setBodyClass() {
+          if (now > sunrise && now < sunset) return;
+          document.body.classList.add('dark');
+        }
+
+        if (date !== prev) {
+          fetch('https://api.ipgeolocation.io/astronomy?apiKey=5ed37d85103e4defa5df4c5298ed5215')
+            .then(res => res.json())
+            .then(data => {
+              sunrise = data.sunrise.split(':').map(Number);
+              sunset = data.sunset.split(':').map(Number);
+            })
+            .catch(() => {
+              sunrise = [7, 0];
+              sunset = [19, 0];
+            })
+            .finally(() => {
+              sunrise = time.setHours(sunrise[0], sunrise[1], 0);
+              sunset = time.setHours(sunset[0], sunset[1], 0);
+              setBodyClass();
+              localStorage.setItem('sunrise', sunrise);
+              localStorage.setItem('sunset', sunset);
+            });
+          localStorage.setItem('date', date);
+        } else {
+          sunrise = Number(localStorage.getItem('sunrise'));
+          sunset = Number(localStorage.getItem('sunset'));
+          setBodyClass();
+        }
+      }
+    </script>
+  </head>
+  <body class="single">
+    <script>
+      setTheme();
+    </script>
+    <header class="header">
+      <nav class="nav">
+        <p class="logo"><a href="https://xshi000.github.io/">及时当勉励，岁月不待人！@iNuo</a></p>
+      </nav>
+    </header>
+    <main class="main">
+
+
+<article class="post-single">
+  <header class="post-header">
+    <h1 class="post-title">Python项目：pygame游戏开发之飞机大战</h1>
+    <div class="post-meta">September 29, 2020</div>
+  </header>
+  <div class="post-content"><h3 id="heading"></h3>
+<h3 id="第一章编写pygame-helloworld程序">第一章、编写pygame HelloWorld程序</h3>
+<p><strong>1.</strong> <strong>搭建开发环境</strong></p>
+<blockquote>
+<p>Python 、集成开发环境PyCharm 、用于游戏开发的第三方库pygame</p>
+<p>pip install -i <a href="https://pypi.tuna.tsinghua.edu.cn/simple">https://pypi.tuna.tsinghua.edu.cn/simple</a> pygame //指定下载路径</p>
+</blockquote>
+<p><strong>2.</strong> <strong>HelloWorld程序的运行效果和实现步骤</strong></p>
+<blockquote>
+<p>实现步骤：</p>
+<p>1、创建并显示一个固定尺寸的窗口</p>
+<p>2、处理用户关闭窗口从而退出程序的事件</p>
+<p>3、设置窗口的标题和背景色</p>
+<p>4、在窗口的底部居中位置绘制一架飞机</p>
+<p>5、让飞机向上匀速移动</p>
+</blockquote>
+<p><strong>3.</strong> <strong>HelloWorld1创建并显示一个固定尺寸的窗口</strong></p>
+<blockquote>
+<p>创建项目PlaneWar</p>
+<p>添加Main.py</p>
+<p>导入pygame-初始化-调用pygame.display.set_mode()</p>
+<p>编写游戏运行函数run_game()-调用</p>
+</blockquote>
+<p><strong>4.</strong> <strong>HelloWorld2处理用户关闭窗口以退出程序的事件</strong></p>
+<blockquote>
+<p>Main：</p>
+<p>While循环等待关闭事件触发，卸载pygame库，退出程序（sys库）</p>
+</blockquote>
+<p><strong>5.</strong> <strong>HelloWorld3设置窗体的标题和背景色</strong></p>
+<blockquote>
+<p>标题：调用pygame.display.set_caption()</p>
+<p>图标：加载图片-设置set_icon（）</p>
+<p>背景色：接收窗体对象为window-调用fill（）—刷新flip（）</p>
+</blockquote>
+<p><strong>6.</strong> <strong>HelloWorld4绘制飞机</strong></p>
+<blockquote>
+<p>新建Directory-导入飞机图片</p>
+<p>Main，加载图片pygame.image.load（）赋予my_plane</p>
+<p>窗体中，绘制window.blit（）</p>
+<p>窗口坐标系：左上角为坐标原点，右向为X轴，下向为Y轴</p>
+<p>本例：窗口（500，700） 飞机（102，126）</p>
+<p>飞机的初始位置：X=（500-102）/2  Y=700-126  即（199，574）</p>
+</blockquote>
+<p><strong>7.</strong> <strong>HelloWorld5飞机移动</strong></p>
+<blockquote>
+<p>游戏开发帧率至少30帧/秒，常规60帧/秒，75以上，无法分辨！</p>
+<p>时间测试：导入datetime，开始、结束时间打点datetime.datetime.now()，相减</p>
+<p>创建时钟对象clock-设置动画最大帧率clock.tick(30)</p>
+<p>飞机移动过程，只Y改变，抽取Y为pos_y 并替换初始位置的Y坐标</p>
+<p>将绘制飞机和刷新置于while中，并将Y坐标作为循环变量，减少一个值</p>
+<p>将绘制背景颜色置于while中，绘制飞机之前！（消除残影）</p>
+</blockquote>
+<p><strong>8.</strong> <strong>总结HelloWorld程序结构</strong></p>
+<blockquote>
+<p>Run_game()函数框架结构：</p>
+<p>While循环之前：</p>
+<p>初始化pygame库</p>
+<p>创建指定尺寸的窗口</p>
+<p>设置窗口（标题、图标&hellip;）</p>
+<p>加载窗口中要绘制的所有图形元素</p>
+<p>创建时钟对象</p>
+<p>While循环体内：</p>
+<p>从事件队列中将所有事件全部取出并逐个进行处理</p>
+<p>设置窗口的背景色或背景图片</p>
+<p>绘制窗口中的所有图形元素</p>
+<p>将内存中的窗体对象绘制到屏幕上以更新屏幕</p>
+<p>更新窗口中所有图形元素的位置和图像</p>
+<p>设置while循环体在一秒内执行的最大次数（设置动画最大帧率）</p>
+</blockquote>
+<h3 id="第二章重构pygame-helloworld程序">第二章、重构pygame HelloWorld程序</h3>
+<p><strong>9.</strong> <strong>将面向过程改为面向对象</strong></p>
+<blockquote>
+<p>重构：在不改变代码原有功能的前提下，改进软件的设计，重新调整其内部特征，从而提高软件的维护性、复用性和扩展性。 书籍《重构，改善既有代码的设计》</p>
+<p>重构&raquo;&gt;</p>
+<p>创建管理游戏的总体类Class PlaneWar</p>
+<p>将while之前的看作游戏的初始化  归于def <strong>init</strong>(self):</p>
+<p>将while之中的看做游戏的运行  归于def run_game(self):</p>
+<p>通过类的实例化对象调用  PlaneWar().run_game()</p>
+<p>将变量绑定到实体属性self.my_plane,self.pos_y,。。。（上下都加self.）</p>
+</blockquote>
+<p><strong>10.</strong> <strong>抽象出我方飞机类</strong></p>
+<blockquote>
+<p>创键Python文件my_plane.py</p>
+<p>创键我方飞机类MyPlane</p>
+<p>我方飞机可：</p>
+<p>初始化  <strong>init</strong>(self,pos): 加载飞机挪过来，添加位置参数</p>
+<p>更新位置  update(self): 向上移动挪过来</p>
+<p>绘制  draw(self):  绘制挪过来</p>
+<p>初始化添加参数window以获取窗体对象</p>
+<p>Main中，通过类MyPlane创键我方飞机对象，同理更新、绘制</p>
+</blockquote>
+<p><strong>11.</strong> <strong>通过矩形表示元素在窗口中的位置</strong></p>
+<blockquote>
+<p>矩形属性：</p>
+<p>left【x】\top【y】\width【w】\height【h】</p>
+<p>right\bottom\centerx\centery</p>
+<p>size【（width,height）】\center【(centerx,centery)】</p>
+<p>Topleft【(left,top)】左上角\Bottomleft【(left,bottom)】左下角</p>
+<p>Bottomright【(right,bottom)】右下角\Topright【(right,top)】右上角</p>
+<p>Midtop【(centerx,top)】上边缘中心点\Midleft【(left,centery)】左边缘中心点</p>
+<p>Midbottom【(centerx,bottom)】下边中心点\Midright【(right,centery)】右边中心点</p>
+<p>其中，w,h,size表矩形尺寸，其余表位置。</p>
+<p>Right=left+width  bottom=top+height  centerx=left+width/2  centery=top+height/2</p>
+<p>创键test目录</p>
+<p>创键python文件rect.py</p>
+<p>创键矩形对象 pygame.Rect（） 查看其属性 rect.left</p>
+</blockquote>
+<p><strong>12.</strong> <strong>通过矩形表示我方飞机在窗口</strong></p>
+<blockquote>
+<p>My_plane中，</p>
+<p>获取我方飞机矩形 self.image.get_rect()</p>
+<p>获取窗体矩形 self.window.get_rect()</p>
+<p>设置初始位置为：窗口的底部居中位置</p>
+<p>设置更新为：矩形属性top</p>
+<p>用矩形代替位置，所以，初始化的pos可以舍弃了！</p>
+<p>同步删除main中的实参；</p>
+<p>My_plane中，不需要获取我方飞机的位置pos；</p>
+<p>同时，绘制的位置参数换成矩形</p>
+</blockquote>
+<p><strong>13.</strong> <strong>提取函数或方法</strong></p>
+<blockquote>
+<p>提取函数/方法是常见的重构手段之一！（代码过长）</p>
+<p>注：被提取函数/方法应只做一件事（颗粒度尽可能小），复用机会就大！</p>
+<p>Main中，将设置窗体标题、图标合并为一个函数 设置窗体_set_window() 相关代码拖过来，调用放回去 设置窗体self._set_window()</p>
+<p>重构重要原则：小步修改，频繁测试！</p>
+<p>Main中，将while循环内的事件合并为一个函数 处理事件_handle_events() 相关代码拖过来，调用放回去 处理事件self._handle_events()</p>
+</blockquote>
+<h3 id="第三章窗口尺寸适配">第三章、窗口尺寸适配</h3>
+<p><strong>14.</strong> <strong>窗口尺寸适配电脑屏幕</strong></p>
+<blockquote>
+<p>屏幕分辨率越高，创建的窗体在屏幕上所占的比例就越小！</p>
+<p>Main中，编写获取电脑屏幕尺寸函数 get_screen_size（）（与PlaneWar无关，放置类内类外都可） 获取宽高值</p>
+<p>初始化时，调用函数获取尺寸；计算窗口尺寸；传参</p>
+<p>报错：float要转化为int；  用round（）</p>
+</blockquote>
+<h3 id="第四章键盘按键控制飞机移动">第四章、键盘按键控制飞机移动</h3>
+<p><strong>15.</strong> <strong>通过持续按下键盘上的上箭头控制我方飞机向上持续移动</strong></p>
+<blockquote>
+<p>事件队列思想</p>
+<p>Main中的处理事件函数下，添加条件分支，判断是否是按键操作？判断按键是否为上箭头？</p>
+<p>My_plane中，创键一个标记 飞机向上移动 is_move_up并赋值为False</p>
+<p>Main中，是按键！是上箭头！ 标记赋值为True</p>
+<p>​    是松键！是上箭头！  标记赋值为False</p>
+<p>My_plane中，更新位置函数下，添加条件：标记为True，才更新！</p>
+</blockquote>
+<p><strong>16.</strong> <strong>通过持续按下键盘上的任意方向箭头控制我方飞机往指定的任意方向</strong></p>
+<blockquote>
+<p>My_plane中，创键三个标记 向下、左、右移动 并赋值为 False</p>
+<p>Main中，处理事件函数下，是按键操作的条件下，添加判断是否为下、左、右箭头，并给标记赋值为True；松开按键同理。</p>
+<p>My_plane中，更新位置函数下，添加三个判断，是否向下、左、右移动（即标志为True），更新位置。</p>
+<p>同理，可在Main判断按键处添加WASD键，控制移动！</p>
+<p>注：</p>
+<p>if  if 并列结构，近似同时运行，所以，可保证同时按下左右键时，飞机不动！同时按下左上键时，飞机向左上方斜向移动！</p>
+<p>Main中，是否是按键操作 条件下用If elif结构，是因为对于任一事件，key都是唯一的</p>
+</blockquote>
+<p><strong>17.</strong> <strong>限制我方飞机的移动范围以避免其超出窗口边缘</strong></p>
+<blockquote>
+<p>My-plane中，更新位置函数判断是否移动中添加条件（到边不动）</p>
+<p>添加条件；and self.rect.top&gt;10  #10 下一步可移动距离</p>
+</blockquote>
+<p><strong>18.</strong> <strong>重构处理事件的方法</strong></p>
+<blockquote>
+<p>main中，编写处理键盘按下事件 _handle_keydown_events（self，event） 将按下上下左右箭头的代码挪过来，调用放回去，并添加参数event</p>
+<p>处理键盘松开事件同理。</p>
+</blockquote>
+<p><strong>19.</strong> <strong>重构之提取魔法数字</strong></p>
+<blockquote>
+<p>魔法数字：在代码中有明确含义，但没有表现出相应的含义，导致可读性较差，不易维护。</p>
+<p>某一魔法数字修改，代码中所有相同数字都得修改，可维护性差。</p>
+<p>提取魔法数字也是常用的重构手段之一。</p>
+<p>Pycharm自带重构工具：Refactor-Extract-Variable（变量）/Constant（常量）/Field（字段，即实例属性；可选当前方法或初始化方法）/Parameter（参数） 可以改名！</p>
+<p>或：选定某一魔法数字，右键菜单。</p>
+<p>My_plane中，更新位置函数下的 10  重构为Field（初始化方法）  重命名为offset</p>
+<p>Main中，同理，重构2/5，4/5，30为常量，并重命名。</p>
+</blockquote>
+<h3 id="第五章全屏运行游戏">第五章、全屏运行游戏</h3>
+<p><strong>20.</strong> <strong>以全屏模式运行游戏并添加退出游戏的快捷键</strong></p>
+<blockquote>
+<p>Main中，初始化方法中，改变创键窗体的参数，添加参数pygame.FULLSCREEN实现全屏</p>
+<p>键盘按下事件中，添加Esc键事件代码</p>
+</blockquote>
+<h3 id="第六章发射bullet">第六章、发射Bullet</h3>
+<p><strong>21.</strong> <strong>让我方飞机在每次按下空格键后发射一颗Bullet</strong></p>
+<blockquote>
+<p>Bullet对象与我方飞机对象近似，可复制my_plane.py  to  buttle.py  仿照修改即可！</p>
+<p>Main中，编写按下SPACE键事件代码  实例化子弹对象（导入模块）</p>
+<p>初始化函数中，创键子弹列表：bullet_list</p>
+<p>按下空格键事件中，将创键的子弹添加到子弹列表中</p>
+<p>在run_game的while循环中，绘制飞机后，添加绘制子弹代码；同理添加更新位置代码</p>
+<p>重构&raquo;&gt;</p>
+<p>将绘制飞机和绘制子弹重构为绘制函数 选中右键-Refactor-ExtractMethod 更新位置同理</p>
+</blockquote>
+<p><strong>22.</strong> <strong>删除窗口中不可见的Bullet</strong></p>
+<blockquote>
+<p>射出窗体的子弹依然存在，会耗费内存空间，应判断删除之！</p>
+<p>Main中，创键删除不可见子弹函数_delete_invisible_bullets（）</p>
+<p>在run_game中，更新所有元素之后，调用删除函数</p>
+</blockquote>
+<p><strong>23.</strong> <strong>让我方飞机定时发射Bullet</strong></p>
+<blockquote>
+<p>自定义事件：除按下键盘、操纵鼠标、操纵游戏杆、退出程序外，我们可自定义事件。</p>
+<p>每个自定义事件都有一个id，取值范围【pygame.USEREVENT~pygame.USEREVENT+7】</p>
+<p>Pygame.USEREVEVT是pygame中定义的常量，值为24.</p>
+<p>当while循环从事件队列中逐个取出事件时，要确定该事件为自定义事件，只需判断事件类型type是否等于自定义事件的id即可。</p>
+<p>在事件队列中每隔一段时间生成一个自定义事件：</p>
+<p>Pygame.time.set_timer(eventid,milliseconds)  (自定义事件id，时间间隔（毫秒）)</p>
+<p>Main中，初始化函数最末端，添加隔时生成事件代码</p>
+<p>顶端，创键两个常量 自定义事件的id 和自定义事件的时间间隔；传入常量</p>
+<p>在处理事件函数末端添加判断，是否为自定义事件代码；</p>
+<p>将按下空格键事件-创键子弹&amp;添加列表 代码  挪过来。删除空格键事件</p>
+</blockquote>
+<h3 id="第七章定时创建敌机">第七章、定时创建敌机</h3>
+<p><strong>24.</strong> <strong>定时创建一架小型敌机并从窗口的上方向下匀速移动</strong></p>
+<blockquote>
+<p>小型敌机和Bullet更为相似，复制，修改为 small_enemy.py</p>
+<p>Main中，初始化函数末添加隔时生成事件代码；（后续同上 定时发射Bullet）</p>
+<p>顶端，创键两个常量 自定义事件的id 和自定义事件的时间间隔；传入常量</p>
+<p>在处理事件函数末端添加判断，是否为自定义事件“创键小型敌机”；</p>
+<p>创键小型敌机&amp;添加列表</p>
+<p>初始化函数中，创键小型敌机列表</p>
+<p>Run_game中的绘制函数内，添加绘制小型敌机；同理更新</p>
+<p>任意位置，添加删除不可见小型敌机函数_delete_invisible_small_enemy（）</p>
+<p>run_game函数中，调用删除函数。</p>
+<p>Tips：左侧structure可打开函数目录，可快速跳转！</p>
+</blockquote>
+<p><strong>25.</strong> <strong>通过提取方法重构既有的代码</strong></p>
+<blockquote>
+<p>Main中，重构&raquo;&gt;</p>
+<p>合并至 删除窗口中所有不可见的画面元素 _delete_invisible_elements()</p>
+<p>合并至 创键管理画面元素的列表 _create_lists()</p>
+<p>合并至 设置定时器 _set_timers()</p>
+<p>合并至 创键窗口 _create_window()</p>
+</blockquote>
+<p><strong>26.</strong> <strong>重构之将所有常量提取到一个单独的模块中</strong></p>
+<blockquote>
+<p>新建python文件：constants</p>
+<p>将所有常量导入并导入pygame</p>
+<p>Main中，导入常量模块，并给每个常量前添加 constants.</p>
+</blockquote>
+<p><strong>27.</strong> <strong>定时创建一架中型敌机并从窗口的上方向下匀速移动</strong></p>
+<blockquote>
+<p>与小型敌机几乎无差别（创键的时间间隔）复制，命名为mid_enemy.py</p>
+<p>Tips：Ctrl+R 替换</p>
+<p>Constants中，添加常量id和时间间隔</p>
+<p>Main中，_set_timer()函数中，设置定时器</p>
+<p>​     _handle_events()函数中，添加判断分支；（导入MidEnemy+创键列表）</p>
+<p>​     _draw_elements()函数中，绘制</p>
+<p>​     _update_positions（）函数中，更新</p>
+<p>​    任意位置，添加删除不可见中型敌机函数_delete_invisible_mid_enemy（）</p>
+<p>​    _delete_invisible_elements()函数中，调用删除函数。</p>
+</blockquote>
+<p>​</p>
+<p><strong>28.</strong> <strong>定时创建一架大型敌机并从窗口的上方向下匀速移动</strong></p>
+<blockquote>
+<p>复制，命名为big_enemy.py</p>
+<p>Constants中，添加常量id和时间间隔</p>
+<p>Main中，_set_timer()函数中，设置定时器</p>
+<p>​     _handle_events()函数中，添加判断分支；（导入BigEnemy+创键列表）</p>
+<p>​     _draw_elements()函数中，绘制</p>
+<p>​     _update_positions（）函数中，更新</p>
+<p>​    任意位置，添加删除不可见大型敌机函数_delete_invisible_big_enemy（）</p>
+<p>​    _delete_invisible_elements()函数中，调用删除函数。</p>
+</blockquote>
+<h3 id="第八章碰撞检测">第八章、碰撞检测</h3>
+<p><strong>29.</strong> <strong>精灵Sprite和管理精灵的分组Group</strong></p>
+<blockquote>
+<p>精灵Sprite：位于pygame.sprite模块中，表示游戏画面中的所有元素。例：我方飞机、子弹、敌机等，都可看作精灵！</p>
+<p>要让游戏画面中的元素变为精灵，只需让元素对应的类对象继承Sprite即可！</p>
+<p>分组Group：位于pygame.sprite模块中，用来管理游戏画面中的精灵。精灵和分组是多对多的关系，即一个分组可管理多个不同精灵，一个精灵也可被多个不同分组所管理。</p>
+<p>My_plane中，导入Sprite，继承于Sprite，并调用父类Sprite的特殊方法__init__()</p>
+<p>Bullet、small_enemy、mid_enemy、big_enemy操作同上！</p>
+<p>Main中，导入Group</p>
+<p>​    _create_lists（）列表转化为分组Group（） 初始化中，修改为 调用分组</p>
+<p>_handle_events（）列表转分组 append改为add</p>
+<p>_draw_elements（）list——group.sprites() 更新同理！</p>
+<p>_delete_invisible_elements（）内的每个函数打开 转换</p>
+</blockquote>
+<p><strong>30.</strong> <strong>通过分组更方便地绘制精灵</strong></p>
+<blockquote>
+<p>分组Group也定义了一个draw（）</p>
+<p>作用；对分组中的每一个精灵，会自动的调用surface.blit(self.image,self,rect)</p>
+<p>其中，surface是调用draw（）时传入的实参，实参为self.window时，相当于我们自定义的draw（）。因此，对于分组所有精灵的绘制，可以直接调用相应分组的方法draw（），而无需单独调用每个精灵的方法draw（）</p>
+<p>注：要调用分组的draw（），需要分组中所有精灵都有一个名为image的实例属性用来表示精灵图像，并有一个名为rect的实例属性用来表示精灵的矩形。</p>
+<p>Main中，_draw_elements（）函数中，将bullet、大/中/小敌机的 循环逐一绘制  转换为  分组绘制；所对应类中的draw（）方法可以删除了！</p>
+</blockquote>
+<p><strong>31.</strong> <strong>通过分组更方便的更新精灵位置</strong></p>
+<blockquote>
+<p>分组Group也定义了一个update（）</p>
+<p>Main中，_update_positions（）函数中，将bullet、大/中/小敌机的 循环逐一更新  转换为  分组更新；所对应类中的update（）方法  不  能删除！</p>
+</blockquote>
+<p><strong>32.</strong> <strong>让每个敌机精灵都被两个不同的分组所管理</strong></p>
+<blockquote>
+<p>Main中，_create_groups（） 创键一个管理所有敌机的分组</p>
+<p>_handle_events（） 判断分支创键大/中/小敌机中，将大/中/小型敌机添加到管理所有敌机分组中</p>
+<p>合并 删除不可见大/中/小型敌机 _delete_invisible_enemies()</p>
+<p>_delete_invisible_elements()中 合并  调用删除函数</p>
+<p>注：合并删除函数的删除语句enemy_group.remove(enemy)只是从管理所有敌机分组中删除敌机，而在各自的分组中依然保留着敌机对象。故，调用精灵的方法Kill（）！</p>
+</blockquote>
+<p><strong>33.</strong> <strong>为我方飞机尾部添加突突突的动画特效</strong></p>
+<blockquote>
+<p>突突突特效，实质时两张略微差异图片的快速切换</p>
+<p>导入my_plane2.png</p>
+<p>My_plane中，加载第二张图片，重命名第一张图片为my_plane1.png,修改图标路径</p>
+<p>​      添加图片切换函数switch_image()</p>
+<p>Main中，run_game（）内，调用 我方飞机切换函数</p>
+<p>My_plane中，初始化函数中，添加计数器</p>
+<p>​      switch_image()中，技术器加1，添加切换条件，并置魔法数字为常量</p>
+</blockquote>
+<p><strong>34.</strong> <strong>检测Bullet与小型敌机的碰撞（1）之检测碰撞函数</strong></p>
+<blockquote>
+<p>碰撞检测：pygame提供一个函数groupcollide（groupa，groupb，dokilla，dokillb）</p>
+<p>用于检测指定分组groupa和指定分组groupb中是否有精灵发生碰撞，如果有精灵发生碰撞：</p>
+<p>若dokilla为True，对于groupa中发生碰撞的精灵，会将其从它所在的所有分组中删除</p>
+<p>若dokillb为True，对于groupb中发生碰撞的精灵，会将其从它所在的所有分组中删除</p>
+<p>该函数返回值是一个字典，字典的key是groupa中发生碰撞的精灵，字典的value是groupb中与对应的key发生碰撞的所有精灵组成的列表。</p>
+<p>Main中，创键 检测子弹与小型敌机碰撞函数_check_collision_bullets_smalls（）</p>
+<p>​    调用 碰撞函数pygame.sprite.groupcollide（）接收字典为dict_collided</p>
+<p>​    run_game（）中，调用检测碰撞函数</p>
+</blockquote>
+<p><strong>35.</strong> <strong>检测Bullet与小型敌机的碰撞（2）之获取敌机</strong></p>
+<blockquote>
+<p>Main中，碰撞函数pygame.sprite.groupcollide（groupa，groupb，dokilla，dokillb）</p>
+<p>调换参数顺序为：pygame.sprite.groupcollide（groupb，groupa，dokillb，dokilla）</p>
+<p>则，返回值的key值为groupb中发生碰撞的精灵，本例中为小型敌机</p>
+<p>注：碰撞发生时，小型敌机不直接消失，要先爆炸！所以为False</p>
+<p>dict_collided.keys()获得所有发生碰撞的小型敌机</p>
+</blockquote>
+<p><strong>36.</strong> <strong>检测Bullet与小型敌机的碰撞（3）之播放爆炸声音</strong></p>
+<blockquote>
+<p>Main中，_check_collision_bullets_smalls（）下，当有碰撞发生时，播放爆炸声音</p>
+<p>新建目录sounds 导入爆炸音频</p>
+<p>small_enemy中，创键 播放爆炸声音函数 play_explode_sound（）</p>
+<p>Main中，_check_collision_bullets_smalls（）下，调用 播放爆炸声音函数</p>
+</blockquote>
+<p><strong>37.</strong> <strong>检测Bullet与小型敌机的碰撞（4）之播放爆炸画面</strong></p>
+<blockquote>
+<p>导入小型敌机爆炸组图，爆炸原理与之前突突突特效一致</p>
+<p>small_plane中，加载爆炸图组</p>
+<p>​        切换图片与我方飞机突突突切换类似，复制，修改</p>
+<p>​        创键标记is_switching_explode_image赋值False</p>
+<p>Main中，播放爆炸声音之后，判断是否切换爆炸图片，并执行切换！</p>
+<p>​     发生碰撞之后，循环遍历小型敌机，标志为True，则切换爆炸图片！</p>
+<p>Bug：第一发Bullet碰撞小型敌机，发出爆炸声，敌机爆炸，开始切换爆炸图片，此时，第二发Bullet碰撞正在切换中的敌机，又发出爆炸声！！！</p>
+<p>Debug：只有在标志为False时，才播放声音！此例，将播放代码下移。</p>
+</blockquote>
+<p><strong>38.</strong> <strong>检测Bullet与中型敌机的碰撞（1）之基础功能实现</strong></p>
+<blockquote>
+<p>相比于小型敌机，扩展的功能包括：</p>
+<p>\1. 被子弹击中N次才会爆炸</p>
+<p>\2. 尾部上方显示能量</p>
+<p>\3. 击中能量减少</p>
+<p>\4. 击中头部播放动画</p>
+<p>导入爆炸音效和爆炸图片</p>
+<p>Constants中，添加 切换爆炸图片频率常量</p>
+<p>Mid_enemy中，加载 爆炸图片组（与小型敌机类似）</p>
+<p>​       添加 标记和计数器</p>
+<p>​       编写 播放爆炸声音函数</p>
+<p>​       编写 切换爆炸图片函数</p>
+<p>Main中，创键 检测子弹与中型敌机碰撞函数_check_collision_bullets_mids（）</p>
+<p>​    run_game()中，调用 检测碰撞函数</p>
+<p>重构&raquo;&gt;  合并 检测碰撞 _check_collisions()</p>
+</blockquote>
+<p><strong>39.</strong> <strong>检测Bullet与中型敌机的碰撞（2）之扩展功能一</strong></p>
+<blockquote>
+<p>扩展功能一：被子弹击中N次才会爆炸</p>
+<p>Mid_enemy中，创键 中型敌机能量值 energy赋值为5</p>
+<p>Main中，检测碰撞函数下，在遍历所有发生碰撞的中型敌机循环下，添加 判断语句：</p>
+<p>​     如果能量值大于0，能量值减1</p>
+<p>​     如果能量值等于0，播放爆炸声音，置标志为True！</p>
+</blockquote>
+<p><strong>40.</strong> <strong>检测Bullet与中型敌机的碰撞（3）之扩展功能二</strong></p>
+<blockquote>
+<p>扩展功能二、尾部上方显示能量</p>
+<p>绘制线段：</p>
+<p>调用pygame.draw.line(Surface,color,start_pos,end_pos,width=1)</p>
+<p>参数Surface用于指定线段被绘制到那个对象上；例：绘制到窗口，传入实参self.window</p>
+<p>参数color用于指定线段颜色。pygame.Color(“lightskyblue”)或（0，0，255）</p>
+<p>参数start_pos和end_pos分别用于指定线段的起点位置和终点位置。</p>
+<p>参数width用于指定线段的宽度，默认值为1像素。</p>
+<p>Mid_enemy中，创键 绘制能量条函数draw_energy_lines()</p>
+<p>​       调用 pygame.draw.line（）绘制</p>
+<p>Main中，_draw_elements（）中，绘制中型敌机之后，通过调用绘制函数draw_energy_lines()绘制 所有 中型敌机的能量条</p>
+</blockquote>
+<p><strong>41.</strong> <strong>检测Bullet与中型敌机的碰撞（4）之扩展功能三</strong></p>
+<blockquote>
+<p>扩展功能三、击中能量减少</p>
+<p>Mid_enemy中，先绘制一条白色线段，再绘制一条红色线段，实现覆盖。</p>
+<p>能量条减少实现方法：红色线段右端点向左逐次移动，</p>
+<p>即右端点横坐标为：self.rect.left+self.rect.width*（剩余能量/初始能量）</p>
+<p>Mid_enemy中，修改红色能量条右端点的横坐标并定义能量剩余比energy_left_ratio</p>
+<p>Constants中，创建 中型敌机的初始能量 常量 energy_left_ratio=self.energy/constants.MID_ENEMY_INITIAL_ENERGY</p>
+<p>Bug：当中型敌机被击中5次后，能量值为0，但是绘制红色线段函数依然会运行，一个起点和终点重合的小红点！</p>
+<p>Debug：加个判断，中型敌机有能量时，再去绘制红色线段！</p>
+</blockquote>
+<p><strong>42.</strong> <strong>检测Bullet与中型敌机的碰撞（5）之扩展功能四</strong></p>
+<blockquote>
+<p>扩展功能四、击中头部播放动画</p>
+<p>导入图片</p>
+<p>mid_enemy中，加载 击中图片</p>
+<p>​       添加 标记和计数器</p>
+<p>Constants中，添加 常量</p>
+<p>mid_enemy中，创建 切换中型敌机被击中的图片 函数（与切换爆炸类似）</p>
+<p>Main中，_check_collision_bullets_mids（）下，如果能量值为0的条件分支后，添加else分支；for循环中添加被击中切换！</p>
+</blockquote>
+<p><strong>43.</strong> <strong>检测Bullet与大型敌机的碰撞</strong></p>
+<blockquote>
+<p>与中型敌机碰撞效果无异！复制，修改即可！</p>
+<p>所以，可将大型敌机的检测函数和中型的检测函数 合二为一！</p>
+<p>即_check_collision_bullets_midsorbigs(self,enemy_group)</p>
+<p>将mid_enemy_group/big_enemy_group 替换为 enemy_group</p>
+<p>将mid_enemy 替换为 enemy</p>
+<p>注：在enemy_group排除小型敌机 not in ；因为小型敌机没有被击中切换图片特效！！</p>
+<p>调用时，分别调用即可！</p>
+<p>Tips：选中区域，Ctrl+R 替换 ，实现快速替换！！</p>
+<p>注：大/中/小型敌机，加载图片组可合并，重构！！ _load_images()</p>
+</blockquote>
+<p><strong>44.</strong> <strong>为大型敌机的头部添加移动时的动画效果</strong></p>
+<blockquote>
+<p>与我方飞机突突突实现过程类似</p>
+<p>导入大型敌机图片2</p>
+<p>big_enemy中，加载 图2赋值于big_image2，重命名原始图为big_image</p>
+<p>复制my_plane中的switch_image，修改</p>
+<p>Main中，run_game（）内，调用 我方飞机切换函数</p>
+</blockquote>
+<p><strong>45.</strong> <strong>检测我方飞机与敌机的碰撞（1）之检测精灵与分组精灵碰撞函数</strong></p>
+<blockquote>
+<p>函数groupcollide（），用于检测两个指定的分组是否有精灵发生碰撞。</p>
+<p>我方飞机没有通过分组管理，所以不能调用该函数！</p>
+<p>Pygame提供了另一个函数spritecollide（sprite,group,dokill,collided=None）</p>
+<p>该函数用于检测指定精灵sprite和指定分组group中是否有精灵发生了碰撞。</p>
+<p>触发碰撞，当dokill为True，对于group中发生碰撞的精灵，会将其从它所在的所有分组中删除，该函数的返回值时一个列表，列表中的元素时group中发生碰撞的所有精灵。</p>
+<p>Main中，创建 检测我方飞机与敌机碰撞函数_check_collidion_myplane_enemies()</p>
+<p>​       调用 函数spritecollide（），并接收列表list_collided,并打印！</p>
+<p>​    _check_collisions() 调用 检测碰撞</p>
+</blockquote>
+<p><strong>46.</strong> <strong>检测我方飞机与敌机的碰撞（2）之回调函数定义碰撞</strong></p>
+<blockquote>
+<p>Bug：上述效果是我方飞机矩形与敌机矩形有重合区域，便删除敌机，效果不真实，没碰到，就消失！！！</p>
+<p>函数spritecollide（sprite,group,dokill,collided=None）</p>
+<p>collided参数的作用是指定一个回调函数，通过该回调函数来定义两个精灵是否发生了碰撞的规则。该回调函数必须满足两个条件：必须接收两个精灵作为实参+必须返回一个布尔值以表明传入的两个精灵是否发生了碰撞。</p>
+<p>Main中，_check_collidion_myplane_enemies()下，创建回调函数collid_callback()</p>
+<p>​      自定义碰撞条件，返回True/False</p>
+<p>​      传递实参collid_callback至函数spritecollide（）的参数列表中</p>
+<p>希望运行效果：当我方飞机与敌机可见部分发生重合时，才认为发生了碰撞！</p>
+<p>Pygame定义了回调函数：pygame.sprite.collide_mask()</p>
+<p>Main中，_check_collidion_myplane_enemies()下，传递实参pygame.sprite.collide_mask</p>
+<p>去除自定义函数</p>
+</blockquote>
+<p><strong>47.</strong> <strong>检测我方飞机与敌机的碰撞（3）之碰撞后播放声音和画面</strong></p>
+<blockquote>
+<p>Main中，_check_collidion_myplane_enemies()下，将函数spritecollide（）第三个参数dokill=False，则，碰撞后敌机不直接消失！</p>
+<p>我方飞机与敌机碰撞效果 和 子弹与小型敌机碰撞效果 相似，复制，修改</p>
+<p>Main中，_check_collision_bullets_smalls（）下，复制发生碰撞之后的代码，放置到_check_collidion_myplane_enemies()的判断发生了碰撞之后即可！</p>
+</blockquote>
+<p><strong>48.</strong> <strong>检测我方飞机与敌机的碰撞（4）之创建我方飞机生命数</strong></p>
+<blockquote>
+<p>my_plane中，初始化中，定义我方飞机初始生命数life_Number=3</p>
+<p>​       创建 重置我方飞机位置函数 reset_position()</p>
+<p>复制初始化中，定位我方飞机的代码即可</p>
+<p>Main中，_check_collidion_myplane_enemies（）下，检测到碰撞的条件分支下，添加生命数相关代码（初始化函数中定义标记is_gameover=False）</p>
+<p>​    创建 停止定时器函数_stop_timer（），放置于_set_timers（）之后，</p>
+<p>复制，修改：时间间隔为0即可</p>
+<p>​    生命数为0分支，修改标志，并调用停止定时器函数</p>
+<p>​    run_game中，添加 停止条件 至 检测碰撞、更新位置、删除不可见、切换元素</p>
+</blockquote>
+<p>​</p>
+<p><strong>49.</strong> <strong>检测我方飞机与敌机的碰撞（5）之我方飞机生命数即时显示</strong></p>
+<blockquote>
+<p>my_plane中，初始化函数中，创建 我方飞机生命图片对象life_image，即缩小版图片</p>
+<p>借助pygame.transform.scale(原图，尺寸：元组表示)函数实现</p>
+<p>创建我方飞机生命图片矩形的列表，并根据初始生命数，将对应数量的生命图片矩形定位在窗口中</p>
+<p>Main中，_draw_elements（）下，绘制所有生命图片！</p>
+</blockquote>
+<p><strong>50.</strong> <strong>检测我方飞机与敌机的碰撞（6）之我方飞机无敌状态</strong></p>
+<blockquote>
+<p>my_plane中，初始化函数中，创建 无敌状态标记 is_invincible=False</p>
+<p>Main中，_check_collidion_myplane_enemies（）下，重置位置之后，标记我方飞机处于无敌状态！</p>
+<p>&ndash;创建自定义事件“解除我方飞机的无敌状态”</p>
+<p>Contants中，创建id和时间间隔常量</p>
+<p>Main中，标记无敌状体之后，添加自定义事件“解除我方飞机的无敌状态”</p>
+<p>​    发生碰撞的条件分支下，添加分支：如果没处于无敌状态，才去生命数-1，才去判断是否大于或等于0</p>
+<p>​     _handle_events（），添加自定义事件“解除我方飞机的无敌状态”分支</p>
+<p>​       标记置False；停止生成自定义事件</p>
+</blockquote>
+<p><strong>51.</strong> <strong>检测我方飞机与敌机的碰撞（7）之我方飞机无敌状态文本显示</strong></p>
+<blockquote>
+<p>在pygame中，绘制文本与绘制图片类似</p>
+<p>调用window.blit(文本对应的surface对象，文本对应的矩形)</p>
+<p>通过调用pygame.image.load()来获得图片的surface对象</p>
+<p>如何得到文本的surface对象？先获得字体Font的一个实例对象，再调用render（）对要绘制的文本进行渲染即可。</p>
+<p>Main中，创建 无敌状态提示文本函数_draw_invincible_prompt_text(),编写提示文本</p>
+<p>新建目录fonts，导入字体</p>
+<p>Main中，初始化时，创建 字体并获得字体对象赋值于invincible_font</p>
+<p>Main中，_draw_invincible_prompt_text()下</p>
+<p>调用绘制问题函数render（）以获得surface对象prompt_text_surface;</p>
+<p>进一步，获得提示文本的矩形 prompt_text_surface_rect,并定位于窗口中部</p>
+<p>​	  调用window.blit（）绘制提示文本</p>
+<p>Main中，_draw_elements（）内，添加条件（无敌状态），并调用绘制函数进行绘制</p>
+</blockquote>
+<p><strong>52.</strong> <strong>检测我方飞机与敌机的碰撞（8）之游戏结束文本显示</strong></p>
+<blockquote>
+<p>Main中，复制_draw_invincible_prompt_text()修改为_draw_gameover_prompt_text()</p>
+<p>修改顺序：字体-绘制</p>
+<p>重构&raquo;&gt; 合并为 _get_fonts() 获取字体对象</p>
+</blockquote>
+<h3 id="第九章定时补给bullet和bomb">第九章、定时补给Bullet和Bomb</h3>
+<p><strong>53.</strong> <strong>定时创建一个Bullet补给并从窗口的上方向下匀速移动</strong></p>
+<blockquote>
+<p>与小型敌机基本一致，复制，修改为bullet_supply.py</p>
+<p>导入子弹补给图片 加载图片 修改其他</p>
+<p>Constants中，添加 自定义事件“创建子弹补给”的id和时间间隔</p>
+<p>Main中，_set_timers（）中，设置定时器下添加事件“创建子弹补给”的生成代码</p>
+<p>​               停止定时器下添加事件“创建子弹补给”的停止代码</p>
+<p>Main中，_handle_events（）中，创建子弹事件后，添加创建子弹补给分支（复制修改）</p>
+<p>​    _create_groups（）中，创建管理所有子弹补给的分组</p>
+<p>​    _draw_elements（）中，绘制所有补给</p>
+<p>​    _update_positions（）中，更新所有补给位置</p>
+<p>​    _delete_invisible_elements（）中，调用 删除所有不可见补给函数</p>
+<p>​     _delete_invisible_bullet_supplies（）先去创建（复制删除敌机的代码）</p>
+<p>合并&raquo;&gt; _delete_invisible_bullet_supplies（）和 _delete_invisible_enemy（）</p>
+<p>重新调用</p>
+</blockquote>
+<p><strong>54.</strong> <strong>检测我方飞机与Bullet补给的碰撞</strong></p>
+<blockquote>
+<p>Main中，创建 检测碰撞函数 _check_collision_myplane_bulletsupply()</p>
+<p>​    在_check_collisions中，调用该函数</p>
+<p>Main中， _check_collision_myplane_bulletsupply()下，将敌机与我方飞机碰撞检测函数下的 检测到碰撞代码 复制过来，修改；如果检测到碰撞，遍历子弹补给分组，播放碰撞声音</p>
+<p>导入我方飞机与子弹补给碰撞音频</p>
+<p>Bullet_supply中，创建播放函数（复制小型敌机播放爆炸声音函数，修改）</p>
+<p>Main中， _check_collision_myplane_bulletsupply()下，调用播放函数播放声音；将补给从所有分组中删除；停止自定义事件“创建子弹”</p>
+<p>Constants中，创建 自定义事件“创建双发子弹”的id和时间间隔</p>
+<p>Main中， _check_collision_myplane_bulletsupply()下，生成自事件“创建双发子弹”</p>
+<p>_stop_timer（）中，停止事件“创建双发子弹”</p>
+<p>Main中，_handle_events（）中，添加条件分支 自定义事件“创建双发子弹”；</p>
+<p>Main中，创建函数-创建两颗双发子弹_create_two_double_bullets()</p>
+<p>Main中，_handle_events（）中，调用_create_two_double_bullets()方法</p>
+<p>导入双发子弹图片；复制bullet.py为double_bullet.py</p>
+<p>double_bullet中，修改；删除双发子弹初始位置设置</p>
+<p>Main中，_create_two_double_bullets（）中，创建一颗位于我方飞机左翼的双发子弹；并设置初始位置；同理右侧</p>
+<p>Main中，_create_groups（）中，创建 管理所有双发子弹的分组</p>
+<p>_create_two_double_bullets（）中，将创建的两颗双发子弹添加到分组中</p>
+<p><strong>init</strong>（）中，创建 双发子弹计数器</p>
+<p>Main中，_create_two_double_bullets（）中，计数器加1，并添加判断是否达到设定值，（达到）才进行双发子弹的创建； 创建else子句：生成子弹，关闭双发子弹，重置计数器为0</p>
+<p>Main中，_check_collision_myplane_bulletsupply（）内，双发子弹计数器置0</p>
+<p>_draw_elements（）中，绘制所有双发子弹</p>
+<p>​    _update_positions（）中，更新所有双发子弹位置</p>
+<p>Main中，_delete_invisible_bullets()中，合并单双子弹不可见删除函数为_delete_invisible_bulletsordouble()</p>
+<p>Main中，_delete_invisible_elements（）中，修改调用</p>
+<p>​    _check_collidion_myplane_enemies（）中，碰撞之后，生命数还大于0，则：停止双发子弹，生成单发子弹</p>
+</blockquote>
+<p><strong>55.</strong> <strong>检测双发Bullet与小型敌机的碰撞</strong></p>
+<blockquote>
+<p>和Bullet与小型敌机碰撞  类似，合并二者！</p>
+<p>Main中，合并为_check_collision_bulletsordouble_smalls（self,group）</p>
+<p>_check_collisions()中，修改调用</p>
+</blockquote>
+<p><strong>56.</strong> <strong>检测双发Bullet与中型敌机或大型敌机的碰撞</strong></p>
+<blockquote>
+<p>和Bullet与中/大型敌机碰撞  类似，合并二者！</p>
+<p>合为_check_collision_bulletsordouble_midsorbigs(self,blt_group,enemy_group)</p>
+<p>Main中，_check_collisions()中，分四次调用</p>
+<p>回到方法，继续修改；当能量值为0时，分情况处理</p>
+</blockquote>
+<p><strong>57.</strong> <strong>定时创建一个Bomb补给并从窗口的上方向下匀速移动</strong></p>
+<blockquote>
+<p>与bullet_supply类似，复制，修改</p>
+<p>导入炸弹补给图片</p>
+<p>Constants中，创建 自定义事件“创建炸弹补给”的id和时间间隔</p>
+<p>Main中，_set_timers（）中，设置定时器 自定义事件“创建炸弹补给”</p>
+<p>_stop_timer（）中，停止定时器</p>
+<p>_handle_events（）中，添加事件分支</p>
+<p>_create_groups（）中，创建分组</p>
+<p>_draw_elements()中，绘制</p>
+<p>_update_positions（）中，更新位置</p>
+<p>_delete_invisible_enemies_supplies（）中，修改注释即可</p>
+<p>_delete_invisible_elements（）中，调用该函数</p>
+</blockquote>
+<p><strong>58.</strong> <strong>可视化我方飞机的Bomb数</strong></p>
+<blockquote>
+<p>导入可视化Bomb图片</p>
+<p>新建python文件visual_bomb_group 创建 可视化炸弹组 类  VisualBombGroup并编写</p>
+<p>Main中，初始化中，创建一个可视化炸弹组</p>
+<p>​     _draw_elements（）中，绘制可视化炸弹组的所有炸弹图片</p>
+</blockquote>
+<p><strong>59.</strong> <strong>按下空格键后我方飞机发射一个Bomb</strong></p>
+<blockquote>
+<p>Main中，_handle_keydown_events（）中，定义 按下Space事件</p>
+<p>Main中，创键方法_launch_bomb（）</p>
+<p>导入炸弹爆炸音频</p>
+<p>visual_bomb_group中，创建播放函数（小型敌机播放函数复制，修改）</p>
+<p>Main中，_launch_bomb（）下，调用 播放声音函数，销毁所有敌机，炸弹数减1</p>
+</blockquote>
+<p><strong>60.</strong> <strong>检测我方飞机与Bomb补给的碰撞</strong></p>
+<blockquote>
+<p>与检测我方飞机与子弹补给碰撞 类似，复制</p>
+<p>修改为_check_collision_myplane_bombsupply（），删除自定义事件部分代码</p>
+<p>Main中，_check_collision_myplane_bombsupply（）下，遍历碰撞下，添加条件判断</p>
+<p>导入补给与我方飞机碰撞声音文件</p>
+<p>Bomb_supply中，创建播放声音函数（复制 bullet_supply中的播放函数，修改）</p>
+<p>Main中，_check_collisions（）中，调用 检测碰撞函数</p>
+</blockquote>
+<h3 id="第十章显示得分和关数">第十章、显示得分和关数</h3>
+<p><strong>61.</strong> <strong>在控制台打印当前得分</strong></p>
+<blockquote>
+<p>Main中，初始化时，定义 当前得分 current_score=0</p>
+<p>Constans中，添加三个常量：摧毁小中大型敌机的得分</p>
+<p>Main中，创建 函数_update_current_score(self,enemy);添加分支语句</p>
+<p>Main中，_check_collision_bulletsordouble_smalls（）中，播放爆炸声音之前，更新得分；_check_collision_bulletsordouble_midsorbigs（）中，同理。</p>
+<p>Main中，_launch_bomb（）中，遍历所有敌机，销毁前，根据摧毁的敌机更新当前得分</p>
+<p>Main中，_check_collidion_myplane_enemies（）中，播放爆炸声音之前，更新得分</p>
+<p>Main中，run_game（）中，在控制台打印当前得分</p>
+</blockquote>
+<p><strong>62.</strong> <strong>在窗口的左上方实时显示当前得分</strong></p>
+<blockquote>
+<p>新建python文件 score_board 创建 得分板类ScoreBoard；绘制函数draw_current_score</p>
+<p>将main中初始化的当前得分，剪切到ScoreBoard的初始化中。</p>
+<p>Main中，初始化中，创建一个得分板</p>
+<p>_update_current_score（）中，修改current_score的调用方式</p>
+<p>_draw_elements（）中，调用得分板的绘制函数</p>
+<p>run_game（）中，删除打印在控制台代码</p>
+<p>score_board中，draw_current_score（）下，复制绘制无敌状态文本代码（main中），修改；复制_get_fonts（）中的获得字体对象代码，放置初始化下，修改；初始化函数添加window参数，并绑定窗口对象</p>
+<p>Main中，初始化得分板时传递window参数</p>
+</blockquote>
+<p><strong>63.</strong> <strong>在窗口的左上方显示Highest得分</strong></p>
+<blockquote>
+<p>新建目录 txts 目录中，新建文件 highest_score.txt 用来存储最高得分，初始存值1000</p>
+<p>score_board中，创建 读取最高得分函数：打开文件、读取最高得分</p>
+<p>​        初始化中，读取最高得分</p>
+<p>​        创建 在得分板绘制最高得分函数（与绘制当前得分相似，复制，修改）</p>
+<p>Tips：如何获取同一模块下不同函数内的变量值？ 统一加self.前缀！！</p>
+<p>Main中，_draw_elements（）中，绘制最高得分</p>
+</blockquote>
+<p><strong>64.</strong> <strong>退出游戏时判断是否将当前得分保存为Highest得分</strong></p>
+<blockquote>
+<p>score_board中，创建 保存最高得分函数save_current_score（）</p>
+<p>Main中，_handle_events（）中，触发退出事件时，添加保存最新（高）得分代码</p>
+<p>​    _handle_keydown_events（）中，按下Esc键同理添加代码</p>
+</blockquote>
+<p><strong>65.</strong> <strong>在窗口的左上方实时显示当前关数</strong></p>
+<blockquote>
+<p>score_board中，初始化中，定义当前关数</p>
+<p>​        编写 绘制当前关数函数（复制绘制最高得分，修改）添加.self前缀</p>
+<p>Main中，_draw_elements（）中，调用 绘制当前关数</p>
+<p>score_board中，创建 根据当前得分更新当前关数函数 update_current_level()添加语句</p>
+<p>constants中，创建 4个常量 1.2.3.4关的得分最大值</p>
+<p>Main中，_check_collision_bulletsordouble_smalls（）中，更新得分之后判断是否更新关数，调用函数</p>
+<p>​    _check_collision_bulletsordouble_midsorbigs（）中，同理</p>
+<p>​    _launch_bomb（）中，同理</p>
+<p>​    _check_collidion_myplane_enemies（）中，同理</p>
+</blockquote>
+<p><strong>66.</strong> <strong>根据当前关数更新所有敌机和补给的速度</strong></p>
+<blockquote>
+<p>Main中，创建 据关数更新敌机和补给的速度函数_update_enemies_supplies_speed（）</p>
+<p>​    初始化中，定义4个是否更新标记is_update_level*_speed=False</p>
+<p>​	创建分支，并编写代码</p>
+<p>small_enemy中，将小型敌机偏移量转变为类属性（即放置类内函数外），因此，访问偏移量offset就要有类对象（即SmallEnemy.offset）</p>
+<p>small_enemy中，定义类方法update_offset(cls,pixels)更新小型敌机每次移动时的偏移量</p>
+<p>Main中，_update_enemies_supplies_speed()更新速度处，调用函数update_offset（）</p>
+<p>Mid_enemy同理操作</p>
+<p>Big_enemy同理操作</p>
+<p>bullet_supply 同理操作</p>
+<p>Bomb_supply 同理操作</p>
+<p>Main中，在所有更新关数的代码之后，调用更新速度函数</p>
+</blockquote>
+<h3 id="第十一章背景音乐">第十一章、背景音乐</h3>
+<p><strong>67.</strong> <strong>为游戏添加背景音乐</strong></p>
+<blockquote>
+<p>导入背景音乐音频</p>
+<p>Main中，创建 播放背景音乐函数_play_bg_music（） （与播放爆炸声音不同！）初始化mixer模块、加载背景音乐、设置音量、播放音乐</p>
+<p>Main中，初始化时调用播放</p>
+<p>​     _check_collidion_myplane_enemies，停止计时器后，停止播放背景音乐</p>
+</blockquote>
+<h3 id="第十二章暂停游戏和重新开始游戏">第十二章、暂停游戏和重新开始游戏</h3>
+<p><strong>68.</strong> <strong>暂停游戏和重新开始</strong></p>
+<blockquote>
+<p>暂停游戏：</p>
+<p>新建python文件，pause_button.py;导入暂停和继续的图片文件</p>
+<p>pause_button中，创建PauseButton类；初始化，导入4张图片，并设置暂停按钮的矩形的初始位置，以及标记游戏不处于暂停状态；创建 在窗口绘制暂停按钮函数 draw（）</p>
+<p>Main中，初始化，创建一个暂停按钮</p>
+<p>​     _draw_elements（）中，如果游戏没有结束，绘制按钮</p>
+<p>pause_button中，创建 切换暂停按钮图片函数switch_image</p>
+<p>Main中，_handle_events（）中，添加分支：移动鼠标事件pygame.MOUSEMOTION：</p>
+<p>如果游戏没有结束，调用函数pause_button.switch_image(event)以切换暂停按钮图片</p>
+<p>Main中，_handle_events（）中，添加分支：按下鼠标事件pygame.MOUSEBUTTONDOWN</p>
+<p>如果游戏没有结束，如果按下的是鼠标左键，如果鼠标点击了暂停按钮，</p>
+<p>则调用 处理鼠标对暂停按钮的单击 函数_handle_click_pause_button（）；</p>
+<p>Main中，创建 处理鼠标对暂停按钮的单击 函数_handle_click_pause_button（）：切换暂停与不暂停状态，如果处于暂停，则暂停声音和调用函数_stop_timers()以停止定时器；如果不处于暂停，则继续播放声音和调用函数_set_timers()以设置定时器</p>
+<p>如果游戏已经结束，如果按下的是鼠标左键，如果点击了重新开始游戏的文本矩形,</p>
+<p>则调用 处理鼠标对重新开始游戏的单击函数_handle_click_restartgame（）：</p>
+<p>Main中，创建 处理鼠标对重新开始游戏的单击函数_handle_click_restartgame（）：重新播放背景音乐，重置我方飞机的位置和初始生命数、重置炸弹的初始数量、重置当前分数、重置当前关数、重设最高得分（如果当前得分大于最高得分，将当前得分作为最高得分保存到文件，#将当前分数赋值给最高分数）、调用函数_empty_all_groups()以删除所有分组中的所有精灵、调用函数_set_timers()以设置定时器、重置双发子弹的计数器、调用函数_reset_offsets()以重置敌机和供给每次移动时的偏移量</p>
+<p>Main中，创建 在窗口中绘制重新开始游戏的文本函数_draw_restartgame_text（）：_get_fonts（）中获得字体对象+创建文本——获得文本对应的surface对象——获得文本的矩形——将文本的矩形定位在窗口——在窗口中绘制的文本</p>
+<p>Main中，_draw_elements（）下，如果游戏结束，绘制“游戏结束”之后，调用函数</p>
+<p>_draw_restartgame_text（）绘制“重新开始游戏”：如果游戏没有结束，在窗体中绘制暂停按钮</p>
+<p>Main中，run_game（）中，给更新位置、删除不可见、切换添加条件：游戏没有结束并且游戏没有暂停！！</p>
+</blockquote>
+<h3 id="planewar框架结构"><strong>PlaneWar框架结构：</strong></h3>
+<pre><code>import...**
+
+ 
+
+**class** PlaneWar:
+  **&quot;&quot;&quot;管理游戏的总体类&quot;&quot;&quot;**
+
+ 
+
+**def** __init__(self):
+  **&quot;&quot;&quot;初始化游戏&quot;&quot;&quot;**
+
+初始化pygame库
+
+   创建指定尺寸的窗口
+
+   设置窗口（标题、图标...）
+
+   加载窗口中要绘制的所有图形元素
+
+   创建时钟对象
+
+**def** run_game(self):
+  **&quot;&quot;&quot;运行游戏&quot;&quot;&quot;**
+
+从事件队列中将所有事件全部取出并逐个进行处理
+
+ 设置窗口的背景色或背景图片
+
+ 绘制窗口中的所有图形元素
+
+ 将内存中的窗体对象绘制到屏幕上以更新屏幕
+
+ 更新窗口中所有图形元素的位置和图像
+
+ 设置while循环体在一秒内执行的最大次数（设置动画最大帧率）
+
+ 
+
+**if** __name__==**'__main__'**:
+  #运行游戏
+  PlaneWar().run_game()
+</code></pre></div>
+  
+</article></main>
+<footer class="footer">
+  <span>&copy; 2020 <a href="https://xshi000.github.io/">及时当勉励，岁月不待人！@iNuo</a></span>
+  <span>&middot;</span>
+  <span>Powered by <a href="https://gohugo.io/" rel="noopener" target="_blank">Hugo️️</a>️</span>
+  <span>&middot;</span>
+  <span>Theme️ <a href="https://github.com/nanxiaobei/hugo-paper" rel="noopener" target="_blank">Paper</a></span>
+</footer>
+<script src="https://xshi000.github.io/highlight.min.js"></script>
+<script>
+  hljs.initHighlightingOnLoad();
+</script>
+</body>
+</html>
+

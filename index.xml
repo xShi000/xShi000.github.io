@@ -6,10 +6,168 @@
     <description>Recent content on 及时当勉励，岁月不待人！@iNuo</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-cn</language>
-    <lastBuildDate>Mon, 28 Sep 2020 22:26:11 +0800</lastBuildDate>
+    <lastBuildDate>Tue, 29 Sep 2020 22:03:41 +0800</lastBuildDate>
     
 	<atom:link href="https://xshi000.github.io/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>论文写作技巧</title>
+      <link>https://xshi000.github.io/write/</link>
+      <pubDate>Tue, 29 Sep 2020 22:03:41 +0800</pubDate>
+      
+      <guid>https://xshi000.github.io/write/</guid>
+      <description>1.降重 代码降重   代码加注释
+  批量改变量（Ctrl+F 查找）改为全称/简称
+  添加透明字符，普通字符变小变白
+  代码变图片（需pdf软件转换）
+  文本降重   文本添加到公式框内，即文字转变为图片
+  算法流程转流程图，常用，降重并且简洁
+  2.三线表？   去除所有格式，边框：无框线
+  添加上下框线，较粗一点
+  选定第一行，添加下框线，线条正常粗细
+    字体格式问题：中文（宋体，小四） 英文&amp;amp;数字（Time New Romance）
+  表格公式占位宽问题：段落，取消勾选两个勾
+  表名问题：表上图下（图不用带标题）字体小一号；表标题上一行文字，进入段落，设置段后（0.5行）
+  表标题：加粗，大小与正文一致
+  打印与预览 可看最终效果！
+  3.公式上浮？ 对于段落中的公式上浮问题：
+  【治标】选中段落 段落 中文版式 文本对齐方式：居中
+  【治本】正文格式 修改 段落 中文版式 文本对齐方式：居中</description>
+    </item>
+    
+    <item>
+      <title>DBSCAN聚类算法流程图</title>
+      <link>https://xshi000.github.io/dbscan/</link>
+      <pubDate>Tue, 29 Sep 2020 22:02:40 +0800</pubDate>
+      
+      <guid>https://xshi000.github.io/dbscan/</guid>
+      <description> </description>
+    </item>
+    
+    <item>
+      <title>python进阶思维导图</title>
+      <link>https://xshi000.github.io/pymendpic/</link>
+      <pubDate>Tue, 29 Sep 2020 22:01:42 +0800</pubDate>
+      
+      <guid>https://xshi000.github.io/pymendpic/</guid>
+      <description>1. 数据交换格式 2. 数据库编程 3. 网络编程 4. wxPython图形用户界面编程 5. 多线程编程 6. 网络爬虫 7. 数据可视化 8. 宠物商店项目 9. QQ聊天工具 ​</description>
+    </item>
+    
+    <item>
+      <title>Python项目：pygame游戏开发之飞机大战</title>
+      <link>https://xshi000.github.io/pygame/</link>
+      <pubDate>Tue, 29 Sep 2020 22:00:56 +0800</pubDate>
+      
+      <guid>https://xshi000.github.io/pygame/</guid>
+      <description>第一章、编写pygame HelloWorld程序 1. 搭建开发环境
+ Python 、集成开发环境PyCharm 、用于游戏开发的第三方库pygame
+pip install -i https://pypi.tuna.tsinghua.edu.cn/simple pygame //指定下载路径
+ 2. HelloWorld程序的运行效果和实现步骤
+ 实现步骤：
+1、创建并显示一个固定尺寸的窗口
+2、处理用户关闭窗口从而退出程序的事件
+3、设置窗口的标题和背景色
+4、在窗口的底部居中位置绘制一架飞机
+5、让飞机向上匀速移动
+ 3. HelloWorld1创建并显示一个固定尺寸的窗口
+ 创建项目PlaneWar
+添加Main.py
+导入pygame-初始化-调用pygame.display.set_mode()
+编写游戏运行函数run_game()-调用
+ 4. HelloWorld2处理用户关闭窗口以退出程序的事件
+ Main：
+While循环等待关闭事件触发，卸载pygame库，退出程序（sys库）
+ 5. HelloWorld3设置窗体的标题和背景色
+ 标题：调用pygame.display.set_caption()
+图标：加载图片-设置set_icon（）
+背景色：接收窗体对象为window-调用fill（）—刷新flip（）
+ 6. HelloWorld4绘制飞机
+ 新建Directory-导入飞机图片
+Main，加载图片pygame.image.load（）赋予my_plane
+窗体中，绘制window.blit（）
+窗口坐标系：左上角为坐标原点，右向为X轴，下向为Y轴
+本例：窗口（500，700） 飞机（102，126）
+飞机的初始位置：X=（500-102）/2 Y=700-126 即（199，574）
+ 7. HelloWorld5飞机移动
+ 游戏开发帧率至少30帧/秒，常规60帧/秒，75以上，无法分辨！
+时间测试：导入datetime，开始、结束时间打点datetime.datetime.now()，相减
+创建时钟对象clock-设置动画最大帧率clock.tick(30)
+飞机移动过程，只Y改变，抽取Y为pos_y 并替换初始位置的Y坐标
+将绘制飞机和刷新置于while中，并将Y坐标作为循环变量，减少一个值
+将绘制背景颜色置于while中，绘制飞机之前！（消除残影）</description>
+    </item>
+    
+    <item>
+      <title>C#项目：学员信息管理系统</title>
+      <link>https://xshi000.github.io/cshape/</link>
+      <pubDate>Tue, 29 Sep 2020 21:59:56 +0800</pubDate>
+      
+      <guid>https://xshi000.github.io/cshape/</guid>
+      <description>0.项目总体概述 功能模块
+   学员管理系统               系统 学员管理 成绩管理 考勤管理 帮助         秘密修改 退出系统 添加学员 信息打印 学员管理 成绩分析 快速查询 考勤打卡 考勤查询 在线帮助 联系我们    项目数据库
+学员表 &amp;amp; 成绩表 &amp;amp; 班级表 管理员表 项目框架设计（典型两层设计）
+   UI 应用程序层（界面）     Models 实体层(数据封装与传递)   DAL 数据访问层   数据库     1.</description>
+    </item>
+    
+    <item>
+      <title>T-SQL</title>
+      <link>https://xshi000.github.io/sql/</link>
+      <pubDate>Tue, 29 Sep 2020 21:59:39 +0800</pubDate>
+      
+      <guid>https://xshi000.github.io/sql/</guid>
+      <description>新建数据库
+create database TestDB; 使用数据库
+use TestDB; //跳转到指定数据库 新建表
+create table Student( Id int primary key identity(1831301,1), --编号 整数 主键 标识列（种子，增量 ） Names nvarchar(30) not null, --姓名 字符 非空 Gender char(2) not null, --性别 字符 非空 Age int not null, --年龄 整数 非空 Adress nvarchar(50) default(&#39;湖北武汉&#39;),--地址 字符 默认值（湖北武汉）	Score float check(Score&amp;gt;=0 and Score&amp;lt;=100) not null --分数 小数 check约束（0~100之间) 非空 ); //查 --查询数据库表Student里的所有信息 select * from Student; //改 update Student set Major=4 where Major=2; //删 delete from Student where Number=1831304; //增 insert into Student (Names,Gender,Age,Adress,Score) values (&#39;李荣浩&#39;,&#39;男&#39;,18,default,88); 删除表</description>
+    </item>
+    
+    <item>
+      <title>ADO.NET</title>
+      <link>https://xshi000.github.io/ado/</link>
+      <pubDate>Tue, 29 Sep 2020 21:59:21 +0800</pubDate>
+      
+      <guid>https://xshi000.github.io/ado/</guid>
+      <description>ADO.NET是数据库访问的方法和技术
+ADO.NET由两部分组成：DataSet（数据集）和.NET Framework数据提供程序
+  DataSet数据集——能临时保存各种类型数据库中的数据；
+  .Net framework数据提供程序——它由几个组件组成，分别负责连接、操作和访问数据库，其中负责访问数据的组件是只读只进式的，也就是只读不修改、只能往前读不能后退
+  ADO.NET主要通过以下对象操作数据库：
+  Connection对象，负责连接数据库。
+  Command对象，对数据库进行增删改的操作。
+  Datareader对象，读取数据（只读只进）。
+  DataAdapter对象，从数据库获取对象后填充给DataSet临时数据库。
+  使用connection对象的步骤
+示例1
+private void button1_Click(object sender, EventArgs e) { //1.创建链接对象 SqlConnection con = new SqlConnection(); //2.给对象添加属性 con.ConnectionString = &amp;quot;data source=.; initial catalog=TestDB; integrated security=true&amp;quot;; try //将可能出现异常的代码，放在try里 { //3.打开数据库连接 con.Open(); MessageBox.Show(&amp;quot;打开数据库连接成功&amp;quot;); } catch (Exception ex)//如果出现异常，则允许catch里的代码 { MessageBox.Show(ex.Message);//以消息框形式，输出异常消息 } finally //不管程序错误与否，都会执行的代码 { con.Close(); MessageBox.Show(&amp;quot;关闭数据库连接成功&amp;quot;); } } 使用Command对象</description>
+    </item>
+    
+    <item>
+      <title>Excel-图表模板大法</title>
+      <link>https://xshi000.github.io/excel2/</link>
+      <pubDate>Tue, 29 Sep 2020 21:14:31 +0800</pubDate>
+      
+      <guid>https://xshi000.github.io/excel2/</guid>
+      <description>主题颜色 经济学人主题色 水蓝系
+商业周刊主题色 黑标系
+华尔街时报主题色 茶色系
+Think-cell主题色 咨询风
+金融日报主题色 粉色系
+第一财经周报主题色 奶色系
+颜色主题库位置：C:\Users\iNuo\AppData\Roaming\Microsoft\Templates\Document Themes\Theme Colors
+图表模板 经济学人图表模板 水蓝系
+商业周刊图表模板 黑标系
+华尔街时报图表模板 茶色系
+Think-cell图表模板 咨询风
+金融日报图表模板 粉色系
+第一财经周报图表模板 奶色系
+图表模板库位置：C:\Users\iNuo\AppData\Roaming\Microsoft\Templates\Charts
+操作技巧 一键出图
+在图表模板中，选中某一模板，右键，设置为默认图表即可！
+按Alt+F1，瞬间出图！
+Office通用
+在Word和PPT中，同样可以调出模板，直接出图！</description>
+    </item>
     
     <item>
       <title>向《经济学人》学图表</title>
@@ -43,16 +201,10 @@
       <guid>https://xshi000.github.io/anaconda/</guid>
       <description>【声明】本篇博客为个人笔记整理，笔记来源各个技术博客/书籍/个人编撰，如有侵权，必删之！
 快速访问区    描述 操作     Py库 https://www.lfd.uci.edu/~gohlke/pythonlibs/   路径 pip install -i https://pypi.tuna.tsinghua.edu.cn/simple pygame   超时 pip &amp;ndash;default-timeout=100 install tensorflow   镜像    清华 https://pypi.tuna.tsinghua.edu.cn/simple   豆瓣 https://pypi.douban.com/simple    ​
-Python 一种面向对象的解释型计算机程序设计语言
-python环境 一个解释器和一个包集合.
-【python解释器】即python.exe，这才是python的本体。解释器根据python的版本大概分为2和3. python2和3之间无法互相兼容。
-【Lib】即python包文件，包括自带的包和第三方包；自带的包,如：日志包logging, 异步包 concurrent；第三方包都放在site-packages文件夹里面，第三方包通过pip/conda install来下载。
-Python的强大之处在于它的应用领域范围之广，遍及人工智能、科学计算、Web开发、系统运维、大数据及云计算、金融、游戏开发等。实现其强大功能的前提，就是Python具有数量庞大且功能相对完善的标准库和第三方库。通过对库的引用，能够实现对不同领域业务的开发。然而，正是由于库的数量庞大，对于管理这些库以及对库作及时的维护成为既重要但复杂度又高的事情。那么接下来我们要引入这款神器——Anaconda。
-Anaconda 一种可便捷获取包且对包进行管理，同时对环境可以统一管理的发行版本，其包含了conda、Python在内的超过180个科学包及依赖项。Anaconda具有如下特点：开源\安装过程简单\高性能使用Python和R语言\免费的社区支持，其特点的实现主要基于Anaconda拥有的：conda包\环境管理器\1,000+开源库。
-Anaconda、conda、pip、virtualenv的区别 ① Anaconda
-Anaconda是一个包含180+的科学包及其依赖项的发行版本，其包含的科学包包括：conda, numpy, scipy, ipython notebook等。
-② conda
-conda是包及其依赖项和环境的管理工具，适用语言：Python, R, Ruby, Lua, Scala, Java, JavaScript, C/C++, FORTRAN，适用平台：Windows, macOS, Linux。</description>
+手动安装python包  有时候，pip安装python包会失败，提示 “未找到和环境相匹配的包”！此时，可以试试手动安装。
+操作流程如下：
+ 首先，在py库 https://www.lfd.uci.edu/~gohlke/pythonlibs/ 中，下载安装包 然后，解包后，放到 Lib-&amp;gt;site-packages 下面（site-packages放第三方包） 最后，在包目录下有个setup.py，需要在这个目录下打开命令行，运行 “ python setup.py install ” 完成编译。这样就完成安装了。   Python  一种面向对象的解释型计算机程序设计语言
+ python环境  一个解释器和一个包集合.</description>
     </item>
     
   </channel>

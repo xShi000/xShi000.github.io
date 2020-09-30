@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    
+    <title>C#项目：学员信息管理系统 - 及时当勉励，岁月不待人！@iNuo</title>
+    
+    <meta name="description" content="0.项目总体概述 功能模块
+   学员管理系统               系统 学员管理 成绩管理 考勤管理 帮助         秘密修改 退出系统 添加学员 信息打印 学员管理 成绩分析 快速查询 考勤打卡 考勤查询 在线帮助 联系我们    项目数据库
+学员表 &amp; 成绩表 &amp; 班级表 管理员表 项目框架设计（典型两层设计）
+   UI 应用程序层（界面）     Models 实体层(数据封装与传递)   DAL 数据访问层   数据库     1.">
+    <meta name="author" content="">
+    
+    <link href="https://xshi000.github.io/an-old-hope.min.css" rel="stylesheet">
+    <link href="https://xshi000.github.io/style.css" rel="stylesheet">
+    <link href="https://xshi000.github.io/custom.css" rel="stylesheet">
+    
+    <link rel="apple-touch-icon" href="https://xshi000.github.io/apple-touch-icon.png">
+    <link rel="icon" href="https://xshi000.github.io/favicon.ico">
+    <meta name="generator" content="Hugo 0.65.3" />
+    
+    
+    
+    <script>
+      function setTheme() {
+        const time = new Date();
+
+        const prev = localStorage.getItem('date');
+        const date = String(time.getMonth() + 1) + '.' + String(time.getDate());
+
+        const now = time.getTime();
+        let sunrise;
+        let sunset;
+
+        function setBodyClass() {
+          if (now > sunrise && now < sunset) return;
+          document.body.classList.add('dark');
+        }
+
+        if (date !== prev) {
+          fetch('https://api.ipgeolocation.io/astronomy?apiKey=5ed37d85103e4defa5df4c5298ed5215')
+            .then(res => res.json())
+            .then(data => {
+              sunrise = data.sunrise.split(':').map(Number);
+              sunset = data.sunset.split(':').map(Number);
+            })
+            .catch(() => {
+              sunrise = [7, 0];
+              sunset = [19, 0];
+            })
+            .finally(() => {
+              sunrise = time.setHours(sunrise[0], sunrise[1], 0);
+              sunset = time.setHours(sunset[0], sunset[1], 0);
+              setBodyClass();
+              localStorage.setItem('sunrise', sunrise);
+              localStorage.setItem('sunset', sunset);
+            });
+          localStorage.setItem('date', date);
+        } else {
+          sunrise = Number(localStorage.getItem('sunrise'));
+          sunset = Number(localStorage.getItem('sunset'));
+          setBodyClass();
+        }
+      }
+    </script>
+  </head>
+  <body class="single">
+    <script>
+      setTheme();
+    </script>
+    <header class="header">
+      <nav class="nav">
+        <p class="logo"><a href="https://xshi000.github.io/">及时当勉励，岁月不待人！@iNuo</a></p>
+      </nav>
+    </header>
+    <main class="main">
+
+
+<article class="post-single">
+  <header class="post-header">
+    <h1 class="post-title">C#项目：学员信息管理系统</h1>
+    <div class="post-meta">September 29, 2020</div>
+  </header>
+  <div class="post-content"><h3 id="heading"></h3>
+<h3 id="0项目总体概述">0.项目总体概述</h3>
+<p><strong>功能模块</strong></p>
+<table>
+<thead>
+<tr>
+<th>学员管理系统</th>
+<th></th>
+<th></th>
+<th></th>
+<th></th>
+<th></th>
+<th></th>
+<th></th>
+<th></th>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>系统</td>
+<td>学员管理</td>
+<td>成绩管理</td>
+<td>考勤管理</td>
+<td>帮助</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>秘密修改</td>
+<td>退出系统</td>
+<td>添加学员</td>
+<td>信息打印</td>
+<td>学员管理</td>
+<td>成绩分析</td>
+<td>快速查询</td>
+<td>考勤打卡</td>
+<td>考勤查询</td>
+<td>在线帮助</td>
+<td>联系我们</td>
+</tr>
+</tbody>
+</table>
+<p><strong>项目数据库</strong></p>
+<pre><code>学员表 &amp; 成绩表 &amp; 班级表  管理员表
+</code></pre><p><strong>项目框架设计</strong>（典型两层设计）</p>
+<table>
+<thead>
+<tr>
+<th>UI</th>
+<th>应用程序层（界面）</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Models</td>
+<td>实体层(数据封装与传递)</td>
+</tr>
+<tr>
+<td>DAL</td>
+<td>数据访问层</td>
+</tr>
+<tr>
+<td>数据库</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h3 id="1-项目框架的搭建">1. 项目框架的搭建</h3>
+<table>
+<thead>
+<tr>
+<th><strong>完善解决方案</strong></th>
+<th><strong>模块中类的设计</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>添加数据库访问模块DAL</td>
+<td>添加数据访问类、SQLHelper类</td>
+</tr>
+<tr>
+<td>添加实体类库模块Models</td>
+<td>添加需要的实体类</td>
+</tr>
+<tr>
+<td>添加UI中的相关辅助类</td>
+<td>添加配置文件App.config</td>
+</tr>
+</tbody>
+</table>
+<p><strong>操作步骤</strong></p>
+<pre><code>建类库：解决方案 新建项目 类库（.NET Framwork） 重命名
+定关系：DAL引用Models  UI引用DAL、Models
+添加类：Models添加实体类 重新生成解决方案
+DAL添加AdminService、ScoreListService、StudentService、StudentClassService ；添加特殊类SQLHelper（通用数据访问类）编写增删改方法，获取单一结果查询方法，返回一个结果集的查询方法
+添加配置文件：UI中添加新项目 应用配置文件 导入链接字符串
+DAL添加引用：System Configration  SQLHelper中添加命名空间  修改链接字符串
+测试：UI FrmMain中添加测试代码
+</code></pre><h3 id="2-企业项目中标准用户登录的实现">2. 企业项目中标准用户登录的实现</h3>
+<p><strong>逻辑思路图</strong></p>
+<table>
+<thead>
+<tr>
+<th>a启动程序</th>
+<th>b显示登陆窗体【Y/N】</th>
+<th>不登陆直接退出</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td></td>
+<td>c获取用户信息并登陆</td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>d后台查询用户信息【T/F】</td>
+<td></td>
+</tr>
+<tr>
+<td>显示系统主界面</td>
+<td>提示登陆失败信息(返回c)</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p><strong>操作步骤</strong></p>
+<pre><code>启动程序显示登陆窗体：program中创建登陆窗体 判断是否登陆成功
+点击登陆进行数据验证：FrmUserLogin中验证数据
+编写数据验证方法： AdminService中编写后台方法
+定义全局变量： program中currentAdmin
+登陆时数据验证：FrmUserLogin中验证数据 封装用户信息到用户对象 提交用户信息（创建数据访问类对象）
+显示用户： FrmMain中显示用户名称
+</code></pre><h3 id="3-在主窗体中嵌入子窗体">3. 在主窗体中嵌入子窗体</h3>
+<p><strong>操作流程</strong></p>
+<pre><code>FrmMain中
+设置窗体显示：显示窗体，设置非顶级控件、窗体最大化、去边框、指定容器
+方法优化：编写OpenForm(Form objForm)和CloseForm()方法
+顺序：关闭之前的窗体 创建窗体 显示窗体
+</code></pre><h3 id="4-程序退出设计方法">4. 程序退出设计方法</h3>
+<p><strong>思考：不论是何种退出（退出按钮/右上角的X）都是触发关闭事件</strong></p>
+<pre><code>点击关闭按钮，定位代码，关闭this.Close();（X按钮不用编写）
+找到窗体关闭事件FrmMain_FormClosing(object sender, FormClosingEventArgs e)
+编写代码实现
+</code></pre><h3 id="5-修改管理员登陆密码">5. 修改管理员登陆密码</h3>
+<p><strong>操作流程</strong></p>
+<pre><code>创建窗体：FrmMain中，点击修改密码，定位代码，创建窗体，以对话框形式
+数据验证：FrmModifyPwd中，点击确认，定位代码；校验用户输入的旧密码是否正确；将新密码提交到数据库
+数据访问类编写修改密码方法：AdminService中编写ModifyPwd(string loginId, string newPwd)
+FrmModifyPwd中创建数据库访问类对象，引入命名空间
+校验旧密码： FrmModifyPwd中，判断原密码是否正确，新密码限制，是否一致
+提交新密码：调用方法objAdminService.ModifyPwd( Id,NewPwd) 同步当前用户密码
+</code></pre><h3 id="6-主窗体细节优化与登录用户体验改进">6. 主窗体细节优化与登录用户体验改进</h3>
+<p><strong>panel容器添加背景</strong></p>
+<pre><code>静态：backgroundImage 导入本地图片 
+
+动态：FrmMain中，panelForm.BackgroundImage导入图片；图片保存在与项目启动文件同级目录下（右键UI在资源管理器中打开，bin/debug中）
+</code></pre><p><strong>版本号动态更新</strong></p>
+<pre><code>在App.config中，添加&lt;appSettings&gt;，写入版本号；
+
+在UI中，添加System Configration引用；
+
+在FrmMain中，引入命名空间；窗体初始化时，获取版本号并赋值。
+</code></pre><p><strong>登陆界面回车跳转设置</strong></p>
+<pre><code>FrmUserLogin中，选定文本框，查找事件KeyDown并添加；编写判断和跳转代码。
+</code></pre><h3 id="7-使用泛型集合动态填充下拉框">7. 使用泛型集合动态填充下拉框</h3>
+<p><strong>操作步骤</strong></p>
+<pre><code>后台编写数据访问方法：StudentClassService中，编写班级数据访问方法，返回班级集合
+
+前台数据填充：FrmAddStudent中，定义数据访问对象objClassService  + 添加命名空间 初始化班级下拉框，设置隐含&amp;显示部分
+</code></pre><h3 id="8-图片选择对话框的使用">8. 图片选择对话框的使用</h3>
+<p><strong>操作步骤</strong></p>
+<pre><code>FrmAddStudent中，点击“选择照片”，触发事件
+
+创建 文件对话框 对象fileDialog
+
+填充图片 Image.FromFile(fileDialog.FileName)
+</code></pre><h3 id="9-添加对象之前的数据验证方法">9. 添加对象之前的数据验证方法</h3>
+<p><strong>操作流程</strong></p>
+<pre><code>前台FrmAddStudent中，点击“添加”，进入代码；
+
+验证姓名、性别、年龄、班级、身份证号、卡号 是否输入；
+
+验证身份证号格式(调用common文件夹下的DataValidate中的IsIdentityCard方法)；
+
+验证身份证号是否和出生日期相吻合；
+
+后台验证身份证号的唯一性：学员数据访问类StudentService中，创建IsIDCardExisted(string idcard)函数（考勤卡号同理）
+
+前台调用：定义数据访问类对象，调用后台验证方法，验证唯一性；（考勤卡号同理）
+</code></pre><h3 id="10-基于oop实现对象添加到数据库从前台到后端">\10. 基于OOP实现对象添加到数据库（从前台到后端）</h3>
+<p><strong>操作步骤</strong></p>
+<pre><code>前端FrmAddStudent中，封装学员对象objStudent；
+
+后端StudentService中，编写添加学员对象方法AddStudent(Student objStudent)；
+
+前端FrmAddStudent中，提交对象，“确认添加”，学员数据访问类对象objStudentservice调用后端添加学员方法AddStudent；继续添加操作实现（清空操作实现）
+</code></pre><h3 id="11-使用datagridview展示查询结果从后端到前台">\11. 使用DataGridView展示查询结果（从后端到前台）</h3>
+<p><strong>操作步骤</strong></p>
+<pre><code>前端FrmStudentManage中，填充下拉框
+
+后端StudentService中，编写查询方法GetStudentByClassId(string classId)
+
+前端FrmStudentManage中，数据访问类对象 objStudentService调用查询方法GetStudentByClassId(this.cboClass.SelectedValue.ToString()) 获取查询结果并绑定数据。
+
+
+前端DataGridView控件设计注意要点：
+
+添加列时，“名称”对应“数据库字段名称/实体对象属性名称（三者一致）”；
+
+“页眉文本”对应“前台显示内容”
+
+数据属性名称DataPropertyName设置：必须与实体对象属性名称一致，否则无法显示！
+
+数据表添加行号：事件RowPostPaint（行重绘）定位代码，调用common下的DataGridViewStyle中的DgvRowPostPaint方法。
+
+  点击选择单元格：属性SelectionMode选择单元格！
+</code></pre><h3 id="12-查询结果的排序">\12. 查询结果的排序</h3>
+<p><strong>操作步骤</strong></p>
+<pre><code>使用IComparer比较器接口排序 （要实现排序，需添加特定的类，通过类实现比较器接口）
+
+比较器方法编写：前端FrmStudentManage中，添加两个特定类NameDESC 和StudentIdDESC分别实现接口IComparer&lt;StudentExt&gt; 编写Compare方法
+
+排序实现：参数对象new NameDESC() 实现排序list.Sort 及数据验证。
+</code></pre><h3 id="13-按照学号精确查询对象">\13. 按照学号精确查询对象</h3>
+<p><strong>操作步骤</strong></p>
+<pre><code>前台FrmStudentManage中，点击“提交查询”，定位代码；数据验证，判断是否输入
+
+后端StudentService中，编写查询方法GetStudentByStuId(string stuId)返回学员对象StudentExt 
+
+前端FrmStudentManage中，根据数据访问类对象objStudentService调用查询方法GetStudentByStuId(this.txtStudentId.Text.Trim())查询学员对象并赋值给objStudent：
+
+判断对象是否为空：
+
+ 若为空：提示弹窗
+
+ 若不空：FrmStudentInfo中，创建带参构造函数FrmStudentInfo(StudentExt objStudent)
+
+​     FrmStudentManage中，创建学员信息显示窗体
+
+优化用户体验，回车提交：	文本框事件KeyDown
+</code></pre><h3 id="14-使用excel实现快速打印">\14. 使用Excel实现快速打印</h3>
+<p><strong>操作步骤</strong></p>
+<pre><code>首先，在资源管理器/bin/debug中设计Excel模板StudentInfo.xls，来接收读取到的数据
+
+前台FrmStudentManage中，点击“打印当前学员信息”，定位代码；
+
+前端FrmStudentManage中，数据验证，判断是否存在并选中学员；获取要打印的学员对象
+
+前端StudentManagerPro中，添加COM引用-Microsoft Excel 14.0 Object Library
+
+前端StudentManagerPro中，Common文件夹下添加 打印类ExcelPrint.cs并编写
+
+前端FrmStudentManage中，调用Excel模板实现打印objPrint.ExecutePrint(objStudent)
+</code></pre><h3 id="15-展示要修改的学员对象">\15. 展示要修改的学员对象</h3>
+<p><strong>操作步骤</strong></p>
+<pre><code>前台FrmStudentManage中，点击“修改”，定位代码；数据验证，判断是否有修改的信息；获取要修改的学员对象objStudent
+
+前端FrmEditStudent中，定义数据访问类对象，引入命名空间；构建带参构造函数FrmEditStudent(StudentExt objStudent)，并初始化学员信息；下拉框和图片特殊处理
+
+前端FrmStudentManage中，创建窗体并显示，接受操作结果并判断
+</code></pre><h3 id="16-实现学员对象修改">\16. 实现学员对象修改</h3>
+<p><strong>操作步骤</strong></p>
+<pre><code>后端StudentService中，编写修改学员对象方法ModifyStudent(Student objStudent)
+
+前端FrmEditStudent中，提交修改，进行数据验证：基本与添加学员验证一致，独验证身份证号是否与别人重复，需在StudentService中重写IsIDCardExisted(string idCard, string StudentId)方法（卡号同理）；前端调用方法实现验证。
+
+前端FrmEditStudent中，封装学员对象，提交学员对象：基本与添加学员验证一致
+
+
+右键快捷菜单设置：菜单和工具栏/组件ContextMenuStrip：添加“修改学员”，改name；双击进入，调用btnEidt_Click(null,null);选择在那个控件区域右键显示，点选控件，选择ContextMenuStrip
+</code></pre><h3 id="17-实现学员对象删除">\17. 实现学员对象删除</h3>
+<p><strong>操作流程</strong></p>
+<pre><code>在前台FrmStudentManage中，点击“删除”，定位代码；进行数据验证；进行删除确认：
+
+否：直接返回即可。
+
+是：获取要删除的学号；根据学号删除
+
+在后端StudentService中，创建删除学员对象函数DeleteStudent(string studentId)
+
+在前端FrmStudentManage中，调用方法objStudentService.DeleteStudent(studentId)；删除提示并刷新表（通过再次查询实现）
+</code></pre><h3 id="18-考勤打卡初始化">\18. 考勤打卡初始化</h3>
+<p><strong>时间显示</strong></p>
+<pre><code>在前台FrmAttendance中，点选工具箱，添加Timer组件；设置属性；设置事件Tick，定位代码
+
+在前端FrmAttendance中，设置时间显示，年月日时周
+</code></pre><p><strong>应到实到缺勤</strong></p>
+<pre><code>在后端DAL中，添加考勤数据访问类AttendanceService.cs；
+
+编写获取学员总数方法GetAllStudent()；
+
+编写获取实到学员总数方法GetAttendStudents(DateTime dt, bool isToday)；
+
+在前端FrmAttendance中，调用方法GetAllStudent()获取考勤学员总数；编写方法ShowStat()显示应出勤总数和签到总数并实现。
+</code></pre><h3 id="19-考勤打卡实现">\19. 考勤打卡实现</h3>
+<p><strong>操作流程</strong></p>
+<pre><code>在后端StudentService中，编写根据卡号获取学员对象的函数GetStudentByCardNo(string cardNo)  （由于其与根据学号查询学员对象的代码基本一致，所以创建内部私有函数GetStudentBySql(string whereSql)来简化代码！）
+
+在后端AttendanceService中，编写添加打卡记录函数AddRecord(string cardNo)
+
+在前台FrmAttendance中，点选卡号文本框，定位KeyDown事件代码
+
+在前端FrmAttendance中，数据验证；获取学员对象；对象为空，失败清空 // 对象不空，界面显示，后台添加； 添加成功，更新待输
+</code></pre><h3 id="20-考勤查询">\20. 考勤查询</h3>
+<p><strong>操作流程</strong></p>
+<pre><code>在后端AttendanceService中，编写 根据日期和姓名查询学员考勤情况 函数 GetStudentByDate(DateTime beginTime, DateTime endTime, string name)返回学员列表List&lt;StudentExt&gt;
+
+在前台FrmAttendanceQuery中，点击“查询”，定位代码
+
+在前端FrmAttendanceQuery中，查询考勤结果objAttService.GetStudentByDate(dt1, dt2, this.txtName.Text.Trim())；考勤学员应到人数 实到人数 缺勤人数 显示；设置显示样式 添加行号
+</code></pre><h3 id="21-使用dataset填充班级下拉框">\21. 使用DataSet填充班级下拉框</h3>
+<p><strong>操作流程</strong></p>
+<pre><code>在后端SQLHelper中，编写DataSet获取数据函数GetDataSet(string sql)
+
+在后端StudentClassService中，编写 通过DataSet获取所有的班级对象 函数GetAllStuClass()
+
+在前台FrmScoreManage中，点选下拉框，查找事件SelectedIndexChanged,定位代码
+
+在前端FrmScoreManage中，使用DataSet填充下拉框
+
+将FrmScoreManage.designer中的添加事件this.cboClass.SelectedIndexChanged += new System.EventHandler(this.cboClass_SelectedIndexChanged);剪切到FrmScoreManage下拉框初始化之后
+</code></pre><h3 id="22-统计全校考试信息">\22. 统计全校考试信息</h3>
+<p><strong>操作流程</strong></p>
+<p><strong>查询考试成绩信息</strong></p>
+<pre><code>在后端ScoreListService中，编写 查询考试成绩信息 方法 GetScoreList(string className)
+
+在前台FrmScoreManage中，检查各个字段DataPropertyName属性值是否与数据库命名相同
+
+在前端FrmScoreManage中，展示考试成绩列表
+</code></pre><p><strong>查询考试综合统计结果</strong></p>
+<pre><code>在后端ScoreListService中，编写 查询考试综合统计结果 方法Dictionary&lt;string, string&gt; GetScoreInfo()
+
+在前端FrmScoreManage中，展示查询成绩统计结果
+</code></pre><p><strong>查询缺考的学员姓名</strong></p>
+<pre><code>在后端ScoreListService中，查询缺考的学员姓名 List&lt;string&gt; getAbsentList()
+
+在前端FrmScoreManage中，展示 查询缺考的学员姓名
+</code></pre><h3 id="23-按照班级统计考试信息">\23. 按照班级统计考试信息</h3>
+<p><strong>操作流程</strong></p>
+<pre><code>在后端ScoreListService中，添加参数 GetScoreInfo(string classId)；同时，在前端FrmScoreManage中添加参数GetScoreInfo(null)；同理，getAbsentList(string classId)
+
+在两处添加 按照班级统计考试信息 代码
+
+在前端FrmScoreManage中，编写根据班级查询 函数cboClass_SelectedIndexChanged； 仿照 统计全校考试成绩 函数btnStat_Click
+</code></pre><h3 id="24-学员成绩快速浏览">\24. 学员成绩快速浏览</h3>
+<p><strong>操作流程</strong></p>
+<pre><code>在后端ScoreListService中，编写 查询全部的考试成绩 函数 GetAllScoreList()返回值为DataSet
+
+在前端FrmScoreQuery中，初始化下拉框、显示全部考试成绩、根据班级名称动态筛选
+
+在前台FrmScoreQuery中，点选按C#成绩快速浏览文本框，选择TextChanged事件，定位代码
+</code></pre><h3 id="25-总体概述">\25. 总体概述</h3>
+<p><strong>操作流程</strong></p>
+<pre><code>系统测试
+</code></pre></div>
+  
+</article></main>
+<footer class="footer">
+  <span>&copy; 2020 <a href="https://xshi000.github.io/">及时当勉励，岁月不待人！@iNuo</a></span>
+  <span>&middot;</span>
+  <span>Powered by <a href="https://gohugo.io/" rel="noopener" target="_blank">Hugo️️</a>️</span>
+  <span>&middot;</span>
+  <span>Theme️ <a href="https://github.com/nanxiaobei/hugo-paper" rel="noopener" target="_blank">Paper</a></span>
+</footer>
+<script src="https://xshi000.github.io/highlight.min.js"></script>
+<script>
+  hljs.initHighlightingOnLoad();
+</script>
+</body>
+</html>
+

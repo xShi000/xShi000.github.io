@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    
+    <title>T-SQL - 及时当勉励，岁月不待人！@iNuo</title>
+    
+    <meta name="description" content="新建数据库
+create database TestDB; 使用数据库
+use TestDB; //跳转到指定数据库 新建表
+create table Student( Id int primary key identity(1831301,1), --编号 整数 主键 标识列（种子，增量 ） Names nvarchar(30) not null, --姓名 字符 非空 Gender char(2) not null, --性别 字符 非空 Age int not null, --年龄 整数 非空 Adress nvarchar(50) default(&#39;湖北武汉&#39;),--地址 字符 默认值（湖北武汉）	Score float check(Score&gt;=0 and Score&lt;=100) not null --分数 小数 check约束（0~100之间) 非空 ); //查 --查询数据库表Student里的所有信息 select * from Student; //改 update Student set Major=4 where Major=2; //删 delete from Student where Number=1831304; //增 insert into Student (Names,Gender,Age,Adress,Score) values (&#39;李荣浩&#39;,&#39;男&#39;,18,default,88); 删除表">
+    <meta name="author" content="">
+    
+    <link href="https://xshi000.github.io/an-old-hope.min.css" rel="stylesheet">
+    <link href="https://xshi000.github.io/style.css" rel="stylesheet">
+    <link href="https://xshi000.github.io/custom.css" rel="stylesheet">
+    
+    <link rel="apple-touch-icon" href="https://xshi000.github.io/apple-touch-icon.png">
+    <link rel="icon" href="https://xshi000.github.io/favicon.ico">
+    <meta name="generator" content="Hugo 0.65.3" />
+    
+    
+    
+    <script>
+      function setTheme() {
+        const time = new Date();
+
+        const prev = localStorage.getItem('date');
+        const date = String(time.getMonth() + 1) + '.' + String(time.getDate());
+
+        const now = time.getTime();
+        let sunrise;
+        let sunset;
+
+        function setBodyClass() {
+          if (now > sunrise && now < sunset) return;
+          document.body.classList.add('dark');
+        }
+
+        if (date !== prev) {
+          fetch('https://api.ipgeolocation.io/astronomy?apiKey=5ed37d85103e4defa5df4c5298ed5215')
+            .then(res => res.json())
+            .then(data => {
+              sunrise = data.sunrise.split(':').map(Number);
+              sunset = data.sunset.split(':').map(Number);
+            })
+            .catch(() => {
+              sunrise = [7, 0];
+              sunset = [19, 0];
+            })
+            .finally(() => {
+              sunrise = time.setHours(sunrise[0], sunrise[1], 0);
+              sunset = time.setHours(sunset[0], sunset[1], 0);
+              setBodyClass();
+              localStorage.setItem('sunrise', sunrise);
+              localStorage.setItem('sunset', sunset);
+            });
+          localStorage.setItem('date', date);
+        } else {
+          sunrise = Number(localStorage.getItem('sunrise'));
+          sunset = Number(localStorage.getItem('sunset'));
+          setBodyClass();
+        }
+      }
+    </script>
+  </head>
+  <body class="single">
+    <script>
+      setTheme();
+    </script>
+    <header class="header">
+      <nav class="nav">
+        <p class="logo"><a href="https://xshi000.github.io/">及时当勉励，岁月不待人！@iNuo</a></p>
+      </nav>
+    </header>
+    <main class="main">
+
+
+<article class="post-single">
+  <header class="post-header">
+    <h1 class="post-title">T-SQL</h1>
+    <div class="post-meta">September 29, 2020</div>
+  </header>
+  <div class="post-content"><h3 id="heading"></h3>
+<p><strong>新建数据库</strong></p>
+<pre><code>create database TestDB;
+</code></pre><p><strong>使用数据库</strong></p>
+<pre><code>use TestDB;        //跳转到指定数据库
+</code></pre><p><strong>新建表</strong></p>
+<pre><code>create table Student(
+	Id int primary key identity(1831301,1), --编号 整数 主键 标识列（种子，增量 ）
+	Names nvarchar(30) not null,      --姓名  字符  非空
+	Gender char(2) not null,        --性别  字符  非空
+	Age int not null,            --年龄  整数  非空
+	Adress nvarchar(50) default('湖北武汉'),--地址  字符  默认值（湖北武汉）	Score float check(Score&gt;=0 and Score&lt;=100) not null  --分数  小数  check约束（0~100之间) 非空
+);
+</code></pre><pre><code>//查 --查询数据库表Student里的所有信息
+select * from Student;   
+
+//改
+update Student set Major=4 where Major=2;
+
+//删
+delete from Student where Number=1831304;
+
+//增
+insert into Student (Names,Gender,Age,Adress,Score) values ('李荣浩','男',18,default,88);
+</code></pre><p><strong>删除表</strong></p>
+<pre><code>drop table Students;
+</code></pre><p><strong>删除数据库</strong></p>
+<pre><code>drop database TestDB;
+</code></pre><p><strong>一次插入多行数据</strong></p>
+<pre><code>insert into Student(Number,Name,Gender,Age,Major,Works,Email)
+select 1831305,'王源','男',16,2,null,'wangyuan@qq.com'  union
+select 1831306,'易烊千玺','男',16,2,null,'qianxi@qq.com' union
+select 1831307,'yangyang','男',16,2,null,'yangyag@qq.com' ;
+</code></pre><pre><code>insert into 新表名(列名1,列名2,…,列名n) select 列名1,列名2,…,列名n from 原表名;
+
+适用情况：将旧表里的数据，保存到新表中，要求必须先创建一个新表，且新表里的列属性要和旧表一致。
+
+ 
+select 列名1,列名2,…,列名n insert into 新表名 from 原表名;
+
+适用情况：适合备份，这里的新表是执行查询语句的时候自动创建的，不能预先存在。执行以后刷新，会有一张新的表生成。
+</code></pre><p><strong>复制表</strong></p>
+<pre><code>SQL Server中，如果目标表不存在：
+select * into 目标表 from 原表;
+
+SQL Server中，如果目标表存在：
+insert into 目标表 select * from 原表;
+</code></pre><p><strong>特殊查询</strong></p>
+<pre><code>select Names,Age 年龄,Names+'.'+Works as 姓名作品,专业年龄 = Major+Age from Student where Major=1;
+
+select top 20 percent * from Student;
+</code></pre><pre><code>//查询学生的学号、姓名、性别、年龄，并按年龄降序排列
+select StudentNo,Names,Gender,Age from Student order by Age desc;
+select StudentNo,Names,Age from Student where Age&lt;21 order by Age asc,Names asc;
+</code></pre><p><strong>函数</strong></p>
+<pre><code>Getdate函数：获取当前的系统日期
+select getdate();
+
+
+power函数：取数值表达式的幂值
+select power(3,3); 
+</code></pre><p><strong>模糊查询</strong></p>
+<pre><code>使用like进行模糊查询
+--查找名字中包含“向”和“三”的同学
+select * from Student where names like '%向%' and names like '%三%';
+
+
+使用between在某个范围内查询
+--查询年龄不在16~19的学生信息
+select * from Student where age not between 16 and 19;
+
+
+使用in在列举值内进行查询
+--查询名字叫“张杰”、“刘诗诗”、“李三娜”的学生信息
+select * from Student where names in('张杰','刘诗诗','李三娜');
+</code></pre><p><strong>聚合函数</strong></p>
+<pre><code>--分别查询不同年龄段里，男同学、女同学的总成绩，
+select gender,age,sum(score) as 总成绩 from Student group by gender,age;
+
+
+--分别查询不同年龄段里，男同学、女同学的平均分，
+select gender,age,avg(score) as 总成绩 from Student group by gender,age;
+
+
+--查询最高分和最低分
+select max(score) 最高分, min(score) 最低分 from Student;
+
+
+--查询表中“分数”列有多少行数据
+select count(score) from Student; 
+
+
+--统计班级中60分以上的总分数，按性别进行分组,并按分数进行降序排列
+select gender 性别 ,sum(score) 总分数 from Student where score&gt;60 group by gender      order by sum(score) desc;
+</code></pre><p><strong>分组查询</strong></p>
+<pre><code>使用group by进行分组查询
+--统计男生和女生总分数：先按照性别进行男生女生分组，然后再利用sum()函数进行求和。
+select Sex 性别,sum(Score) 总分数 from Student group by Sex;
+
+ 
+使用having子句进行分组筛选
+--统计分数大于60分的，不同班级的，男生和女生的总分数，并按照总分数降序排列
+select sex,Class_id, sum(score) as 总分数 from Student where score&gt;=60 group by sex,Class_id order by sum(score);
+</code></pre><p><strong>多表连接查询方式</strong></p>
+<ul>
+<li>
+<p>全连接（交叉连接）：也称笛卡尔集，是将两个表中的每一条数据都进行组合。</p>
+</li>
+<li>
+<p>内连接（自然连接、条件连接）：它是根据两个或多个表中的列之间的关系，从这些表中查询数据。特别是两个表存在主外键关系时，通常使用内连接查询。这也是常用典型的连接查询。（where、inner join）</p>
+</li>
+<li>
+<p>外连接（左连接、右连接）：外连接查询至少返回一个表中的所有记录，根据匹配条件有选择性地返回另一张表的记录。外连接可以是左外连接（left join）、右外连接（right join）</p>
+</li>
+</ul>
+<pre><code>//全连接查询
+select * from banji,stu;
+
+//左连接查询
+select * from banji left join stu on (banji.id=stu.banji_id);
+
+//右连接查询
+select * from banji right join stu on (banji.id=stu.banji_id);
+
+//内连接查询
+select * from banji inner join stu on banji.id=stu.banji_id;
+</code></pre></div>
+  
+</article></main>
+<footer class="footer">
+  <span>&copy; 2020 <a href="https://xshi000.github.io/">及时当勉励，岁月不待人！@iNuo</a></span>
+  <span>&middot;</span>
+  <span>Powered by <a href="https://gohugo.io/" rel="noopener" target="_blank">Hugo️️</a>️</span>
+  <span>&middot;</span>
+  <span>Theme️ <a href="https://github.com/nanxiaobei/hugo-paper" rel="noopener" target="_blank">Paper</a></span>
+</footer>
+<script src="https://xshi000.github.io/highlight.min.js"></script>
+<script>
+  hljs.initHighlightingOnLoad();
+</script>
+</body>
+</html>
+
