@@ -1,0 +1,893 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    
+    <title>极简Java三：Object类与常用API - 及时当勉励，岁月不待人！@iNuo</title>
+    
+    <meta name="description" content="第一章  本章内容  Object类   1.1 Object类概述 java.lang.Object类是Java语言中的根类，即所有类的父类。它的所有方法子类都可以使用。
+如果一个类没有特别指定父类， 那么默认则继承自Object类。例如：
+public class Person extends Object { ... } 根据JDK源代码及Object类的API文档，Object类当中包含的方法有11个。今天我们主要学习其中的2个：
+  public String toString()：返回该对象的字符串表示
+  public boolean equals(Object obj)：指示其他某个对象是否与此对象“相等”
+  toString方法 方法摘要  public String toString()：返回该对象的字符串表示。  toString方法返回该对象的字符串表示，其实该字符串内容就是对象的类型&#43;@&#43;内存地址值。
+由于toString方法返回的结果是内存地址，而在开发中，经常需要按照对象的属性得到相应的字符串表现形式，因此也需要重写它。
+覆盖重写 如果不希望使用toString方法的默认行为，则可以对它进行覆盖重写。例如自定义的Person类：
+public class Person { private String name; private int age; @Override public String toString() { return &#34;Person{&#34; &#43; &#34;name=&#39;&#34; &#43; name &#43; &#39;\&#39;&#39; &#43; &#34;, age=&#34; &#43; age &#43; &#39;}&#39;; } // 省略构造器与Getter Setter  } public class Test { public static void main(String[] args) { Person p=new Person(&#34;iNuo&#34;,23); //重写toString方法运行结果  System.">
+    <meta name="author" content="">
+    
+    <link href="https://xshi000.github.io/an-old-hope.min.css" rel="stylesheet">
+    <link href="https://xshi000.github.io/style.css" rel="stylesheet">
+    <link href="https://xshi000.github.io/custom.css" rel="stylesheet">
+    
+    <link rel="apple-touch-icon" href="https://xshi000.github.io/apple-touch-icon.png">
+    <link rel="icon" href="https://xshi000.github.io/favicon.ico">
+    <meta name="generator" content="Hugo 0.65.3" />
+    
+    
+    
+    <script>
+      function setTheme() {
+        const time = new Date();
+
+        const prev = localStorage.getItem('date');
+        const date = String(time.getMonth() + 1) + '.' + String(time.getDate());
+
+        const now = time.getTime();
+        let sunrise;
+        let sunset;
+
+        function setBodyClass() {
+          if (now > sunrise && now < sunset) return;
+          document.body.classList.add('dark');
+        }
+
+        if (date !== prev) {
+          fetch('https://api.ipgeolocation.io/astronomy?apiKey=5ed37d85103e4defa5df4c5298ed5215')
+            .then(res => res.json())
+            .then(data => {
+              sunrise = data.sunrise.split(':').map(Number);
+              sunset = data.sunset.split(':').map(Number);
+            })
+            .catch(() => {
+              sunrise = [7, 0];
+              sunset = [19, 0];
+            })
+            .finally(() => {
+              sunrise = time.setHours(sunrise[0], sunrise[1], 0);
+              sunset = time.setHours(sunset[0], sunset[1], 0);
+              setBodyClass();
+              localStorage.setItem('sunrise', sunrise);
+              localStorage.setItem('sunset', sunset);
+            });
+          localStorage.setItem('date', date);
+        } else {
+          sunrise = Number(localStorage.getItem('sunrise'));
+          sunset = Number(localStorage.getItem('sunset'));
+          setBodyClass();
+        }
+      }
+    </script>
+  </head>
+  <body class="single">
+    <script>
+      setTheme();
+    </script>
+    <header class="header">
+      <nav class="nav">
+        <p class="logo"><a href="https://xshi000.github.io/">及时当勉励，岁月不待人！@iNuo</a></p>
+      </nav>
+    </header>
+    <main class="main">
+
+
+<article class="post-single">
+  <header class="post-header">
+    <h1 class="post-title">极简Java三：Object类与常用API</h1>
+    <div class="post-meta">January 20, 2021</div>
+  </header>
+  <div class="post-content"><hr>
+<h3 id="第一章">第一章</h3>
+<hr>
+<h5 id="本章内容">本章内容</h5>
+<ul>
+<li>Object类</li>
+</ul>
+<hr>
+<h4 id="11-object类概述">1.1 Object类概述</h4>
+<p>java.lang.Object类是Java语言中的根类，即所有类的父类。它的所有方法子类都可以使用。</p>
+<p>如果一个类没有特别指定父类， 那么默认则继承自Object类。例如：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Person</span> <span style="color:#66d9ef">extends</span> Object <span style="color:#f92672">{</span>
+   <span style="color:#f92672">...</span>
+<span style="color:#f92672">}</span>
+</code></pre></div><p>根据JDK源代码及Object类的API文档，Object类当中包含的方法有11个。今天我们主要学习其中的2个：</p>
+<ul>
+<li>
+<p>public String toString()：返回该对象的字符串表示</p>
+</li>
+<li>
+<p>public boolean equals(Object obj)：指示其他某个对象是否与此对象“相等”</p>
+</li>
+</ul>
+<h4 id="tostring方法">toString方法</h4>
+<h5 id="方法摘要">方法摘要</h5>
+<ul>
+<li>public String toString()：返回该对象的字符串表示。</li>
+</ul>
+<p>toString方法返回该对象的字符串表示，其实该字符串内容就是对象的类型+@+内存地址值。</p>
+<p>由于toString方法返回的结果是内存地址，而在开发中，经常需要按照对象的属性得到相应的字符串表现形式，因此也需要重写它。</p>
+<h5 id="覆盖重写">覆盖重写</h5>
+<p>如果不希望使用toString方法的默认行为，则可以对它进行覆盖重写。例如自定义的Person类：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Person</span> <span style="color:#f92672">{</span>  
+   <span style="color:#66d9ef">private</span> String name<span style="color:#f92672">;</span>
+   <span style="color:#66d9ef">private</span> <span style="color:#66d9ef">int</span> age<span style="color:#f92672">;</span>
+ 
+   <span style="color:#a6e22e">@Override</span>
+   <span style="color:#66d9ef">public</span> String <span style="color:#a6e22e">toString</span><span style="color:#f92672">()</span> <span style="color:#f92672">{</span>
+     <span style="color:#66d9ef">return</span> <span style="color:#e6db74">&#34;Person{&#34;</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;name=&#39;&#34;</span> <span style="color:#f92672">+</span> name <span style="color:#f92672">+</span> <span style="color:#e6db74">&#39;\&#39;&#39;</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;, age=&#34;</span> <span style="color:#f92672">+</span> age <span style="color:#f92672">+</span> <span style="color:#e6db74">&#39;}&#39;</span><span style="color:#f92672">;</span>
+   <span style="color:#f92672">}</span>
+   <span style="color:#75715e">// 省略构造器与Getter Setter
+</span><span style="color:#75715e"></span> <span style="color:#f92672">}</span>
+</code></pre></div><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Test</span> <span style="color:#f92672">{</span>
+    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">main</span><span style="color:#f92672">(</span>String<span style="color:#f92672">[]</span> args<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+
+        Person p<span style="color:#f92672">=</span><span style="color:#66d9ef">new</span> Person<span style="color:#f92672">(</span><span style="color:#e6db74">&#34;iNuo&#34;</span><span style="color:#f92672">,</span>23<span style="color:#f92672">);</span>
+
+        <span style="color:#75715e">//重写toString方法运行结果
+</span><span style="color:#75715e"></span>        System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span>p<span style="color:#f92672">.</span><span style="color:#a6e22e">toString</span><span style="color:#f92672">());</span>
+        System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span>p<span style="color:#f92672">);</span>
+    <span style="color:#f92672">}</span>
+<span style="color:#f92672">}</span>
+</code></pre></div><p>小贴士： 在我们直接使用输出语句输出对象名的时候,其实通过该对象调用了其toString()方法。</p>
+<h4 id="equals方法">equals方法</h4>
+<h5 id="方法摘要-1">方法摘要</h5>
+<ul>
+<li>public boolean equals(Object obj)：指示其他某个对象是否与此对象“相等”。</li>
+</ul>
+<p>调用成员方法equals并指定参数为另一个对象，则可以判断这两个对象是否是相同的。这里的“相同”有默认和自定义两种方式。</p>
+<h5 id="默认地址比较">默认地址比较</h5>
+<p>如果没有覆盖重写equals方法，那么Object类中默认进行==运算符的对象地址比较，只要不是同一个对象，结果必然为false。</p>
+<h5 id="对象内容比较">对象内容比较</h5>
+<p>如果希望进行对象的内容比较，即所有或指定的部分成员变量相同就判定两个对象相同，则可以覆盖重写equals方法。例如：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="color:#f92672">import</span> java.util.Objects<span style="color:#f92672">;</span>
+ 
+ <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Person</span> <span style="color:#f92672">{</span>  
+   <span style="color:#66d9ef">private</span> String name<span style="color:#f92672">;</span>
+   <span style="color:#66d9ef">private</span> <span style="color:#66d9ef">int</span> age<span style="color:#f92672">;</span>
+   
+   <span style="color:#a6e22e">@Override</span>
+   <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">boolean</span> <span style="color:#a6e22e">equals</span><span style="color:#f92672">(</span>Object o<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+     <span style="color:#75715e">// 如果对象地址一样，则认为相同
+</span><span style="color:#75715e"></span>     <span style="color:#66d9ef">if</span> <span style="color:#f92672">(</span><span style="color:#66d9ef">this</span> <span style="color:#f92672">==</span> o<span style="color:#f92672">)</span>
+       <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">true</span><span style="color:#f92672">;</span>
+     <span style="color:#75715e">// 如果参数为空，或者类型信息不一样，则认为不同
+</span><span style="color:#75715e"></span>     <span style="color:#66d9ef">if</span> <span style="color:#f92672">(</span>o <span style="color:#f92672">==</span> <span style="color:#66d9ef">null</span> <span style="color:#f92672">||</span> getClass<span style="color:#f92672">()</span> <span style="color:#f92672">!=</span> o<span style="color:#f92672">.</span><span style="color:#a6e22e">getClass</span><span style="color:#f92672">())</span>
+       <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">false</span><span style="color:#f92672">;</span>
+     <span style="color:#75715e">// 转换为当前类型
+</span><span style="color:#75715e"></span>     Person person <span style="color:#f92672">=</span> <span style="color:#f92672">(</span>Person<span style="color:#f92672">)</span> o<span style="color:#f92672">;</span>
+     <span style="color:#75715e">// 要求基本类型相等，并且将引用类型交给java.util.Objects类的equals静态方法取用结果
+</span><span style="color:#75715e"></span>     <span style="color:#66d9ef">return</span> age <span style="color:#f92672">==</span> person<span style="color:#f92672">.</span><span style="color:#a6e22e">age</span> <span style="color:#f92672">&amp;&amp;</span> Objects<span style="color:#f92672">.</span><span style="color:#a6e22e">equals</span><span style="color:#f92672">(</span>name<span style="color:#f92672">,</span> person<span style="color:#f92672">.</span><span style="color:#a6e22e">name</span><span style="color:#f92672">);</span>
+   <span style="color:#f92672">}</span>
+ <span style="color:#f92672">}</span>
+</code></pre></div><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Test</span> <span style="color:#f92672">{</span>
+    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">main</span><span style="color:#f92672">(</span>String<span style="color:#f92672">[]</span> args<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+
+        Person p<span style="color:#f92672">=</span><span style="color:#66d9ef">new</span> Person<span style="color:#f92672">(</span><span style="color:#e6db74">&#34;iNuo&#34;</span><span style="color:#f92672">,</span>23<span style="color:#f92672">);</span>
+        Person p1<span style="color:#f92672">=</span><span style="color:#66d9ef">new</span> Person<span style="color:#f92672">(</span><span style="color:#e6db74">&#34;iNuo&#34;</span><span style="color:#f92672">,</span>23<span style="color:#f92672">);</span>
+
+        System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span>p<span style="color:#f92672">.</span><span style="color:#a6e22e">equals</span><span style="color:#f92672">(</span>p1<span style="color:#f92672">));</span>
+
+    <span style="color:#f92672">}</span>
+<span style="color:#f92672">}</span>
+</code></pre></div><p>Tips：Object类当中的hashCode等其他方法，今后学习。</p>
+<hr>
+<h3 id="第二章">第二章</h3>
+<hr>
+<h5 id="本章内容-1">本章内容</h5>
+<ul>
+<li>日期时间类</li>
+</ul>
+<hr>
+<h4 id="21-日期时间类">2.1 日期时间类</h4>
+<h4 id="date类">Date类</h4>
+<h5 id="概述">概述</h5>
+<ul>
+<li>
+<p>java.util.Date类 表示特定的瞬间，精确到毫秒。</p>
+<p>继续查阅Date类的描述，发现Date拥有多个构造函数</p>
+<p>public Date()：分配Date对象并初始化此对象，以表示分配它的时间（精确到毫秒）。</p>
+<p>public Date(long date)：分配Date对象并初始化此对象，以表示自从标准基准时间（称为“历元（epoch）”，即1970年1月1日00:00:00 GMT）以来的指定毫秒数。</p>
+</li>
+</ul>
+<p>Tips: 由于我们处于东八区，所以我们的基准时间为1970年1月1日8时0分0秒。</p>
+<p>简单来说：</p>
+<ul>
+<li>
+<p>使用无参构造，可以自动设置当前系统时间的毫秒时刻；</p>
+</li>
+<li>
+<p>指定long类型的构造参数，可以自定义毫秒时刻。</p>
+</li>
+</ul>
+<p>例如：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"> <span style="color:#f92672">import</span> java.util.Date<span style="color:#f92672">;</span>
+ 
+ <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Demo01Date</span> <span style="color:#f92672">{</span>
+   <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">main</span><span style="color:#f92672">(</span>String<span style="color:#f92672">[]</span> args<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+     <span style="color:#75715e">// 创建日期对象，把当前的时间
+</span><span style="color:#75715e"></span>     System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span><span style="color:#66d9ef">new</span> Date<span style="color:#f92672">());</span> <span style="color:#75715e">// Tue Jan 16 14:37:35 CST 2018
+</span><span style="color:#75715e"></span>     <span style="color:#f92672">}</span>
+ <span style="color:#f92672">}</span>
+</code></pre></div><p>Tips:在使用println方法时，会自动调用Date类中的toString方法。Date类对Object类中的toString方法进行了覆盖重写，所以结果为指定格式的字符串。</p>
+<h5 id="常用方法">常用方法</h5>
+<p>Date类中的多数方法已经过时，常用的方法有：</p>
+<ul>
+<li>public long getTime() 把日期对象转换成对应的时间毫秒值。</li>
+</ul>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">MyClass</span>  <span style="color:#f92672">{</span>
+   <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">main</span><span style="color:#f92672">(</span>String<span style="color:#f92672">[]</span> args<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+     System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span><span style="color:#66d9ef">new</span> Date<span style="color:#f92672">());</span> <span style="color:#75715e">// Tue Jan 16 14:37:35 CST 2018
+</span><span style="color:#75715e"></span>     System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span><span style="color:#66d9ef">new</span> Date<span style="color:#f92672">().</span><span style="color:#a6e22e">getTime</span><span style="color:#f92672">());</span><span style="color:#75715e">//1581122052047
+</span><span style="color:#75715e"></span>     System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span><span style="color:#66d9ef">new</span> Date<span style="color:#f92672">(</span>1581122052047l<span style="color:#f92672">));</span> <span style="color:#75715e">// Tue Jan 16 14:37:35 CST 2018
+</span><span style="color:#75715e"></span>   <span style="color:#f92672">}</span>
+ <span style="color:#f92672">}</span>
+</code></pre></div><h4 id="dateformat类">DateFormat类</h4>
+<p>java.text.DateFormat 是日期/时间格式化子类的抽象类，我们通过这个类可以帮我们完成日期和文本之间的转换,也就是可以在Date对象与String对象之间进行来回转换。</p>
+<ul>
+<li>
+<p>格式化：按照指定的格式，从Date对象转换为String对象。</p>
+</li>
+<li>
+<p>解析：按照指定的格式，从String对象转换为Date对象。</p>
+</li>
+</ul>
+<h5 id="构造方法">构造方法</h5>
+<p>由于DateFormat为抽象类，不能直接使用，所以需要常用的子类java.text.SimpleDateFormat。这个类需要一个模式（格式）来指定格式化或解析的标准。构造方法为：</p>
+<ul>
+<li>public SimpleDateFormat(String pattern)：用给定的模式和默认语言环境的日期格式符号构造SimpleDateFormat。</li>
+</ul>
+<p>参数pattern是一个字符串，代表日期时间的自定义格式。</p>
+<h5 id="格式规则">格式规则</h5>
+<p>常用的格式规则为：</p>
+<table>
+<thead>
+<tr>
+<th>标识字母（区分大小写）</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>y</td>
+<td>年</td>
+</tr>
+<tr>
+<td>M</td>
+<td>月</td>
+</tr>
+<tr>
+<td>d</td>
+<td>日</td>
+</tr>
+<tr>
+<td>H</td>
+<td>时</td>
+</tr>
+<tr>
+<td>m</td>
+<td>分</td>
+</tr>
+<tr>
+<td>s</td>
+<td>秒</td>
+</tr>
+</tbody>
+</table>
+<p>备注：更详细的格式规则，可以参考SimpleDateFormat类的API文档0。</p>
+<p>创建SimpleDateFormat对象的代码如：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"> <span style="color:#f92672">import</span> java.text.DateFormat<span style="color:#f92672">;</span>
+ <span style="color:#f92672">import</span> java.text.SimpleDateFormat<span style="color:#f92672">;</span>
+ 
+ <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Demo02SimpleDateFormat</span> <span style="color:#f92672">{</span>
+   <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">main</span><span style="color:#f92672">(</span>String<span style="color:#f92672">[]</span> args<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+     <span style="color:#75715e">// 对应的日期格式如：2018-01-16 15:06:38
+</span><span style="color:#75715e"></span>     DateFormat format <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> SimpleDateFormat<span style="color:#f92672">(</span><span style="color:#e6db74">&#34;yyyy-MM-dd HH:mm:ss&#34;</span><span style="color:#f92672">);</span>
+   <span style="color:#f92672">}</span>   
+ <span style="color:#f92672">}</span>
+</code></pre></div><h5 id="常用方法-1">常用方法</h5>
+<p>DateFormat类的常用方法有：</p>
+<ul>
+<li>
+<p>public String format(Date date)：将Date对象格式化为字符串。</p>
+</li>
+<li>
+<p>public Date parse(String source)：将字符串解析为Date对象。</p>
+</li>
+</ul>
+<h5 id="format方法">format方法</h5>
+<p>使用format方法的代码为：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"> <span style="color:#f92672">import</span> java.text.DateFormat<span style="color:#f92672">;</span>
+ <span style="color:#f92672">import</span> java.text.SimpleDateFormat<span style="color:#f92672">;</span>
+ <span style="color:#f92672">import</span> java.util.Date<span style="color:#f92672">;</span>
+
+<span style="color:#75715e">// 把Date对象转换成String
+</span><span style="color:#75715e"></span> <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Demo03DateFormatMethod</span> <span style="color:#f92672">{</span>
+   <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">main</span><span style="color:#f92672">(</span>String<span style="color:#f92672">[]</span> args<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+     Date date <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> Date<span style="color:#f92672">();</span>
+     <span style="color:#75715e">// 创建日期格式化对象,在获取格式化对象时可以指定风格
+</span><span style="color:#75715e"></span>     DateFormat df <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> SimpleDateFormat<span style="color:#f92672">(</span><span style="color:#e6db74">&#34;yyyy年MM月dd日&#34;</span><span style="color:#f92672">);</span>
+     String str <span style="color:#f92672">=</span> df<span style="color:#f92672">.</span><span style="color:#a6e22e">format</span><span style="color:#f92672">(</span>date<span style="color:#f92672">);</span>
+     System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span>str<span style="color:#f92672">);</span> <span style="color:#75715e">// 2008年1月23日
+</span><span style="color:#75715e"></span>   <span style="color:#f92672">}</span>
+ <span style="color:#f92672">}</span>
+</code></pre></div><h5 id="parse方法">parse方法</h5>
+<p>使用parse方法的代码为：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"> <span style="color:#f92672">import</span> java.text.DateFormat<span style="color:#f92672">;</span>
+ <span style="color:#f92672">import</span> java.text.ParseException<span style="color:#f92672">;</span>
+ <span style="color:#f92672">import</span> java.text.SimpleDateFormat<span style="color:#f92672">;</span>
+ <span style="color:#f92672">import</span> java.util.Date<span style="color:#f92672">;</span>
+ 
+<span style="color:#75715e">// 把String转换成Date对象
+</span><span style="color:#75715e"></span> <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Demo04DateFormatMethod</span> <span style="color:#f92672">{</span>
+   <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">main</span><span style="color:#f92672">(</span>String<span style="color:#f92672">[]</span> args<span style="color:#f92672">)</span> <span style="color:#66d9ef">throws</span> ParseException <span style="color:#f92672">{</span>
+     DateFormat df <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> SimpleDateFormat<span style="color:#f92672">(</span><span style="color:#e6db74">&#34;yyyy年MM月dd日&#34;</span><span style="color:#f92672">);</span>
+     String str <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;2018年12月11日&#34;</span><span style="color:#f92672">;</span>
+     Date date <span style="color:#f92672">=</span> df<span style="color:#f92672">.</span><span style="color:#a6e22e">parse</span><span style="color:#f92672">(</span>str<span style="color:#f92672">);</span>
+     System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span>date<span style="color:#f92672">);</span> <span style="color:#75715e">// Tue Dec 11 00:00:00 CST 2018
+</span><span style="color:#75715e"></span>   <span style="color:#f92672">}</span>
+ <span style="color:#f92672">}</span>
+</code></pre></div><h5 id="练习">练习</h5>
+<p>请使用日期时间相关的API，计算出一个人已经出生了多少天。</p>
+<p>思路：</p>
+<ol>
+<li>
+<p>获取当前时间对应的毫秒值</p>
+</li>
+<li>
+<p>获取自己出生日期对应的毫秒值</p>
+</li>
+<li>
+<p>两个时间相减（当前时间– 出生日期）</p>
+</li>
+</ol>
+<p>代码实现：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">function</span><span style="color:#f92672">()</span> <span style="color:#66d9ef">throws</span> Exception <span style="color:#f92672">{</span>
+   System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;请输入出生日期 格式 YYYY-MM-dd&#34;</span><span style="color:#f92672">);</span>
+   <span style="color:#75715e">// 获取出生日期,键盘输入
+</span><span style="color:#75715e"></span>   String birthdayString <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> Scanner<span style="color:#f92672">(</span>System<span style="color:#f92672">.</span><span style="color:#a6e22e">in</span><span style="color:#f92672">).</span><span style="color:#a6e22e">next</span><span style="color:#f92672">();</span>
+   <span style="color:#75715e">// 将字符串日期,转成Date对象
+</span><span style="color:#75715e"></span>   <span style="color:#75715e">// 创建SimpleDateFormat对象,写日期模式
+</span><span style="color:#75715e"></span>   SimpleDateFormat sdf <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> SimpleDateFormat<span style="color:#f92672">(</span><span style="color:#e6db74">&#34;yyyy-MM-dd&#34;</span><span style="color:#f92672">);</span>
+   <span style="color:#75715e">// 调用方法parse,字符串转成日期对象
+</span><span style="color:#75715e"></span>   Date birthdayDate <span style="color:#f92672">=</span> sdf<span style="color:#f92672">.</span><span style="color:#a6e22e">parse</span><span style="color:#f92672">(</span>birthdayString<span style="color:#f92672">);</span> 
+   <span style="color:#75715e">// 获取今天的日期对象
+</span><span style="color:#75715e"></span>   Date todayDate <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> Date<span style="color:#f92672">();</span>  
+   <span style="color:#75715e">// 将两个日期转成毫秒值,Date类的方法getTime
+</span><span style="color:#75715e"></span>   <span style="color:#66d9ef">long</span> birthdaySecond <span style="color:#f92672">=</span> birthdayDate<span style="color:#f92672">.</span><span style="color:#a6e22e">getTime</span><span style="color:#f92672">();</span>
+   <span style="color:#66d9ef">long</span> todaySecond <span style="color:#f92672">=</span> todayDate<span style="color:#f92672">.</span><span style="color:#a6e22e">getTime</span><span style="color:#f92672">();</span>
+   <span style="color:#66d9ef">long</span> secone <span style="color:#f92672">=</span> todaySecond<span style="color:#f92672">-</span>birthdaySecond<span style="color:#f92672">;</span>  
+   <span style="color:#66d9ef">if</span> <span style="color:#f92672">(</span>secone <span style="color:#f92672">&lt;</span> 0<span style="color:#f92672">){</span>
+     System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;还没出生呢&#34;</span><span style="color:#f92672">);</span>
+   <span style="color:#f92672">}</span> <span style="color:#66d9ef">else</span> <span style="color:#f92672">{</span>
+     System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span>secone<span style="color:#f92672">/</span>1000<span style="color:#f92672">/</span>60<span style="color:#f92672">/</span>60<span style="color:#f92672">/</span>24<span style="color:#f92672">);</span>
+   <span style="color:#f92672">}</span>
+ <span style="color:#f92672">}</span>
+</code></pre></div><h4 id="calendar类">Calendar类</h4>
+<h5 id="概念">概念</h5>
+<p>java.util.Calendar是日历类，在Date后出现，替换掉了许多Date的方法。该类将所有可能用到的时间信息封装为静态成员变量，方便获取，日历类就是方便获取各个时间属性的。</p>
+<h5 id="获取方式">获取方式</h5>
+<p>Calendar为抽象类，由于语言敏感性，Calendar类在创建对象时并非直接创建，而是通过静态方法创建，返回子类对象，如下：</p>
+<p>Calendar静态方法</p>
+<ul>
+<li>public static Calendar getInstance()：使用默认时区和语言环境获得一个日历</li>
+</ul>
+<p>例如：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="color:#f92672">import</span> java.util.Calendar<span style="color:#f92672">;</span>
+ 
+ <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Demo06CalendarInit</span> <span style="color:#f92672">{</span>
+   <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">main</span><span style="color:#f92672">(</span>String<span style="color:#f92672">[]</span> args<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+     Calendar cal <span style="color:#f92672">=</span> Calendar<span style="color:#f92672">.</span><span style="color:#a6e22e">getInstance</span><span style="color:#f92672">();</span>
+   <span style="color:#f92672">}</span>   
+ <span style="color:#f92672">}</span>
+</code></pre></div><h5 id="常用方法-2">常用方法</h5>
+<p>根据Calendar类的API文档，常用方法有：</p>
+<ul>
+<li>
+<p>public int get(int field)：返回给定日历字段的值。</p>
+</li>
+<li>
+<p>public void set(int field, int value)：将给定的日历字段设置为给定值。</p>
+</li>
+<li>
+<p>public abstract void add(int field, int amount)：根据日历的规则，为给定日历字段添加或减去指定的时间量</p>
+</li>
+<li>
+<p>public Date getTime()：返回一个表示此Calendar时间值（从历元到现在的毫秒偏移量）的Date对象。</p>
+</li>
+</ul>
+<p>Calendar类中提供很多成员常量，代表给定的日历字段：</p>
+<table>
+<thead>
+<tr>
+<th>字段值</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>YEAR</td>
+<td>年</td>
+</tr>
+<tr>
+<td>MONTH</td>
+<td>月（从0开始，可以+1使用）</td>
+</tr>
+<tr>
+<td>DAY_OF_MONTH</td>
+<td>月中的天（几号）</td>
+</tr>
+<tr>
+<td>HOUR</td>
+<td>时（12小时制）</td>
+</tr>
+<tr>
+<td>HOUR_OF_DAY</td>
+<td>时（24小时制）</td>
+</tr>
+<tr>
+<td>MINUTE</td>
+<td>分</td>
+</tr>
+<tr>
+<td>SECOND</td>
+<td>秒</td>
+</tr>
+<tr>
+<td>DAY_OF_WEEK</td>
+<td>周中的天（周几，周日为1，可以-1使用）</td>
+</tr>
+</tbody>
+</table>
+<h5 id="getset方法">get/set方法</h5>
+<p>get方法用来获取指定字段的值，set方法用来设置指定字段的值，代码使用演示：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"> <span style="color:#f92672">import</span> java.util.Calendar<span style="color:#f92672">;</span>
+ 
+ <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">CalendarUtil</span> <span style="color:#f92672">{</span>
+   <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">main</span><span style="color:#f92672">(</span>String<span style="color:#f92672">[]</span> args<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+     <span style="color:#75715e">// 创建Calendar对象
+</span><span style="color:#75715e"></span>     Calendar cal <span style="color:#f92672">=</span> Calendar<span style="color:#f92672">.</span><span style="color:#a6e22e">getInstance</span><span style="color:#f92672">();</span>
+     <span style="color:#75715e">// 设置年 
+</span><span style="color:#75715e"></span>     <span style="color:#66d9ef">int</span> year <span style="color:#f92672">=</span> cal<span style="color:#f92672">.</span><span style="color:#a6e22e">get</span><span style="color:#f92672">(</span>Calendar<span style="color:#f92672">.</span><span style="color:#a6e22e">YEAR</span><span style="color:#f92672">);</span>
+     <span style="color:#75715e">// 设置月
+</span><span style="color:#75715e"></span>     <span style="color:#66d9ef">int</span> month <span style="color:#f92672">=</span> cal<span style="color:#f92672">.</span><span style="color:#a6e22e">get</span><span style="color:#f92672">(</span>Calendar<span style="color:#f92672">.</span><span style="color:#a6e22e">MONTH</span><span style="color:#f92672">)</span> <span style="color:#f92672">+</span> 1<span style="color:#f92672">;</span>
+     <span style="color:#75715e">// 设置日
+</span><span style="color:#75715e"></span>     <span style="color:#66d9ef">int</span> dayOfMonth <span style="color:#f92672">=</span> cal<span style="color:#f92672">.</span><span style="color:#a6e22e">get</span><span style="color:#f92672">(</span>Calendar<span style="color:#f92672">.</span><span style="color:#a6e22e">DAY_OF_MONTH</span><span style="color:#f92672">);</span>
+     System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">print</span><span style="color:#f92672">(</span>year <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;年&#34;</span> <span style="color:#f92672">+</span> month <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;月&#34;</span> <span style="color:#f92672">+</span> dayOfMonth <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;日&#34;</span><span style="color:#f92672">);</span>
+   <span style="color:#f92672">}</span>   
+ <span style="color:#f92672">}</span>
+</code></pre></div><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"> <span style="color:#f92672">import</span> java.util.Calendar<span style="color:#f92672">;</span>
+ 
+ <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Demo07CalendarMethod</span> <span style="color:#f92672">{</span>
+   <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">main</span><span style="color:#f92672">(</span>String<span style="color:#f92672">[]</span> args<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+     Calendar cal <span style="color:#f92672">=</span> Calendar<span style="color:#f92672">.</span><span style="color:#a6e22e">getInstance</span><span style="color:#f92672">();</span>
+     cal<span style="color:#f92672">.</span><span style="color:#a6e22e">set</span><span style="color:#f92672">(</span>Calendar<span style="color:#f92672">.</span><span style="color:#a6e22e">YEAR</span><span style="color:#f92672">,</span> 2020<span style="color:#f92672">);</span>
+     System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">print</span><span style="color:#f92672">(</span>year <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;年&#34;</span> <span style="color:#f92672">+</span> month <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;月&#34;</span> <span style="color:#f92672">+</span> dayOfMonth <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;日&#34;</span><span style="color:#f92672">);</span> <span style="color:#75715e">// 2020年1月17日
+</span><span style="color:#75715e"></span>   <span style="color:#f92672">}</span>
+ <span style="color:#f92672">}</span>
+</code></pre></div><h5 id="add方法">add方法</h5>
+<p>add方法可以对指定日历字段的值进行加减操作，如果第二个参数为正数则加上偏移量，如果为负数则减去偏移量。代码如：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"> <span style="color:#f92672">import</span> java.util.Calendar<span style="color:#f92672">;</span>
+ 
+ <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Demo08CalendarMethod</span> <span style="color:#f92672">{</span>
+   <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">main</span><span style="color:#f92672">(</span>String<span style="color:#f92672">[]</span> args<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+     Calendar cal <span style="color:#f92672">=</span> Calendar<span style="color:#f92672">.</span><span style="color:#a6e22e">getInstance</span><span style="color:#f92672">();</span>
+     System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">print</span><span style="color:#f92672">(</span>year <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;年&#34;</span> <span style="color:#f92672">+</span> month <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;月&#34;</span> <span style="color:#f92672">+</span> dayOfMonth <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;日&#34;</span><span style="color:#f92672">);</span> <span style="color:#75715e">// 2018年1月17日
+</span><span style="color:#75715e"></span>     <span style="color:#75715e">// 使用add方法
+</span><span style="color:#75715e"></span>     cal<span style="color:#f92672">.</span><span style="color:#a6e22e">add</span><span style="color:#f92672">(</span>Calendar<span style="color:#f92672">.</span><span style="color:#a6e22e">DAY_OF_MONTH</span><span style="color:#f92672">,</span> 2<span style="color:#f92672">);</span> <span style="color:#75715e">// 加2天
+</span><span style="color:#75715e"></span>     cal<span style="color:#f92672">.</span><span style="color:#a6e22e">add</span><span style="color:#f92672">(</span>Calendar<span style="color:#f92672">.</span><span style="color:#a6e22e">YEAR</span><span style="color:#f92672">,</span> <span style="color:#f92672">-</span>3<span style="color:#f92672">);</span> <span style="color:#75715e">// 减3年
+</span><span style="color:#75715e"></span>     System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">print</span><span style="color:#f92672">(</span>year <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;年&#34;</span> <span style="color:#f92672">+</span> month <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;月&#34;</span> <span style="color:#f92672">+</span> dayOfMonth <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;日&#34;</span><span style="color:#f92672">);</span> <span style="color:#75715e">// 2015年1月18日; 
+</span><span style="color:#75715e"></span>   <span style="color:#f92672">}</span>
+ <span style="color:#f92672">}</span>
+</code></pre></div><h5 id="gettime方法">getTime方法</h5>
+<p>Calendar中的getTime方法并不是获取毫秒时刻，而是拿到对应的Date对象。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"> <span style="color:#f92672">import</span> java.util.Calendar<span style="color:#f92672">;</span>
+ <span style="color:#f92672">import</span> java.util.Date<span style="color:#f92672">;</span>
+ 
+ <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Demo09CalendarMethod</span> <span style="color:#f92672">{</span>
+   <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">main</span><span style="color:#f92672">(</span>String<span style="color:#f92672">[]</span> args<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+     Calendar cal <span style="color:#f92672">=</span> Calendar<span style="color:#f92672">.</span><span style="color:#a6e22e">getInstance</span><span style="color:#f92672">();</span>
+     Date date <span style="color:#f92672">=</span> cal<span style="color:#f92672">.</span><span style="color:#a6e22e">getTime</span><span style="color:#f92672">();</span>
+     System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span>date<span style="color:#f92672">);</span> <span style="color:#75715e">// Tue Jan 16 16:03:09 CST 2018
+</span><span style="color:#75715e"></span>   <span style="color:#f92672">}</span>
+ <span style="color:#f92672">}</span>
+</code></pre></div><p>小贴士：</p>
+<p>西方星期的开始为周日，中国为周一。</p>
+<p>在Calendar类中，月份的表示是以0-11代表1-12月。</p>
+<p>日期是有大小关系的，时间靠后，时间越大。</p>
+<hr>
+<h3 id="第三章">第三章</h3>
+<hr>
+<h5 id="本章内容-2">本章内容</h5>
+<ul>
+<li>System类</li>
+<li>StringBuffer类</li>
+</ul>
+<hr>
+<h4 id="31-system类">3.1 System类</h4>
+<p>java.lang.System类中提供了大量的静态方法，可以获取与系统相关的信息或系统级操作，在System类的API文档中，常用的方法有：</p>
+<ul>
+<li>
+<p>public static long currentTimeMillis()：返回以毫秒为单位的当前时间。</p>
+</li>
+<li>
+<p>public static void arraycopy(Object src, int srcPos, Object dest, int destPos, int length)：将数组中指定的数据拷贝到另一个数组中。</p>
+</li>
+</ul>
+<h5 id="currenttimemillis方法">currentTimeMillis方法</h5>
+<p>实际上，currentTimeMillis方法就是 获取当前系统时间与1970年01月01日00:00点之间的毫秒差值</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="color:#f92672">import</span> java.util.Date<span style="color:#f92672">;</span>
+ 
+ <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">SystemDemo</span> <span style="color:#f92672">{</span>
+   <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">main</span><span style="color:#f92672">(</span>String<span style="color:#f92672">[]</span> args<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+     <span style="color:#75715e">//获取当前时间毫秒值
+</span><span style="color:#75715e"></span>     System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span>System<span style="color:#f92672">.</span><span style="color:#a6e22e">currentTimeMillis</span><span style="color:#f92672">());</span> <span style="color:#75715e">// 1516090531144
+</span><span style="color:#75715e"></span>   <span style="color:#f92672">}</span>
+ <span style="color:#f92672">}</span>
+</code></pre></div><h5 id="练习-1">练习</h5>
+<p>验证for循环打印数字1-9999所需要使用的时间（毫秒）</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"> <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">SystemTest1</span> <span style="color:#f92672">{</span>
+   <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">main</span><span style="color:#f92672">(</span>String<span style="color:#f92672">[]</span> args<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+     <span style="color:#66d9ef">long</span> start <span style="color:#f92672">=</span> System<span style="color:#f92672">.</span><span style="color:#a6e22e">currentTimeMillis</span><span style="color:#f92672">();</span>
+     <span style="color:#66d9ef">for</span> <span style="color:#f92672">(</span><span style="color:#66d9ef">int</span> i <span style="color:#f92672">=</span> 0<span style="color:#f92672">;</span> i <span style="color:#f92672">&lt;</span> 10000<span style="color:#f92672">;</span> i<span style="color:#f92672">++)</span> <span style="color:#f92672">{</span>
+       System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span>i<span style="color:#f92672">);</span>
+     <span style="color:#f92672">}</span>
+     <span style="color:#66d9ef">long</span> end <span style="color:#f92672">=</span> System<span style="color:#f92672">.</span><span style="color:#a6e22e">currentTimeMillis</span><span style="color:#f92672">();</span>
+     System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;共耗时毫秒：&#34;</span> <span style="color:#f92672">+</span> <span style="color:#f92672">(</span>end <span style="color:#f92672">-</span> start<span style="color:#f92672">));</span>
+   <span style="color:#f92672">}</span>
+ <span style="color:#f92672">}</span>
+</code></pre></div><h5 id="arraycopy方法">arraycopy方法</h5>
+<p>public static void arraycopy(Object src, int srcPos, Object dest, int destPos, int length)：将数组中指定的数据拷贝到另一个数组中。</p>
+<p>数组的拷贝动作是系统级的，性能很高。System.arraycopy方法具有5个参数，含义分别为：</p>
+<table>
+<thead>
+<tr>
+<th>参数序号</th>
+<th>参数名称</th>
+<th>参数类型</th>
+<th>参数含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>src</td>
+<td>Object</td>
+<td>源数组</td>
+</tr>
+<tr>
+<td>2</td>
+<td>srcPos</td>
+<td>int</td>
+<td>源数组索引起始位置</td>
+</tr>
+<tr>
+<td>3</td>
+<td>dest</td>
+<td>Object</td>
+<td>目标数组</td>
+</tr>
+<tr>
+<td>4</td>
+<td>destPos</td>
+<td>int</td>
+<td>目标数组索引起始位置</td>
+</tr>
+<tr>
+<td>5</td>
+<td>length</td>
+<td>int</td>
+<td>复制元素个数</td>
+</tr>
+</tbody>
+</table>
+<h5 id="练习-2">练习</h5>
+<p>将src数组中前3个元素，复制到dest数组的前3个位置上复制元素前：src数组元素[1,2,3,4,5]，dest数组元素[6,7,8,9,10]复制元素后：src数组元素[1,2,3,4,5]，dest数组元素[1,2,3,9,10]</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"> <span style="color:#f92672">import</span> java.util.Arrays<span style="color:#f92672">;</span>
+ 
+ <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Demo11SystemArrayCopy</span> <span style="color:#f92672">{</span>
+   <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">main</span><span style="color:#f92672">(</span>String<span style="color:#f92672">[]</span> args<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+       
+     <span style="color:#66d9ef">int</span><span style="color:#f92672">[]</span> src <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> <span style="color:#66d9ef">int</span><span style="color:#f92672">[]{</span>1<span style="color:#f92672">,</span>2<span style="color:#f92672">,</span>3<span style="color:#f92672">,</span>4<span style="color:#f92672">,</span>5<span style="color:#f92672">};</span>
+     <span style="color:#66d9ef">int</span><span style="color:#f92672">[]</span> dest <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> <span style="color:#66d9ef">int</span><span style="color:#f92672">[]{</span>6<span style="color:#f92672">,</span>7<span style="color:#f92672">,</span>8<span style="color:#f92672">,</span>9<span style="color:#f92672">,</span>10<span style="color:#f92672">};</span>
+     System<span style="color:#f92672">.</span><span style="color:#a6e22e">arraycopy</span><span style="color:#f92672">(</span> src<span style="color:#f92672">,</span> 0<span style="color:#f92672">,</span> dest<span style="color:#f92672">,</span> 0<span style="color:#f92672">,</span> 3<span style="color:#f92672">);</span>
+     <span style="color:#75715e">/*
+</span><span style="color:#75715e">     代码运行后：两个数组中的元素发生了变化
+</span><span style="color:#75715e">     src数组元素[1,2,3,4,5]
+</span><span style="color:#75715e">     dest数组元素[1,2,3,9,10]
+</span><span style="color:#75715e">     */</span>
+   <span style="color:#f92672">}</span>
+ <span style="color:#f92672">}</span>
+</code></pre></div><h4 id="32-stringbuilder类">3.2 StringBuilder类</h4>
+<h5 id="字符串拼接问题">字符串拼接问题</h5>
+<p>由于String类的对象内容不可改变，所以每当进行字符串拼接时，总是会在内存中创建一个新的对象。例如：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"> <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">StringDemo</span> <span style="color:#f92672">{</span>
+   <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">main</span><span style="color:#f92672">(</span>String<span style="color:#f92672">[]</span> args<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+     String s <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Hello&#34;</span><span style="color:#f92672">;</span>
+     s <span style="color:#f92672">+=</span> <span style="color:#e6db74">&#34;World&#34;</span><span style="color:#f92672">;</span>
+     System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span>s<span style="color:#f92672">);</span>
+   <span style="color:#f92672">}</span>
+ <span style="color:#f92672">}</span>
+</code></pre></div><p>在API中对String类有这样的描述：字符串是常量，它们的值在创建后不能被更改。</p>
+<p>根据这句话分析我们的代码，其实总共产生了三个字符串，即&quot;Hello&rdquo;、&ldquo;World&quot;和&quot;HelloWorld&rdquo;。引用变量s首先指向Hello对象，最终指向拼接出来的新字符串对象，即HelloWord 。由此可知，如果对字符串进行拼接操作，每次拼接，都会构建一个新的String对象，既耗时，又浪费空间。为了解决这一问题，可以使用java.lang.StringBuilder类。</p>
+<h5 id="stringbuilder概述">StringBuilder概述</h5>
+<p>查阅java.lang.StringBuilder的API，StringBuilder又称为可变字符序列，它是一个类似于 String 的字符串缓冲区，通过某些方法调用可以改变该序列的长度和内容。原来StringBuilder是个字符串的缓冲区，即它是一个容器，容器中可以装很多字符串。并且能够对其中的字符串进行各种操作。它的内部拥有一个数组用来存放字符串内容，进行字符串拼接时，直接在数组中加入新内容。StringBuilder会自动维护数组的扩容（默认16字符空间，超过自动扩充）</p>
+<h5 id="构造方法-1">构造方法</h5>
+<p>根据StringBuilder的API文档，常用构造方法有2个：</p>
+<ul>
+<li>
+<p>public StringBuilder()：构造一个空的StringBuilder容器。</p>
+</li>
+<li>
+<p>public StringBuilder(String str)：构造一个StringBuilder容器，并将字符串添加进去。</p>
+</li>
+</ul>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"> <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">StringBuilderDemo</span> <span style="color:#f92672">{</span>
+   <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">main</span><span style="color:#f92672">(</span>String<span style="color:#f92672">[]</span> args<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+       
+     StringBuilder sb1 <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> StringBuilder<span style="color:#f92672">();</span>
+     System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span>sb1<span style="color:#f92672">);</span> <span style="color:#75715e">// (空白)
+</span><span style="color:#75715e"></span>     <span style="color:#75715e">// 使用带参构造
+</span><span style="color:#75715e"></span>     StringBuilder sb2 <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> StringBuilder<span style="color:#f92672">(</span><span style="color:#e6db74">&#34;xh&#34;</span><span style="color:#f92672">);</span>
+     System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span>sb2<span style="color:#f92672">);</span> <span style="color:#75715e">//   
+</span><span style="color:#75715e"></span>   <span style="color:#f92672">}</span>
+ <span style="color:#f92672">}</span>
+</code></pre></div><h5 id="常用方法-3">常用方法</h5>
+<p>StringBuilder常用的方法有2个：</p>
+<ul>
+<li>
+<p>public StringBuilder append(&hellip;)：添加任意类型数据的字符串形式，并返回当前对象自身。</p>
+</li>
+<li>
+<p>public String toString()：将当前StringBuilder对象转换为String对象。</p>
+</li>
+</ul>
+<h5 id="append方法">append方法</h5>
+<p>append方法具有多种重载形式，可以接收任意类型的参数。任何数据作为参数都会将对应的字符串内容添加到StringBuilder中。例如：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"> <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Demo02StringBuilder</span> <span style="color:#f92672">{</span>
+   <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">main</span><span style="color:#f92672">(</span>String<span style="color:#f92672">[]</span> args<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+       
+     <span style="color:#75715e">//创建对象
+</span><span style="color:#75715e"></span>     StringBuilder builder <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> StringBuilder<span style="color:#f92672">();</span>
+     <span style="color:#75715e">//public StringBuilder append(任意类型)
+</span><span style="color:#75715e"></span>     StringBuilder builder2 <span style="color:#f92672">=</span> builder<span style="color:#f92672">.</span><span style="color:#a6e22e">append</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;hello&#34;</span><span style="color:#f92672">);</span>
+     <span style="color:#75715e">//对比一下
+</span><span style="color:#75715e"></span>     System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;builder:&#34;</span><span style="color:#f92672">+</span>builder<span style="color:#f92672">);</span>
+     System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;builder2:&#34;</span><span style="color:#f92672">+</span>builder2<span style="color:#f92672">);</span>
+     System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span>builder <span style="color:#f92672">==</span> builder2<span style="color:#f92672">);</span> <span style="color:#75715e">//true
+</span><span style="color:#75715e"></span>      <span style="color:#75715e">// 可以添加 任何类型
+</span><span style="color:#75715e"></span>     builder<span style="color:#f92672">.</span><span style="color:#a6e22e">append</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;hello&#34;</span><span style="color:#f92672">);</span>
+     builder<span style="color:#f92672">.</span><span style="color:#a6e22e">append</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;world&#34;</span><span style="color:#f92672">);</span>
+     builder<span style="color:#f92672">.</span><span style="color:#a6e22e">append</span><span style="color:#f92672">(</span><span style="color:#66d9ef">true</span><span style="color:#f92672">);</span>
+     builder<span style="color:#f92672">.</span><span style="color:#a6e22e">append</span><span style="color:#f92672">(</span>100<span style="color:#f92672">);</span>
+     <span style="color:#75715e">// 在我们开发中，会遇到调用一个方法后，返回一个对象的情况。然后使用返回的对象继续调用方法。
+</span><span style="color:#75715e"></span>     <span style="color:#75715e">// 这种时候，我们就可以把代码现在一起，如append方法一样，代码如下
+</span><span style="color:#75715e"></span>     <span style="color:#75715e">//链式编程
+</span><span style="color:#75715e"></span>     builder<span style="color:#f92672">.</span><span style="color:#a6e22e">append</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;hello&#34;</span><span style="color:#f92672">).</span><span style="color:#a6e22e">append</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;world&#34;</span><span style="color:#f92672">).</span><span style="color:#a6e22e">append</span><span style="color:#f92672">(</span><span style="color:#66d9ef">true</span><span style="color:#f92672">).</span><span style="color:#a6e22e">append</span><span style="color:#f92672">(</span>100<span style="color:#f92672">);</span>
+     System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;builder:&#34;</span><span style="color:#f92672">+</span>builder<span style="color:#f92672">);</span>
+   <span style="color:#f92672">}</span>
+ <span style="color:#f92672">}</span>
+</code></pre></div><p>备注：StringBuilder已经覆盖重写了Object当中的toString方法。</p>
+<h5 id="tostring方法-1">toString方法</h5>
+<p>通过toString方法，StringBuilder对象将会转换为不可变的String对象。如：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Demo16StringBuilder</span> <span style="color:#f92672">{</span>
+   <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">main</span><span style="color:#f92672">(</span>String<span style="color:#f92672">[]</span> args<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+       
+     <span style="color:#75715e">// 链式创建
+</span><span style="color:#75715e"></span>     StringBuilder sb <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> StringBuilder<span style="color:#f92672">(</span><span style="color:#e6db74">&#34;Hello&#34;</span><span style="color:#f92672">).</span><span style="color:#a6e22e">append</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;World&#34;</span><span style="color:#f92672">).</span><span style="color:#a6e22e">append</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;Java&#34;</span><span style="color:#f92672">);</span>
+     <span style="color:#75715e">// 调用方法
+</span><span style="color:#75715e"></span>     String str <span style="color:#f92672">=</span> sb<span style="color:#f92672">.</span><span style="color:#a6e22e">toString</span><span style="color:#f92672">();</span>
+     System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span>str<span style="color:#f92672">);</span> <span style="color:#75715e">// HelloWorldJava
+</span><span style="color:#75715e"></span>   <span style="color:#f92672">}</span>
+ <span style="color:#f92672">}</span>
+</code></pre></div><hr>
+<h3 id="第四章">第四章</h3>
+<hr>
+<h5 id="本章内容-3">本章内容</h5>
+<ul>
+<li>包装类</li>
+</ul>
+<hr>
+<h4 id="41-包装类概述">4.1 包装类概述</h4>
+<p>Java提供了两个类型系统，基本类型与引用类型，引用类型又叫包装类，如下：</p>
+<table>
+<thead>
+<tr>
+<th>基本类型</th>
+<th>对应的包装类（位于java.lang包中）</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>byte</td>
+<td>Byte</td>
+</tr>
+<tr>
+<td>short</td>
+<td>Short</td>
+</tr>
+<tr>
+<td>int</td>
+<td>Integer</td>
+</tr>
+<tr>
+<td>long</td>
+<td>Long</td>
+</tr>
+<tr>
+<td>float</td>
+<td>Float</td>
+</tr>
+<tr>
+<td>double</td>
+<td>Double</td>
+</tr>
+<tr>
+<td>char</td>
+<td>Character</td>
+</tr>
+<tr>
+<td>boolean</td>
+<td>Boolean</td>
+</tr>
+</tbody>
+</table>
+<p>从上图我们可以看到除了 char和int其它的包装类型名称和对应的基本类型一样，只是首字母大写了。</p>
+<h5 id="装箱与拆箱">装箱与拆箱</h5>
+<p>基本类型与对应的包装类对象之间，来回转换的过程称为”装箱“与”拆箱“：</p>
+<ul>
+<li>
+<p>装箱：从基本类型转换为对应的包装类对象。</p>
+</li>
+<li>
+<p>拆箱：从包装类对象转换为对应的基本类型。</p>
+</li>
+</ul>
+<p>用Integer与 int为例：（看懂代码即可）</p>
+<p>基本数值&mdash;-&gt;包装对象</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"> Integer i <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> Integer<span style="color:#f92672">(</span>4<span style="color:#f92672">);</span><span style="color:#75715e">//使用构造函数
+</span><span style="color:#75715e"></span> Integer iii <span style="color:#f92672">=</span> Integer<span style="color:#f92672">.</span><span style="color:#a6e22e">valueOf</span><span style="color:#f92672">(</span>4<span style="color:#f92672">);</span><span style="color:#75715e">//使用包装类中的valueOf方法
+</span></code></pre></div><p>包装对象&mdash;-&gt;基本数值</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"> <span style="color:#66d9ef">int</span> num <span style="color:#f92672">=</span> i<span style="color:#f92672">.</span><span style="color:#a6e22e">intValue</span><span style="color:#f92672">();</span>
+</code></pre></div><h5 id="自动装箱与自动拆箱">自动装箱与自动拆箱</h5>
+<p>由于我们经常要做基本类型与包装类之间的转换，从Java 5（JDK 1.5）开始，基本类型与包装类的装箱、拆箱动作可以自动完成。例如：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"> Integer i <span style="color:#f92672">=</span> 4<span style="color:#f92672">;</span><span style="color:#75715e">//自动装箱。相当于Integer i = Integer.valueOf(4);
+</span><span style="color:#75715e"></span> i <span style="color:#f92672">=</span> i <span style="color:#f92672">+</span> 5<span style="color:#f92672">;</span><span style="color:#75715e">//等号右边：将i对象转成基本数值(自动拆箱) i.intValue() + 5;
+</span><span style="color:#75715e"></span> <span style="color:#75715e">//加法运算完成后，再次装箱，把基本数值转成对象。
+</span></code></pre></div><h5 id="为什么要有包装类">为什么要有包装类</h5>
+<ol>
+<li>在某些场合不能使用基本类型必须使用包装类</li>
+</ol>
+<p>比如集合能接受的类型为Object,基本类型是无法添加进去的，还有范型也必须使用包装类。</p>
+<ol start="2">
+<li>包装类可以为null值，基本类型不能</li>
+</ol>
+<p>假设我们要定义一个变量表示分数 如果用基本类型表示的话：int score; 默认值为零，如果我想表示分数为空也就是没有参加考试就没法表现了！因为值类型是无法赋空值的，如果使用包装类型Integer score,就可以表示这种情况，因为Integer的默认值为空。</p>
+<ol start="3">
+<li>包装类型是引用类型，里面有一些有用的属性和方法</li>
+</ol>
+<p>它里面有哪些属性和方法呢？每个包装类型和基本数据类型都是大同小异的，我们拿Integer 和 int来举例说明：</p>
+<p>假设有这样一个场景，我接收到一个String型的数据想把它转换为整型，如果没有包装类这个操作是无法完成的，有了包装类我们可以这样做：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java">String num1 <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;123&#34;</span><span style="color:#f92672">;</span>
+ <span style="color:#66d9ef">int</span> num2 <span style="color:#f92672">=</span> Integer<span style="color:#f92672">.</span><span style="color:#a6e22e">parseInt</span><span style="color:#f92672">(</span>num1<span style="color:#f92672">);</span>
+</code></pre></div><p>parseInt就是Integer包装类提供的一个将字符串转成int型的方法。</p>
+<p>除了Character类之外，其他所有包装类都具有parseXxx静态方法可以将字符串参数转换为对应的基本类型：</p>
+<ul>
+<li>
+<p>public static byte parseByte(String s)：将字符串参数转换为对应的byte基本类型。</p>
+</li>
+<li>
+<p>public static short parseShort(String s)：将字符串参数转换为对应的short基本类型。</p>
+</li>
+<li>
+<p>public static int parseInt(String s)：将字符串参数转换为对应的int基本类型。</p>
+</li>
+<li>
+<p>public static long parseLong(String s)：将字符串参数转换为对应的long基本类型。</p>
+</li>
+<li>
+<p>public static float parseFloat(String s)：将字符串参数转换为对应的float基本类型。</p>
+</li>
+<li>
+<p>public static double parseDouble(String s)：将字符串参数转换为对应的double基本类型。</p>
+</li>
+<li>
+<p>public static boolean parseBoolean(String s)：将字符串参数转换为对应的boolean基本类型。</p>
+</li>
+</ul>
+<ol start="4">
+<li>包装类还有一个很重要的特性就是数据缓存</li>
+</ol>
+<p>还是拿Integer来举例，在-128-127区间的数会被缓存，当类加载的时候就创建这256个数对应的对象，并放到名为cache的数组中，调用valueOf()方法时会先判断该数是否在-128-127的区间，如果在则直接获取数组中该对象的引用，如果不在则创建该对象。valueOf()方法的源码如下</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> Integer <span style="color:#a6e22e">valueOf</span><span style="color:#f92672">(</span><span style="color:#66d9ef">int</span> i<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+   <span style="color:#66d9ef">if</span> <span style="color:#f92672">(</span>i <span style="color:#f92672">&gt;=</span> IntegerCache<span style="color:#f92672">.</span><span style="color:#a6e22e">low</span> <span style="color:#f92672">&amp;&amp;</span> i <span style="color:#f92672">&lt;=</span> IntegerCache<span style="color:#f92672">.</span><span style="color:#a6e22e">high</span><span style="color:#f92672">)</span>
+     <span style="color:#66d9ef">return</span> IntegerCache<span style="color:#f92672">.</span><span style="color:#a6e22e">cache</span><span style="color:#f92672">[</span>i <span style="color:#f92672">+</span> <span style="color:#f92672">(-</span>IntegerCache<span style="color:#f92672">.</span><span style="color:#a6e22e">low</span><span style="color:#f92672">)];</span>
+   <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">new</span> Integer<span style="color:#f92672">(</span>i<span style="color:#f92672">);</span>
+ <span style="color:#f92672">}</span>
+</code></pre></div><p>这里IntegerCache.low为-128，IntegeCache.high为127,IntegerCache.cache为数组存储的就是-128到127的Integer对象。</p>
+<p>在自动装箱的时候调用的就是valueOf方法。</p>
+<p>我们来看下面这段代码：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">main</span><span style="color:#f92672">(</span>String<span style="color:#f92672">[]</span> args<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+    
+   Integer num1 <span style="color:#f92672">=</span> 4<span style="color:#f92672">;</span>
+   Integer num2 <span style="color:#f92672">=</span> 4<span style="color:#f92672">;</span>
+   System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span>num1<span style="color:#f92672">==</span>num2<span style="color:#f92672">);</span>
+   System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span>num1<span style="color:#f92672">.</span><span style="color:#a6e22e">equals</span><span style="color:#f92672">(</span>num2<span style="color:#f92672">));</span>
+    
+   Integer num3 <span style="color:#f92672">=</span> 145<span style="color:#f92672">;</span>
+   Integer num4 <span style="color:#f92672">=</span> 145<span style="color:#f92672">;</span>
+   System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span>num3<span style="color:#f92672">==</span>num4<span style="color:#f92672">);</span>
+   System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span>num3<span style="color:#f92672">.</span><span style="color:#a6e22e">equals</span><span style="color:#f92672">(</span>num4<span style="color:#f92672">));</span>
+ <span style="color:#f92672">}</span>
+</code></pre></div><p>运行结果是：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="color:#66d9ef">true</span>
+<span style="color:#66d9ef">true</span>
+<span style="color:#66d9ef">false</span>
+<span style="color:#66d9ef">true</span>
+</code></pre></div><p>为什么会是这个结果呢？</p>
+<p>Integer num1 = 4，这里发生了自动装箱，调用了ValueOf()方法，因为4在-128~127之间，所以num1和num2都指向了缓存中的同一地址，所以用==比较和equls比较返回的都是true.</p>
+<p>Integer num3 = 145，因为145不在这个范围区间，所以会在堆中生成对象num3和num4分别指向两个不同地址的对象，所以返回false。从这个例子我们可以看出，如果要进行比较最好使用equals,如果使用在数值范围不同的情况下得到的结果也是不同的。</p>
+<p>各包装类缓存的取值范围：</p>
+<ul>
+<li>
+<p>Boolean：使用静态 final 定义；</p>
+</li>
+<li>
+<p>Byte：缓存区 -128~127</p>
+</li>
+<li>
+<p>Short：缓存区 -128~127；</p>
+</li>
+<li>
+<p>Character：缓存区 0~127；</p>
+</li>
+<li>
+<p>Long：缓存区 -128~127；</p>
+</li>
+<li>
+<p>Integer：缓存区 -128~127。</p>
+</li>
+<li>
+<p>Float 和 Double 不会有缓存。</p>
+</li>
+</ul>
+<h5 id="包装类的使用场合">包装类的使用场合</h5>
+<ol>
+<li>控制器中的参数</li>
+</ol>
+<p>如果在控制器中接收一个参数该参数定义成了基本数据类型int，那么传过来的参数如果为空则会报空指针错误，如果定义为其包装类型Integer则不会报错，而是得到一个null值。所以在RPC方法里面参数和返回值类型都需要用包装类。</p>
+<p>RPC(Remote Procedure Call)是远程过程调用,它是一种通过网络从远程计算机程序上请求服务,而不需要了解底层网络技术的协议。</p>
+<ol start="2">
+<li>pojo类的属性</li>
+</ol>
+<p>Pojo类中如果定义成基本类型，数据库中对应的字段为空的时候映射时会出问题。因为基本类型不能赋null。所以在Pojo类中数据类型都需要定义成包装类。</p>
+<p>POJO(Plain Ordinary Java Object)是简单的Java对象,实际就是普通JavaBeans,是为了避免和EJB混淆所创造的简称。</p>
+<p>如果是局部变量我们一般定义成基本类型，因为基本类型存储在栈上，方法执行完毕，栈上的内存空间也随之释放。</p>
+</div>
+  
+</article></main>
+<footer class="footer">
+  <span>&copy; 2021 <a href="https://xshi000.github.io/">及时当勉励，岁月不待人！@iNuo</a></span>
+  <span>&middot;</span>
+  <span>Powered by <a href="https://gohugo.io/" rel="noopener" target="_blank">Hugo️️</a>️</span>
+  <span>&middot;</span>
+  <span>Theme️ <a href="https://github.com/nanxiaobei/hugo-paper" rel="noopener" target="_blank">Paper</a></span>
+</footer>
+<script src="https://xshi000.github.io/highlight.min.js"></script>
+<script>
+  hljs.initHighlightingOnLoad();
+</script>
+</body>
+</html>
+

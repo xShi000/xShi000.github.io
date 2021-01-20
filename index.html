@@ -79,6 +79,26 @@
 
 <article class="first-entry">
   <header class="entry-header">
+    <h2>极简Java三：Object类与常用API</h2>
+  </header>
+  <section class="entry-content">
+   <p>第一章  本章内容  Object类   1.1 Object类概述 java.lang.Object类是Java语言中的根类，即所有类的父类。它的所有方法子类都可以使用。
+如果一个类没有特别指定父类， 那么默认则继承自Object类。例如：
+public class Person extends Object { ... } 根据JDK源代码及Object类的API文档，Object类当中包含的方法有11个。今天我们主要学习其中的2个：
+  public String toString()：返回该对象的字符串表示
+  public boolean equals(Object obj)：指示其他某个对象是否与此对象“相等”
+  toString方法 方法摘要  public String toString()：返回该对象的字符串表示。  toString方法返回该对象的字符串表示，其实该字符串内容就是对象的类型&#43;@&#43;内存地址值。
+由于toString方法返回的结果是内存地址，而在开发中，经常需要按照对象的属性得到相应的字符串表现形式，因此也需要重写它。
+覆盖重写 如果不希望使用toString方法的默认行为，则可以对它进行覆盖重写。例如自定义的Person类：
+public class Person { private String name; private int age; @Override public String toString() { return &#34;Person{&#34; &#43; &#34;name=&#39;&#34; &#43; name &#43; &#39;\&#39;&#39; &#43; &#34;, age=&#34; &#43; age &#43; &#39;}&#39;; } // 省略构造器与Getter Setter  } public class Test { public static void main(String[] args) { Person p=new Person(&#34;iNuo&#34;,23); //重写toString方法运行结果  System....</p>
+  </section>
+  <footer class="entry-footer">
+    <time>January 20, 2021</time>
+  </footer>
+  <a class="entry-link" href="https://xshi000.github.io/java_3/"></a>
+</article>
+<article class="post-entry">
+  <header class="entry-header">
     <h2>极简Java二：面对对象</h2>
   </header>
   <section class="entry-content">
@@ -272,36 +292,6 @@ private void button1_Click(object sender, EventArgs e) { //1.创建链接对象 
     <time>September 29, 2020</time>
   </footer>
   <a class="entry-link" href="https://xshi000.github.io/ado/"></a>
-</article>
-<article class="post-entry">
-  <header class="entry-header">
-    <h2>Excel-图表模板大法</h2>
-  </header>
-  <section class="entry-content">
-   <p>主题颜色 经济学人主题色 水蓝系
-商业周刊主题色 黑标系
-华尔街时报主题色 茶色系
-Think-cell主题色 咨询风
-金融日报主题色 粉色系
-第一财经周报主题色 奶色系
-颜色主题库位置：C:\Users\iNuo\AppData\Roaming\Microsoft\Templates\Document Themes\Theme Colors
-图表模板 经济学人图表模板 水蓝系
-商业周刊图表模板 黑标系
-华尔街时报图表模板 茶色系
-Think-cell图表模板 咨询风
-金融日报图表模板 粉色系
-第一财经周报图表模板 奶色系
-图表模板库位置：C:\Users\iNuo\AppData\Roaming\Microsoft\Templates\Charts
-操作技巧 一键出图
-在图表模板中，选中某一模板，右键，设置为默认图表即可！
-按Alt&#43;F1，瞬间出图！
-Office通用
-在Word和PPT中，同样可以调出模板，直接出图！...</p>
-  </section>
-  <footer class="entry-footer">
-    <time>September 29, 2020</time>
-  </footer>
-  <a class="entry-link" href="https://xshi000.github.io/excel2/"></a>
 </article>
 <footer class="page-footer">
   <nav class="pagination">

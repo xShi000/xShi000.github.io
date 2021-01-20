@@ -6,10 +6,27 @@
     <description>Recent content on 及时当勉励，岁月不待人！@iNuo</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-cn</language>
-    <lastBuildDate>Sun, 17 Jan 2021 18:02:46 +0800</lastBuildDate>
+    <lastBuildDate>Wed, 20 Jan 2021 17:39:52 +0800</lastBuildDate>
     
 	<atom:link href="https://xshi000.github.io/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>极简Java三：Object类与常用API</title>
+      <link>https://xshi000.github.io/java_3/</link>
+      <pubDate>Wed, 20 Jan 2021 17:39:52 +0800</pubDate>
+      
+      <guid>https://xshi000.github.io/java_3/</guid>
+      <description>第一章  本章内容  Object类   1.1 Object类概述 java.lang.Object类是Java语言中的根类，即所有类的父类。它的所有方法子类都可以使用。
+如果一个类没有特别指定父类， 那么默认则继承自Object类。例如：
+public class Person extends Object { ... } 根据JDK源代码及Object类的API文档，Object类当中包含的方法有11个。今天我们主要学习其中的2个：
+  public String toString()：返回该对象的字符串表示
+  public boolean equals(Object obj)：指示其他某个对象是否与此对象“相等”
+  toString方法 方法摘要  public String toString()：返回该对象的字符串表示。  toString方法返回该对象的字符串表示，其实该字符串内容就是对象的类型+@+内存地址值。
+由于toString方法返回的结果是内存地址，而在开发中，经常需要按照对象的属性得到相应的字符串表现形式，因此也需要重写它。
+覆盖重写 如果不希望使用toString方法的默认行为，则可以对它进行覆盖重写。例如自定义的Person类：
+public class Person { private String name; private int age; @Override public String toString() { return &amp;#34;Person{&amp;#34; + &amp;#34;name=&amp;#39;&amp;#34; + name + &amp;#39;\&amp;#39;&amp;#39; + &amp;#34;, age=&amp;#34; + age + &amp;#39;}&amp;#39;; } // 省略构造器与Getter Setter  } public class Test { public static void main(String[] args) { Person p=new Person(&amp;#34;iNuo&amp;#34;,23); //重写toString方法运行结果  System.</description>
+    </item>
     
     <item>
       <title>极简Java二：面对对象</title>
