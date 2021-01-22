@@ -6,10 +6,22 @@
     <description>Recent content on 及时当勉励，岁月不待人！@iNuo</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-cn</language>
-    <lastBuildDate>Thu, 21 Jan 2021 18:39:14 +0800</lastBuildDate>
+    <lastBuildDate>Fri, 22 Jan 2021 21:06:57 +0800</lastBuildDate>
     
 	<atom:link href="https://xshi000.github.io/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>极简Java五：IO流</title>
+      <link>https://xshi000.github.io/java_5/</link>
+      <pubDate>Fri, 22 Jan 2021 21:06:57 +0800</pubDate>
+      
+      <guid>https://xshi000.github.io/java_5/</guid>
+      <description>第一章  本章内容  递归 File类 FileInputStream FileOutputStream   1.1 递归 递归的概述 递归，指在当前方法内调用自己的这种现象！
+public class DemoStack { public static void main(String[] args) { method(); } public static void method(){ System.out.println(&amp;#34;递归的演示&amp;#34;); //在当前方法内调用自己  method(); } }   递归一定要有条件限定，保证递归能够停止下来，否则会发生栈内存溢出。
+  在递归中虽然有限定条件，但是递归次数不能太多。否则也会发生栈内存溢出。
+  public class DemoDigui { public static void main(String[] args) { test(1); } public static void test(int i){ System.out.println(i); if(i==10000){ return; } test(++i); } } 递归的代码演示，计算1-n之间的和，使用递归完成</description>
+    </item>
     
     <item>
       <title>极简Java四：集合框架</title>
