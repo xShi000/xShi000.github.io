@@ -1,0 +1,1153 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    
+    <title>极简Java六：反射注解 - 及时当勉励，岁月不待人！@iNuo</title>
+    
+    <meta name="description" content="第一章  本章内容  反射   1.1 反射 JAVA反射机制是在运行状态中，对于任意一个类，都能够知道这个类的所有属性和方法；对于任意一个对象，都能够调用它的任意一个方法和属性；这种动态获取的信息以及动态调用对象的方法的功能称为java语言的反射机制。
+要想解剖一个类,必须先要获取到该类的字节码文件对象。而解剖使用的就是Class类中的方法！所以先要获取到每一个字节码文件对应的Class类型的对象。
+Class类 获取Class对象的三种方式
+ 方式一: 通过Object类中的getObject()方法  Person p = new Person(); Class c = p.getClass();  方式二: 通过 类名.class 获取到字节码文件对象（任意数据类型都具备一个class静态属性,看上去要比第一种方式简单）。  Class c2 = Person.class;  方式三: 通过Class类中的方法（将类名作为字符串传递给Class类中的静态方法forName即可）。  Class c3 = Class.forName(&#34;Person&#34;); 注意：第三种和前两种的区别
+ 前两种你必须明确Person类型； 第三种是指定这种类型的字符串就行，这种扩展更强！我不需要知道你的类，我只提供字符串，按照配置文件加载就可以了  代码演示：
+/* \ 获取.class字节码文件对象的方式 \ 1：通过Object类中的getObject()方法 \ 2: 通过 类名.class 获取到字节码文件对象 \ 3: 反射中的方法, \public static Class&lt;?&gt; forName(String className) throws ClassNotFoundException \返回与带有给定字符串名的类或接口相关联的 Class 对象 */ public class ReflectDemoReflect { public static void main(String[] args) throws ClassNotFoundException { // 1： 通过Object类中的getObject()方法  // Person p1 = new Person();  // Class c1 = p1.">
+    <meta name="author" content="">
+    
+    <link href="https://xshi000.github.io/an-old-hope.min.css" rel="stylesheet">
+    <link href="https://xshi000.github.io/style.css" rel="stylesheet">
+    <link href="https://xshi000.github.io/custom.css" rel="stylesheet">
+    
+    <link rel="apple-touch-icon" href="https://xshi000.github.io/apple-touch-icon.png">
+    <link rel="icon" href="https://xshi000.github.io/favicon.ico">
+    <meta name="generator" content="Hugo 0.65.3" />
+    
+    
+    
+    <script>
+      function setTheme() {
+        const time = new Date();
+
+        const prev = localStorage.getItem('date');
+        const date = String(time.getMonth() + 1) + '.' + String(time.getDate());
+
+        const now = time.getTime();
+        let sunrise;
+        let sunset;
+
+        function setBodyClass() {
+          if (now > sunrise && now < sunset) return;
+          document.body.classList.add('dark');
+        }
+
+        if (date !== prev) {
+          fetch('https://api.ipgeolocation.io/astronomy?apiKey=5ed37d85103e4defa5df4c5298ed5215')
+            .then(res => res.json())
+            .then(data => {
+              sunrise = data.sunrise.split(':').map(Number);
+              sunset = data.sunset.split(':').map(Number);
+            })
+            .catch(() => {
+              sunrise = [7, 0];
+              sunset = [19, 0];
+            })
+            .finally(() => {
+              sunrise = time.setHours(sunrise[0], sunrise[1], 0);
+              sunset = time.setHours(sunset[0], sunset[1], 0);
+              setBodyClass();
+              localStorage.setItem('sunrise', sunrise);
+              localStorage.setItem('sunset', sunset);
+            });
+          localStorage.setItem('date', date);
+        } else {
+          sunrise = Number(localStorage.getItem('sunrise'));
+          sunset = Number(localStorage.getItem('sunset'));
+          setBodyClass();
+        }
+      }
+    </script>
+  </head>
+  <body class="single">
+    <script>
+      setTheme();
+    </script>
+    <header class="header">
+      <nav class="nav">
+        <p class="logo"><a href="https://xshi000.github.io/">及时当勉励，岁月不待人！@iNuo</a></p>
+      </nav>
+    </header>
+    <main class="main">
+
+
+<article class="post-single">
+  <header class="post-header">
+    <h1 class="post-title">极简Java六：反射注解</h1>
+    <div class="post-meta">January 23, 2021</div>
+  </header>
+  <div class="post-content"><hr>
+<h3 id="第一章">第一章</h3>
+<hr>
+<h5 id="本章内容">本章内容</h5>
+<ul>
+<li>反射</li>
+</ul>
+<hr>
+<h4 id="11-反射">1.1 反射</h4>
+<p>JAVA反射机制是在运行状态中，对于任意一个类，都能够知道这个类的所有属性和方法；对于任意一个对象，都能够调用它的任意一个方法和属性；这种动态获取的信息以及动态调用对象的方法的功能称为java语言的反射机制。</p>
+<p><img src="/img/image-20210123093241617.png" alt="image-20210123093241617"></p>
+<p>要想解剖一个类,必须先要获取到该类的字节码文件对象。而解剖使用的就是Class类中的方法！所以先要获取到每一个字节码文件对应的Class类型的对象。</p>
+<h4 id="class类">Class类</h4>
+<p>获取Class对象的三种方式</p>
+<ul>
+<li>方式一: 通过Object类中的getObject()方法</li>
+</ul>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java">Person p <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> Person<span style="color:#f92672">();</span>
+
+Class c <span style="color:#f92672">=</span> p<span style="color:#f92672">.</span><span style="color:#a6e22e">getClass</span><span style="color:#f92672">();</span>
+</code></pre></div><ul>
+<li>方式二: 通过 类名.class 获取到字节码文件对象（任意数据类型都具备一个class静态属性,看上去要比第一种方式简单）。</li>
+</ul>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java">Class c2 <span style="color:#f92672">=</span> Person<span style="color:#f92672">.</span><span style="color:#a6e22e">class</span><span style="color:#f92672">;</span>
+</code></pre></div><ul>
+<li>方式三: 通过Class类中的方法（将类名作为字符串传递给Class类中的静态方法forName即可）。</li>
+</ul>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java">Class c3 <span style="color:#f92672">=</span> Class<span style="color:#f92672">.</span><span style="color:#a6e22e">forName</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;Person&#34;</span><span style="color:#f92672">);</span>
+</code></pre></div><p>注意：第三种和前两种的区别</p>
+<ul>
+<li>前两种你必须明确Person类型；</li>
+<li>第三种是指定这种类型的字符串就行，这种扩展更强！我不需要知道你的类，我只提供字符串，按照配置文件加载就可以了</li>
+</ul>
+<p>代码演示：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="color:#75715e">/*
+</span><span style="color:#75715e"> \ 获取.class字节码文件对象的方式
+</span><span style="color:#75715e"> \    1：通过Object类中的getObject()方法
+</span><span style="color:#75715e"> \    2: 通过 类名.class 获取到字节码文件对象
+</span><span style="color:#75715e"> \    3: 反射中的方法,
+</span><span style="color:#75715e"> \public static Class&lt;?&gt; forName(String className) throws ClassNotFoundException
+</span><span style="color:#75715e"> \返回与带有给定字符串名的类或接口相关联的 Class 对象 
+</span><span style="color:#75715e">*/</span>
+
+<span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">ReflectDemoReflect</span> <span style="color:#f92672">{</span>
+  <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">main</span><span style="color:#f92672">(</span>String<span style="color:#f92672">[]</span> args<span style="color:#f92672">)</span> <span style="color:#66d9ef">throws</span> ClassNotFoundException <span style="color:#f92672">{</span>
+
+    <span style="color:#75715e">// 1： 通过Object类中的getObject()方法
+</span><span style="color:#75715e"></span>    <span style="color:#75715e">// Person p1 = new Person();
+</span><span style="color:#75715e"></span>    <span style="color:#75715e">// Class c1 = p1.getClass();
+</span><span style="color:#75715e"></span>    <span style="color:#75715e">// System.out.println(&#34;c1 = &#34;+ c1);
+</span><span style="color:#75715e"></span>
+    <span style="color:#75715e">// 2: 通过 类名.class 获取到字节码文件对象
+</span><span style="color:#75715e"></span>    <span style="color:#75715e">// Class c2 = Person.class;
+</span><span style="color:#75715e"></span>    <span style="color:#75715e">// System.out.println(&#34;c2 = &#34;+ c2);
+</span><span style="color:#75715e"></span>
+    <span style="color:#75715e">// 3: 反射中的方法
+</span><span style="color:#75715e"></span>    Class c3 <span style="color:#f92672">=</span> Class<span style="color:#f92672">.</span><span style="color:#a6e22e">forName</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;cn.xh_01_Reflect.Person&#34;</span><span style="color:#f92672">);</span><span style="color:#75715e">// 包名.类名
+</span><span style="color:#75715e"></span>    System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;c3 = &#34;</span> <span style="color:#f92672">+</span> c3<span style="color:#f92672">);</span>
+
+  <span style="color:#f92672">}</span>
+
+<span style="color:#f92672">}</span>
+</code></pre></div><p>Person类</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="color:#f92672">package</span> cn.itcast_01_Reflect<span style="color:#f92672">;</span>
+
+<span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Person</span> <span style="color:#f92672">{</span>
+
+  <span style="color:#75715e">//成员变量
+</span><span style="color:#75715e"></span>  <span style="color:#66d9ef">public</span> String name<span style="color:#f92672">;</span>
+  <span style="color:#66d9ef">public</span> Integer age<span style="color:#f92672">;</span>
+  <span style="color:#66d9ef">private</span> String address<span style="color:#f92672">;</span>
+
+  <span style="color:#75715e">//构造方法
+</span><span style="color:#75715e"></span>  <span style="color:#66d9ef">public</span> <span style="color:#a6e22e">Person</span><span style="color:#f92672">()</span> <span style="color:#f92672">{</span>
+    System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;空参数构造方法&#34;</span><span style="color:#f92672">);</span>
+  <span style="color:#f92672">}</span>
+
+  <span style="color:#66d9ef">public</span> <span style="color:#a6e22e">Person</span><span style="color:#f92672">(</span>String name<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+    <span style="color:#66d9ef">this</span><span style="color:#f92672">.</span><span style="color:#a6e22e">name</span> <span style="color:#f92672">=</span> name<span style="color:#f92672">;</span>
+    System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;带有String的构造方法&#34;</span><span style="color:#f92672">);</span>
+  <span style="color:#f92672">}</span>
+
+  <span style="color:#75715e">//私有的构造方法
+</span><span style="color:#75715e"></span>  <span style="color:#66d9ef">private</span> <span style="color:#a6e22e">Person</span><span style="color:#f92672">(</span>String name<span style="color:#f92672">,</span> Integer age<span style="color:#f92672">){</span>
+    <span style="color:#66d9ef">this</span><span style="color:#f92672">.</span><span style="color:#a6e22e">name</span> <span style="color:#f92672">=</span> name<span style="color:#f92672">;</span>
+    <span style="color:#66d9ef">this</span><span style="color:#f92672">.</span><span style="color:#a6e22e">age</span> <span style="color:#f92672">=</span> age<span style="color:#f92672">;</span>
+    System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;带有String，Integer的构造方法&#34;</span><span style="color:#f92672">);</span>
+  <span style="color:#f92672">}</span>
+
+  <span style="color:#66d9ef">public</span> <span style="color:#a6e22e">Person</span><span style="color:#f92672">(</span>String name<span style="color:#f92672">,</span> Integer age<span style="color:#f92672">,</span> String address<span style="color:#f92672">){</span>
+    <span style="color:#66d9ef">this</span><span style="color:#f92672">.</span><span style="color:#a6e22e">name</span> <span style="color:#f92672">=</span> name<span style="color:#f92672">;</span>
+    <span style="color:#66d9ef">this</span><span style="color:#f92672">.</span><span style="color:#a6e22e">age</span> <span style="color:#f92672">=</span> age<span style="color:#f92672">;</span>
+    <span style="color:#66d9ef">this</span><span style="color:#f92672">.</span><span style="color:#a6e22e">address</span> <span style="color:#f92672">=</span> address<span style="color:#f92672">;</span>
+    System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;带有String, Integer, String的构造方法&#34;</span><span style="color:#f92672">);</span>
+  <span style="color:#f92672">}</span>
+
+
+  <span style="color:#75715e">//成员方法
+</span><span style="color:#75715e"></span>  <span style="color:#75715e">//没有返回值没有参数的方法
+</span><span style="color:#75715e"></span>  <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">method1</span><span style="color:#f92672">(){</span>
+    System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;没有返回值没有参数的方法&#34;</span><span style="color:#f92672">);</span>
+  <span style="color:#f92672">}</span>
+
+  <span style="color:#75715e">//没有返回值，有参数的方法
+</span><span style="color:#75715e"></span>  <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">method2</span><span style="color:#f92672">(</span>String name<span style="color:#f92672">){</span>
+    System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;没有返回值，有参数的方法 name= &#34;</span><span style="color:#f92672">+</span> name<span style="color:#f92672">);</span>
+  <span style="color:#f92672">}</span>
+
+  <span style="color:#75715e">//有返回值，没有参数
+</span><span style="color:#75715e"></span>  <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">int</span> <span style="color:#a6e22e">method3</span><span style="color:#f92672">(){</span>
+    System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;有返回值，没有参r数的方法&#34;</span><span style="color:#f92672">);</span>
+    <span style="color:#66d9ef">return</span> 123<span style="color:#f92672">;</span>
+  <span style="color:#f92672">}</span>
+
+  <span style="color:#75715e">//有返回值，有参数的方法
+</span><span style="color:#75715e"></span>  <span style="color:#66d9ef">public</span> String <span style="color:#a6e22e">method4</span><span style="color:#f92672">(</span>String name<span style="color:#f92672">){</span>
+    System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;有返回值，有参数的方法&#34;</span><span style="color:#f92672">);</span>
+    <span style="color:#66d9ef">return</span> <span style="color:#e6db74">&#34;哈哈&#34;</span> <span style="color:#f92672">+</span> name<span style="color:#f92672">;</span>
+  <span style="color:#f92672">}</span>
+
+  <span style="color:#75715e">//私有方法
+</span><span style="color:#75715e"></span>  <span style="color:#66d9ef">private</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">method5</span><span style="color:#f92672">(){</span>
+    System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;私有方法&#34;</span><span style="color:#f92672">);</span>
+  <span style="color:#f92672">}</span>
+
+
+  <span style="color:#a6e22e">@Override</span>
+  <span style="color:#66d9ef">public</span> String <span style="color:#a6e22e">toString</span><span style="color:#f92672">()</span> <span style="color:#f92672">{</span>
+    <span style="color:#66d9ef">return</span> <span style="color:#e6db74">&#34;Person [name=&#34;</span> <span style="color:#f92672">+</span> name <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;, age=&#34;</span> <span style="color:#f92672">+</span> age <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;, address=&#34;</span> <span style="color:#f92672">+</span> address<span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;]&#34;</span><span style="color:#f92672">;</span>
+  <span style="color:#f92672">}</span>
+
+<span style="color:#f92672">}</span>
+</code></pre></div><h4 id="通过反射获取构造方法并使用">通过反射获取构造方法并使用</h4>
+<p>在反射机制中，把类中的成员（构造方法、成员方法、成员变量）都封装成了对应的类进行表示。其中，构造方法使用类Constructor表示。可通过Class类中提供的方法获取构造方法：</p>
+<p>返回一个构造方法</p>
+<ul>
+<li>
+<p>public Constructor<!-- raw HTML omitted --> getConstructor(Class&lt;?&gt;&hellip; parameterTypes) 获取public修饰的指定参数类型所对应的构造方法</p>
+</li>
+<li>
+<p>public Constructor<!-- raw HTML omitted --> getDeclaredConstructor(Class&lt;?&gt;&hellip; parameterTypes) 获取指定参数类型所对应的构造方法(包含私有的)</p>
+</li>
+</ul>
+<p>返回多个构造方法</p>
+<ul>
+<li>
+<p>public Constructor&lt;?&gt;[] getConstructors() 获取所有的public 修饰的构造方法</p>
+</li>
+<li>
+<p>public Constructor&lt;?&gt;[] getDeclaredConstructors() 获取所有的构造方法(包含私有的)</p>
+</li>
+</ul>
+<p>获取构造方法的代码演示：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">DemoReflect1</span> <span style="color:#f92672">{</span>
+  <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">main</span><span style="color:#f92672">(</span>String<span style="color:#f92672">[]</span> args<span style="color:#f92672">)</span> <span style="color:#66d9ef">throws</span> ClassNotFoundException<span style="color:#f92672">,</span> NoSuchMethodException<span style="color:#f92672">,</span> SecurityException <span style="color:#f92672">{</span>
+
+    <span style="color:#75715e">//获取Class对象
+</span><span style="color:#75715e"></span>    Class c <span style="color:#f92672">=</span> Class<span style="color:#f92672">.</span><span style="color:#a6e22e">forName</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;cn.xh_01_Reflect.Person&#34;</span><span style="color:#f92672">);</span><span style="color:#75715e">//包名.类名
+</span><span style="color:#75715e"></span>
+      
+    <span style="color:#75715e">//获取所有的构造方法
+</span><span style="color:#75715e"></span>      
+    <span style="color:#75715e">//Constructor[] cons = c.getConstructors();//获取所有的public 修饰的构造方法
+</span><span style="color:#75715e"></span>    Constructor<span style="color:#f92672">[]</span> cons <span style="color:#f92672">=</span> c<span style="color:#f92672">.</span><span style="color:#a6e22e">getDeclaredConstructors</span><span style="color:#f92672">();</span><span style="color:#75715e">//获取所有的构造方法(包含私有的)
+</span><span style="color:#75715e"></span>    
+    <span style="color:#75715e">//输出打印
+</span><span style="color:#75715e"></span>    <span style="color:#66d9ef">for</span> <span style="color:#f92672">(</span>Constructor con <span style="color:#f92672">:</span> cons<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+      System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span>con<span style="color:#f92672">);</span>
+    <span style="color:#f92672">}</span>
+    System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;------------------------&#34;</span><span style="color:#f92672">);</span>
+
+    
+    <span style="color:#75715e">//获取一个构造方法
+</span><span style="color:#75715e"></span>
+    <span style="color:#75715e">//public Person() 
+</span><span style="color:#75715e"></span>    Constructor con1 <span style="color:#f92672">=</span> c<span style="color:#f92672">.</span><span style="color:#a6e22e">getConstructor</span><span style="color:#f92672">(</span><span style="color:#66d9ef">null</span><span style="color:#f92672">);</span>
+    System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span>con1<span style="color:#f92672">);</span>
+
+    <span style="color:#75715e">//public Person(String name)
+</span><span style="color:#75715e"></span>    Constructor con2 <span style="color:#f92672">=</span> c<span style="color:#f92672">.</span><span style="color:#a6e22e">getConstructor</span><span style="color:#f92672">(</span>String<span style="color:#f92672">.</span><span style="color:#a6e22e">class</span><span style="color:#f92672">);</span>
+    System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span>con2<span style="color:#f92672">);</span>
+
+    <span style="color:#75715e">//private Person(String name, int age)
+</span><span style="color:#75715e"></span>    Constructor con3 <span style="color:#f92672">=</span> c<span style="color:#f92672">.</span><span style="color:#a6e22e">getDeclaredConstructor</span><span style="color:#f92672">(</span>String<span style="color:#f92672">.</span><span style="color:#a6e22e">class</span><span style="color:#f92672">,</span> <span style="color:#66d9ef">int</span><span style="color:#f92672">.</span><span style="color:#a6e22e">class</span><span style="color:#f92672">);</span>
+    System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span>con3<span style="color:#f92672">);</span>
+
+    <span style="color:#75715e">//public Person(String name, int age, String address)
+</span><span style="color:#75715e"></span>    Constructor con4 <span style="color:#f92672">=</span> c<span style="color:#f92672">.</span><span style="color:#a6e22e">getDeclaredConstructor</span><span style="color:#f92672">(</span>String<span style="color:#f92672">.</span><span style="color:#a6e22e">class</span><span style="color:#f92672">,</span> <span style="color:#66d9ef">int</span><span style="color:#f92672">.</span><span style="color:#a6e22e">class</span><span style="color:#f92672">,</span> String<span style="color:#f92672">.</span><span style="color:#a6e22e">class</span><span style="color:#f92672">);</span>
+    System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span>con4<span style="color:#f92672">);</span>
+
+  <span style="color:#f92672">}</span>
+
+<span style="color:#f92672">}</span>
+</code></pre></div><h5 id="通过反射方式获取构造方法创建对象">通过反射方式，获取构造方法，创建对象</h5>
+<p>获取构造方法，步骤如下：</p>
+<ol>
+<li>
+<p>获取到Class对象</p>
+</li>
+<li>
+<p>获取指定的构造方法</p>
+</li>
+<li>
+<p>通过构造方法类Constructor中的方法，创建对象</p>
+<p>public T newInstance(Object&hellip; initargs)</p>
+</li>
+</ol>
+<p>代码演示</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">DemoConstructor</span> <span style="color:#f92672">{</span>
+
+  <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">main</span><span style="color:#f92672">(</span>String<span style="color:#f92672">[]</span> args<span style="color:#f92672">)</span> <span style="color:#66d9ef">throws</span> ClassNotFoundException<span style="color:#f92672">,</span> NoSuchMethodException<span style="color:#f92672">,</span> SecurityException<span style="color:#f92672">,</span> InstantiationException<span style="color:#f92672">,</span> IllegalAccessException<span style="color:#f92672">,</span> IllegalArgumentException<span style="color:#f92672">,</span> InvocationTargetException <span style="color:#f92672">{</span>
+
+    <span style="color:#75715e">//1,获取到Class对象
+</span><span style="color:#75715e"></span>    Class c <span style="color:#f92672">=</span> Class<span style="color:#f92672">.</span><span style="color:#a6e22e">forName</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;cn.xh_01_Reflect.Person&#34;</span><span style="color:#f92672">);</span><span style="color:#75715e">//包名.类名
+</span><span style="color:#75715e"></span>
+    <span style="color:#75715e">//2,获取指定的构造方法
+</span><span style="color:#75715e"></span>
+    <span style="color:#75715e">//public Person()
+</span><span style="color:#75715e"></span>    Constructor con1 <span style="color:#f92672">=</span> c<span style="color:#f92672">.</span><span style="color:#a6e22e">getConstructor</span><span style="color:#f92672">(</span><span style="color:#66d9ef">null</span><span style="color:#f92672">);</span>
+
+    <span style="color:#75715e">//public Person(String name, int age, String address)
+</span><span style="color:#75715e"></span>    Constructor con2 <span style="color:#f92672">=</span> c<span style="color:#f92672">.</span><span style="color:#a6e22e">getConstructor</span><span style="color:#f92672">(</span>String<span style="color:#f92672">.</span><span style="color:#a6e22e">class</span><span style="color:#f92672">,</span> <span style="color:#66d9ef">int</span><span style="color:#f92672">.</span><span style="color:#a6e22e">class</span><span style="color:#f92672">,</span> String<span style="color:#f92672">.</span><span style="color:#a6e22e">class</span><span style="color:#f92672">);</span>
+
+
+    <span style="color:#75715e">//3,通过构造方法类中Constructor的方法，创建对象
+</span><span style="color:#75715e"></span>    Object obj1 <span style="color:#f92672">=</span> con1<span style="color:#f92672">.</span><span style="color:#a6e22e">newInstance</span><span style="color:#f92672">(</span><span style="color:#66d9ef">null</span><span style="color:#f92672">);</span>
+    Object obj2 <span style="color:#f92672">=</span> con2<span style="color:#f92672">.</span><span style="color:#a6e22e">newInstance</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;小明&#34;</span><span style="color:#f92672">,</span> 22<span style="color:#f92672">,</span> <span style="color:#e6db74">&#34;哈尔滨&#34;</span><span style="color:#f92672">);</span>
+
+    <span style="color:#75715e">//显示
+</span><span style="color:#75715e"></span>    System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span>obj1<span style="color:#f92672">);</span>
+    System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span>obj2<span style="color:#f92672">);</span>
+
+  <span style="color:#f92672">}</span>
+
+<span style="color:#f92672">}</span>
+</code></pre></div><h5 id="通过反射方式获取私有构造方法创建对象">通过反射方式，获取私有构造方法，创建对象</h5>
+<p>AccessibleObject 类是 Field、Method 和 Constructor 对象的父类。它提供了将反射的对象标记为在使用时取消默认 Java 语言访问控制检查的能力。</p>
+<p>对于公共成员、默认（打包）访问成员、受保护成员和私有成员，在分别使用 Field、Method 或 Constructor 对象来设置或获取字段、调用方法，或者创建和初始化类的新实例的时候，会执行访问检查。常用方法如下：</p>
+<ul>
+<li>public void setAccessible(boolean flag) throws <a href="mk:@MSITStore:D:%5C%E4%BC%A0%E6%99%BA%E5%9F%BA%E7%A1%80%E7%8F%AD%5CJDK_API_1_6_zh_CN.CHM::/java/lang/SecurityException.html">SecurityException</a></li>
+</ul>
+<p>参数值为 <code>true</code> 则指示反射的对象在使用时应该取消 Java 语言访问检查。参数值为 <code>false</code> 则指示反射的对象应该实施 Java 语言访问检查。</p>
+<p>获取私有构造方法，步骤如下：</p>
+<ol>
+<li>
+<p>获取到Class对象</p>
+</li>
+<li>
+<p>获取指定的构造方法</p>
+</li>
+<li>
+<p>暴力访问, 通过setAccessible(boolean flag)方法</p>
+</li>
+<li>
+<p>通过构造方法类Constructor中的方法，创建对象</p>
+<p>public T newInstance(Object&hellip; initargs)</p>
+</li>
+</ol>
+<p>代码演示：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">ConstructorDemo2</span> <span style="color:#f92672">{</span>
+
+  <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">main</span><span style="color:#f92672">(</span>String<span style="color:#f92672">[]</span> args<span style="color:#f92672">)</span> <span style="color:#66d9ef">throws</span> ClassNotFoundException<span style="color:#f92672">,</span> NoSuchMethodException<span style="color:#f92672">,</span> SecurityException<span style="color:#f92672">,</span> InstantiationException<span style="color:#f92672">,</span> IllegalAccessException<span style="color:#f92672">,</span> IllegalArgumentException<span style="color:#f92672">,</span> InvocationTargetException <span style="color:#f92672">{</span>
+
+    <span style="color:#75715e">//1,获取到Class对象
+</span><span style="color:#75715e"></span>    Class c <span style="color:#f92672">=</span> Class<span style="color:#f92672">.</span><span style="color:#a6e22e">forName</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;cn.xh_01_Reflect.Person&#34;</span><span style="color:#f92672">);</span><span style="color:#75715e">//包名.类名
+</span><span style="color:#75715e"></span>
+
+    <span style="color:#75715e">//2,获取指定的构造方法
+</span><span style="color:#75715e"></span>    <span style="color:#75715e">//private Person(String name, int age)
+</span><span style="color:#75715e"></span>    Constructor con <span style="color:#f92672">=</span> c<span style="color:#f92672">.</span><span style="color:#a6e22e">getDeclaredConstructor</span><span style="color:#f92672">(</span>String<span style="color:#f92672">.</span><span style="color:#a6e22e">class</span><span style="color:#f92672">,</span> <span style="color:#66d9ef">int</span><span style="color:#f92672">.</span><span style="color:#a6e22e">class</span><span style="color:#f92672">);</span>
+
+
+    <span style="color:#75715e">//3,暴力反射 
+</span><span style="color:#75715e"></span>    con<span style="color:#f92672">.</span><span style="color:#a6e22e">setAccessible</span><span style="color:#f92672">(</span><span style="color:#66d9ef">true</span><span style="color:#f92672">);</span><span style="color:#75715e">//取消 Java 语言访问检查
+</span><span style="color:#75715e"></span>      
+
+    <span style="color:#75715e">//4,通过构造方法类中的功能，创建对象
+</span><span style="color:#75715e"></span>    Object obj <span style="color:#f92672">=</span> con<span style="color:#f92672">.</span><span style="color:#a6e22e">newInstance</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;小明&#34;</span><span style="color:#f92672">,</span> 23<span style="color:#f92672">);</span>
+    System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span>obj<span style="color:#f92672">);</span>
+
+
+  <span style="color:#f92672">}</span>
+
+<span style="color:#f92672">}</span>
+</code></pre></div><h4 id="通过反射获取成员变量并使用">通过反射获取成员变量并使用</h4>
+<p>在反射机制中，把类中的成员变量使用类Field表示，可通过Class类中提供的方法获取成员变量：</p>
+<p>返回一个成员变量</p>
+<ul>
+<li>
+<p>public Field getField(String name) 获取指定的 public修饰的变量</p>
+</li>
+<li>
+<p>public Field getDeclaredField(String name) 获取指定的任意变量</p>
+</li>
+</ul>
+<p>返回多个成员变量</p>
+<ul>
+<li>
+<p>public Field[] getFields() 获取所有public 修饰的变量</p>
+</li>
+<li>
+<p>public Field[] getDeclaredFields() 获取所有的 变量 (包含私有)</p>
+</li>
+</ul>
+<p>获取成员变量的代码演示：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">FieldDemo</span> <span style="color:#f92672">{</span>
+
+  <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">main</span><span style="color:#f92672">(</span>String<span style="color:#f92672">[]</span> args<span style="color:#f92672">)</span> <span style="color:#66d9ef">throws</span> ClassNotFoundException<span style="color:#f92672">,</span> NoSuchFieldException<span style="color:#f92672">,</span> SecurityException <span style="color:#f92672">{</span>
+
+    <span style="color:#75715e">//获取Class对象
+</span><span style="color:#75715e"></span>    Class c <span style="color:#f92672">=</span> Class<span style="color:#f92672">.</span><span style="color:#a6e22e">forName</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;cn.xh_01_Reflect.Person&#34;</span><span style="color:#f92672">);</span>
+
+      
+    <span style="color:#75715e">//获取成员变量
+</span><span style="color:#75715e"></span>      
+    <span style="color:#75715e">//多个变量
+</span><span style="color:#75715e"></span>    <span style="color:#75715e">//Field[] fields = c.getFields();
+</span><span style="color:#75715e"></span>    Field<span style="color:#f92672">[]</span> fields <span style="color:#f92672">=</span> c<span style="color:#f92672">.</span><span style="color:#a6e22e">getDeclaredFields</span><span style="color:#f92672">();</span>
+
+    <span style="color:#66d9ef">for</span> <span style="color:#f92672">(</span>Field field <span style="color:#f92672">:</span> fields<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+      System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span>field<span style="color:#f92672">);</span>
+    <span style="color:#f92672">}</span>
+    System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#960050;background-color:#1e0010">\</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;-----------------&#34;</span><span style="color:#f92672">);</span>
+
+      
+    <span style="color:#75715e">//一个变量
+</span><span style="color:#75715e"></span>    <span style="color:#75715e">//public int age;
+</span><span style="color:#75715e"></span>    Field ageField <span style="color:#f92672">=</span> c<span style="color:#f92672">.</span><span style="color:#a6e22e">getField</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;age&#34;</span><span style="color:#f92672">);</span>
+    System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span>ageField<span style="color:#f92672">);</span>
+
+    <span style="color:#75715e">//private String address
+</span><span style="color:#75715e"></span>    Field addressField <span style="color:#f92672">=</span> c<span style="color:#f92672">.</span><span style="color:#a6e22e">getDeclaredField</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;address&#34;</span><span style="color:#f92672">);</span>
+    System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span>addressField<span style="color:#f92672">);</span>
+
+  <span style="color:#f92672">}</span>
+
+<span style="color:#f92672">}</span>
+</code></pre></div><h5 id="通过反射创建对象获取指定的成员变量进行赋值与获取值操作">通过反射，创建对象，获取指定的成员变量，进行赋值与获取值操作</h5>
+<p>获取成员变量，步骤如下：</p>
+<ol>
+<li>
+<p>获取Class对象</p>
+</li>
+<li>
+<p>获取构造方法</p>
+</li>
+<li>
+<p>通过构造方法，创建对象</p>
+</li>
+<li>
+<p>获取指定的成员变量（私有成员变量，通过setAccessible(boolean flag)方法暴力访问）</p>
+</li>
+<li>
+<p>通过方法，给指定对象的指定成员变量赋值或者获取值</p>
+</li>
+</ol>
+<ul>
+<li>
+<p>public void set(Object obj, Object value) 在指定对象obj中，将此 Field 对象表示的成员变量设置为指定值</p>
+</li>
+<li>
+<p>public Object get(Object obj) 返回指定对象obj中，此 Field 对象表示的成员变量的值</p>
+</li>
+</ul>
+<p>代码演示：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">FieldDemo2</span> <span style="color:#f92672">{</span>
+
+  <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">main</span><span style="color:#f92672">(</span>String<span style="color:#f92672">[]</span> args<span style="color:#f92672">)</span> <span style="color:#66d9ef">throws</span> ClassNotFoundException<span style="color:#f92672">,</span> NoSuchMethodException<span style="color:#f92672">,</span> SecurityException<span style="color:#f92672">,</span> InstantiationException<span style="color:#f92672">,</span> IllegalAccessException<span style="color:#f92672">,</span> IllegalArgumentException<span style="color:#f92672">,</span> InvocationTargetException<span style="color:#f92672">,</span> NoSuchFieldException <span style="color:#f92672">{</span>
+
+    <span style="color:#75715e">//1,获取Class对象
+</span><span style="color:#75715e"></span>    Class c <span style="color:#f92672">=</span> Class<span style="color:#f92672">.</span><span style="color:#a6e22e">forName</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;cn.xh_01_Reflect.Person&#34;</span><span style="color:#f92672">);</span>
+
+    <span style="color:#75715e">//2，获取构造方法
+</span><span style="color:#75715e"></span>    <span style="color:#75715e">//public Person(String name) 
+</span><span style="color:#75715e"></span>    Constructor con <span style="color:#f92672">=</span> c<span style="color:#f92672">.</span><span style="color:#a6e22e">getConstructor</span><span style="color:#f92672">(</span>String<span style="color:#f92672">.</span><span style="color:#a6e22e">class</span><span style="color:#f92672">);</span>
+
+    <span style="color:#75715e">//3，通过构造方法，创建对象
+</span><span style="color:#75715e"></span>    Object obj <span style="color:#f92672">=</span> con<span style="color:#f92672">.</span><span style="color:#a6e22e">newInstance</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;小明&#34;</span><span style="color:#f92672">);</span>
+
+    <span style="color:#75715e">//4，获取指定的成员变量
+</span><span style="color:#75715e"></span>    <span style="color:#75715e">//public String name;
+</span><span style="color:#75715e"></span>    Field nameField <span style="color:#f92672">=</span> c<span style="color:#f92672">.</span><span style="color:#a6e22e">getField</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;name&#34;</span><span style="color:#f92672">);</span>
+    <span style="color:#75715e">//public int age;
+</span><span style="color:#75715e"></span>    Field ageField <span style="color:#f92672">=</span> c<span style="color:#f92672">.</span><span style="color:#a6e22e">getField</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;age&#34;</span><span style="color:#f92672">);</span>
+    <span style="color:#75715e">//private String address;
+</span><span style="color:#75715e"></span>    Field addressField <span style="color:#f92672">=</span> c<span style="color:#f92672">.</span><span style="color:#a6e22e">getDeclaredField</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;address&#34;</span><span style="color:#f92672">);</span>
+    <span style="color:#75715e">//取消 Java 语言访问检查
+</span><span style="color:#75715e"></span>    addressField<span style="color:#f92672">.</span><span style="color:#a6e22e">setAccessible</span><span style="color:#f92672">(</span><span style="color:#66d9ef">true</span><span style="color:#f92672">);</span> 
+
+    <span style="color:#75715e">//5，通过方法，给指定对象的指定成员变量赋值或者获取值
+</span><span style="color:#75715e"></span>    System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;name = &#34;</span><span style="color:#f92672">+</span> nameField<span style="color:#f92672">.</span><span style="color:#a6e22e">get</span><span style="color:#f92672">(</span>obj<span style="color:#f92672">));</span>
+    System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;age = &#34;</span><span style="color:#f92672">+</span> ageField<span style="color:#f92672">.</span><span style="color:#a6e22e">get</span><span style="color:#f92672">(</span>obj<span style="color:#f92672">));</span>
+    System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;address = &#34;</span><span style="color:#f92672">+</span> addressField<span style="color:#f92672">.</span><span style="color:#a6e22e">get</span><span style="color:#f92672">(</span>obj<span style="color:#f92672">));</span>
+    <span style="color:#75715e">//赋值
+</span><span style="color:#75715e"></span>    ageField<span style="color:#f92672">.</span><span style="color:#a6e22e">set</span><span style="color:#f92672">(</span>obj<span style="color:#f92672">,</span> 23<span style="color:#f92672">);</span>
+    addressField<span style="color:#f92672">.</span><span style="color:#a6e22e">set</span><span style="color:#f92672">(</span>obj<span style="color:#f92672">,</span> <span style="color:#e6db74">&#34;凯利广场&#34;</span><span style="color:#f92672">);</span>
+
+    System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;------------------------&#34;</span><span style="color:#f92672">);</span>
+    System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;name = &#34;</span><span style="color:#f92672">+</span> nameField<span style="color:#f92672">.</span><span style="color:#a6e22e">get</span><span style="color:#f92672">(</span>obj<span style="color:#f92672">));</span>
+    System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;age = &#34;</span><span style="color:#f92672">+</span> ageField<span style="color:#f92672">.</span><span style="color:#a6e22e">get</span><span style="color:#f92672">(</span>obj<span style="color:#f92672">));</span>
+    System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;address = &#34;</span><span style="color:#f92672">+</span> addressField<span style="color:#f92672">.</span><span style="color:#a6e22e">get</span><span style="color:#f92672">(</span>obj<span style="color:#f92672">));</span>
+
+  <span style="color:#f92672">}</span>
+
+<span style="color:#f92672">}</span>
+</code></pre></div><h4 id="通过反射获取成员方法并使用">通过反射获取成员方法并使用</h4>
+<p>在反射机制中，把类中的成员方法使用类Method表示。可通过Class类中提供的方法获取成员方法：</p>
+<p>返回获取一个方法：</p>
+<ul>
+<li>
+<p>public Method getMethod(String name, Class&lt;?&gt;&hellip; parameterTypes) 获取public 修饰的方法</p>
+</li>
+<li>
+<p>public Method getDeclaredMethod(String name, Class&lt;?&gt;&hellip; parameterTypes) 获取任意的方法，包含私有</p>
+</li>
+</ul>
+<p>​	参数1：name 要查找的方法名称；</p>
+<p>​    参数2：parameterTypes 该方法的参数类型</p>
+<p>返回获取多个方法：</p>
+<ul>
+<li>
+<p>public Method[] getMethods() 获取本类与父类中所有public 修饰的方法</p>
+</li>
+<li>
+<p>public Method[] getDeclaredMethods() 获取本类中所有的方法(包含私有的)</p>
+</li>
+</ul>
+<p>获取成员方法的代码演示：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">MethodDemo</span> <span style="color:#f92672">{</span>
+
+  <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">main</span><span style="color:#f92672">(</span>String<span style="color:#f92672">[]</span> args<span style="color:#f92672">)</span> <span style="color:#66d9ef">throws</span> ClassNotFoundException<span style="color:#f92672">,</span> NoSuchMethodException<span style="color:#f92672">,</span> SecurityException <span style="color:#f92672">{</span>
+
+    <span style="color:#75715e">//获取Class对象
+</span><span style="color:#75715e"></span>    Class c <span style="color:#f92672">=</span> Class<span style="color:#f92672">.</span><span style="color:#a6e22e">forName</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;cn.xh_Reflect.Person&#34;</span><span style="color:#f92672">);</span>
+
+      
+    <span style="color:#75715e">//获取多个方法
+</span><span style="color:#75715e"></span>    <span style="color:#75715e">//Method[] methods = c.getMethods();
+</span><span style="color:#75715e"></span>    Method<span style="color:#f92672">[]</span> methods <span style="color:#f92672">=</span> c<span style="color:#f92672">.</span><span style="color:#a6e22e">getDeclaredMethods</span><span style="color:#f92672">();</span>
+
+    <span style="color:#66d9ef">for</span> <span style="color:#f92672">(</span>Method method <span style="color:#f92672">:</span> methods<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+      System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span>method<span style="color:#f92672">);</span>
+    <span style="color:#f92672">}</span>
+    System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;-----------------------&#34;</span><span style="color:#f92672">);</span>
+
+      
+    <span style="color:#75715e">//获取一个方法：
+</span><span style="color:#75715e"></span>    <span style="color:#75715e">//public void method1()
+</span><span style="color:#75715e"></span>    Method method <span style="color:#f92672">=</span> c<span style="color:#f92672">.</span><span style="color:#a6e22e">getMethod</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;method1&#34;</span><span style="color:#f92672">,</span> <span style="color:#66d9ef">null</span><span style="color:#f92672">);</span>
+    System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span>method<span style="color:#f92672">);</span>
+
+    <span style="color:#75715e">//public String method4(String name){
+</span><span style="color:#75715e"></span>    method <span style="color:#f92672">=</span> c<span style="color:#f92672">.</span><span style="color:#a6e22e">getMethod</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;method4&#34;</span><span style="color:#f92672">,</span> String<span style="color:#f92672">.</span><span style="color:#a6e22e">class</span><span style="color:#f92672">);</span>
+    System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span>method<span style="color:#f92672">);</span>
+
+    <span style="color:#75715e">//私有方法
+</span><span style="color:#75715e"></span>    <span style="color:#75715e">//private void method5()
+</span><span style="color:#75715e"></span>    method <span style="color:#f92672">=</span> c<span style="color:#f92672">.</span><span style="color:#a6e22e">getDeclaredMethod</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;method5&#34;</span><span style="color:#f92672">,</span> <span style="color:#66d9ef">null</span><span style="color:#f92672">);</span>
+    System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span>method<span style="color:#f92672">);</span>
+
+  <span style="color:#f92672">}</span>
+
+<span style="color:#f92672">}</span>
+</code></pre></div><h5 id="通过反射创建对象调用指定的方法">通过反射，创建对象，调用指定的方法</h5>
+<p>获取成员方法，步骤如下：</p>
+<ol>
+<li>
+<p>获取Class对象</p>
+</li>
+<li>
+<p>获取构造方法</p>
+</li>
+<li>
+<p>通过构造方法，创建对象</p>
+</li>
+<li>
+<p>获取指定的方法</p>
+</li>
+<li>
+<p>执行找到的方法</p>
+</li>
+</ol>
+<ul>
+<li>public Object invoke(Object obj, Object&hellip; args)</li>
+</ul>
+<p>执行指定对象obj中，当前Method对象所代表的方法，方法要传入的参数通过args指定。</p>
+<p>代码演示：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">MethodDemo2</span> <span style="color:#f92672">{</span>
+
+  <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">main</span><span style="color:#f92672">(</span>String<span style="color:#f92672">[]</span> args<span style="color:#f92672">)</span> <span style="color:#66d9ef">throws</span> ClassNotFoundException<span style="color:#f92672">,</span> NoSuchMethodException<span style="color:#f92672">,</span> SecurityException<span style="color:#f92672">,</span> InstantiationException<span style="color:#f92672">,</span> IllegalAccessException<span style="color:#f92672">,</span> IllegalArgumentException<span style="color:#f92672">,</span> InvocationTargetException <span style="color:#f92672">{</span>
+
+    <span style="color:#75715e">//1， 获取Class对象
+</span><span style="color:#75715e"></span>    Class c <span style="color:#f92672">=</span> Class<span style="color:#f92672">.</span><span style="color:#a6e22e">forName</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;cn.xh_01_Reflect.Person&#34;</span><span style="color:#f92672">);</span>
+
+    <span style="color:#75715e">//2,获取构造方法
+</span><span style="color:#75715e"></span>    <span style="color:#75715e">//public Person(String name, int age, String address){
+</span><span style="color:#75715e"></span>    Constructor con <span style="color:#f92672">=</span> c<span style="color:#f92672">.</span><span style="color:#a6e22e">getConstructor</span><span style="color:#f92672">(</span>String<span style="color:#f92672">.</span><span style="color:#a6e22e">class</span><span style="color:#f92672">,</span> <span style="color:#66d9ef">int</span><span style="color:#f92672">.</span><span style="color:#a6e22e">class</span><span style="color:#f92672">,</span> String<span style="color:#f92672">.</span><span style="color:#a6e22e">class</span><span style="color:#f92672">);</span>
+
+    <span style="color:#75715e">//3，通过构造方法，创建对象
+</span><span style="color:#75715e"></span>    Object obj <span style="color:#f92672">=</span> con<span style="color:#f92672">.</span><span style="color:#a6e22e">newInstance</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;小明&#34;</span><span style="color:#f92672">,</span> 23<span style="color:#f92672">,</span> <span style="color:#e6db74">&#34;哈尔滨&#34;</span><span style="color:#f92672">);</span>
+
+    <span style="color:#75715e">//4，获取指定的方法
+</span><span style="color:#75715e"></span>    <span style="color:#75715e">//public void method1() 没有返回值没有参数的方法
+</span><span style="color:#75715e"></span>    <span style="color:#75715e">//Method m1 = c.getMethod(&#34;method1&#34;, null);
+</span><span style="color:#75715e"></span>
+    <span style="color:#75715e">//public String method4(String name)
+</span><span style="color:#75715e"></span>    Method m4 <span style="color:#f92672">=</span> c<span style="color:#f92672">.</span><span style="color:#a6e22e">getMethod</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;method4&#34;</span><span style="color:#f92672">,</span> String<span style="color:#f92672">.</span><span style="color:#a6e22e">class</span><span style="color:#f92672">);</span>
+
+    <span style="color:#75715e">//5，执行找到的方法
+</span><span style="color:#75715e"></span>    <span style="color:#75715e">//m1.invoke(obj, null);
+</span><span style="color:#75715e"></span>    Object result <span style="color:#f92672">=</span> m4<span style="color:#f92672">.</span><span style="color:#a6e22e">invoke</span><span style="color:#f92672">(</span>obj<span style="color:#f92672">,</span> <span style="color:#e6db74">&#34;xh&#34;</span><span style="color:#f92672">);</span>
+    System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;result = &#34;</span> <span style="color:#f92672">+</span> result<span style="color:#f92672">);</span>
+
+  <span style="color:#f92672">}</span>
+
+<span style="color:#f92672">}</span>
+</code></pre></div><h5 id="通过反射创建对象调用指定的private-方法">通过反射，创建对象，调用指定的private 方法</h5>
+<p>获取私有成员方法，步骤如下：</p>
+<ol>
+<li>
+<p>获取Class对象</p>
+</li>
+<li>
+<p>获取构造方法</p>
+</li>
+<li>
+<p>通过构造方法，创建对象</p>
+</li>
+<li>
+<p>获取指定的方法</p>
+</li>
+<li>
+<p>开启暴力访问</p>
+</li>
+<li>
+<p>执行找到的方法</p>
+</li>
+</ol>
+<ul>
+<li>public Object invoke(Object obj, Object&hellip; args)</li>
+</ul>
+<p>执行指定对象obj中，当前Method对象所代表的方法，方法要传入的参数通过args指定。</p>
+<p>代码演示：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">MethodDemo3</span> <span style="color:#f92672">{</span>
+
+  <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">main</span><span style="color:#f92672">(</span>String<span style="color:#f92672">[]</span> args<span style="color:#f92672">)</span> <span style="color:#66d9ef">throws</span> ClassNotFoundException<span style="color:#f92672">,</span> NoSuchMethodException<span style="color:#f92672">,</span> SecurityException<span style="color:#f92672">,</span> InstantiationException<span style="color:#f92672">,</span> IllegalAccessException<span style="color:#f92672">,</span> IllegalArgumentException<span style="color:#f92672">,</span> InvocationTargetException <span style="color:#f92672">{</span>
+
+    <span style="color:#75715e">//1， 获取Class对象
+</span><span style="color:#75715e"></span>    Class c <span style="color:#f92672">=</span> Class<span style="color:#f92672">.</span><span style="color:#a6e22e">forName</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;cn.xh.demo01.Person&#34;</span><span style="color:#f92672">);</span>
+
+    <span style="color:#75715e">//2,获取构造方法
+</span><span style="color:#75715e"></span>    <span style="color:#75715e">//public Person(String name, int age, String address){
+</span><span style="color:#75715e"></span>    Constructor con <span style="color:#f92672">=</span> c<span style="color:#f92672">.</span><span style="color:#a6e22e">getConstructor</span><span style="color:#f92672">(</span>String<span style="color:#f92672">.</span><span style="color:#a6e22e">class</span><span style="color:#f92672">,</span> <span style="color:#66d9ef">int</span><span style="color:#f92672">.</span><span style="color:#a6e22e">class</span><span style="color:#f92672">,</span> String<span style="color:#f92672">.</span><span style="color:#a6e22e">class</span><span style="color:#f92672">);</span>
+
+    <span style="color:#75715e">//3，通过构造方法，创建对象
+</span><span style="color:#75715e"></span>    Object obj <span style="color:#f92672">=</span> con<span style="color:#f92672">.</span><span style="color:#a6e22e">newInstance</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;小明&#34;</span><span style="color:#f92672">,</span> 23<span style="color:#f92672">,</span> <span style="color:#e6db74">&#34;哈尔滨&#34;</span><span style="color:#f92672">);</span>
+
+    <span style="color:#75715e">//4，获取指定的方法
+</span><span style="color:#75715e"></span>    <span style="color:#75715e">//private void method5(){
+</span><span style="color:#75715e"></span>    Method m5 <span style="color:#f92672">=</span> c<span style="color:#f92672">.</span><span style="color:#a6e22e">getDeclaredMethod</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;method5&#34;</span><span style="color:#f92672">,</span> <span style="color:#66d9ef">null</span><span style="color:#f92672">);</span>
+
+    <span style="color:#75715e">//5,开启暴力访问
+</span><span style="color:#75715e"></span>    m5<span style="color:#f92672">.</span><span style="color:#a6e22e">setAccessible</span><span style="color:#f92672">(</span><span style="color:#66d9ef">true</span><span style="color:#f92672">);</span>
+
+    <span style="color:#75715e">//6，执行找到的方法
+</span><span style="color:#75715e"></span>    m5<span style="color:#f92672">.</span><span style="color:#a6e22e">invoke</span><span style="color:#f92672">(</span>obj<span style="color:#f92672">,</span> <span style="color:#66d9ef">null</span><span style="color:#f92672">);</span>
+
+  <span style="color:#f92672">}</span>
+
+<span style="color:#f92672">}</span>
+</code></pre></div><h4 id="反射练习">反射练习</h4>
+<h5 id="泛型擦除">泛型擦除</h5>
+<p>思考：将已存在的ArrayList<!-- raw HTML omitted -->集合中添加一个字符串数据，如何实现呢？</p>
+<p>其实程序编译后产生的.class文件中是没有泛型约束的，这种现象我们称为泛型擦除。那么，我们可以通过反射技术，来完成向有泛型约束的集合中，添加任意类型的元素</p>
+<p>代码如下：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">ReflectTest</span> <span style="color:#f92672">{</span>
+
+  <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">main</span><span style="color:#f92672">(</span>String<span style="color:#f92672">[]</span> args<span style="color:#f92672">)</span> <span style="color:#66d9ef">throws</span> ClassNotFoundException<span style="color:#f92672">,</span> NoSuchMethodException<span style="color:#f92672">,</span> SecurityException<span style="color:#f92672">,</span> IllegalAccessException<span style="color:#f92672">,</span> IllegalArgumentException<span style="color:#f92672">,</span> InvocationTargetException <span style="color:#f92672">{</span>
+
+    ArrayList<span style="color:#f92672">&lt;</span>Integer<span style="color:#f92672">&gt;</span> list <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> ArrayList<span style="color:#f92672">&lt;</span>Integer<span style="color:#f92672">&gt;();</span>
+
+    <span style="color:#75715e">//添加元素到集合
+</span><span style="color:#75715e"></span>    list<span style="color:#f92672">.</span><span style="color:#a6e22e">add</span><span style="color:#f92672">(</span><span style="color:#66d9ef">new</span> Integer<span style="color:#f92672">(</span>30<span style="color:#f92672">));</span>
+    list<span style="color:#f92672">.</span><span style="color:#a6e22e">add</span><span style="color:#f92672">(</span><span style="color:#66d9ef">new</span> Integer<span style="color:#f92672">(</span><span style="color:#e6db74">&#34;12345&#34;</span><span style="color:#f92672">));</span>
+    list<span style="color:#f92672">.</span><span style="color:#a6e22e">add</span><span style="color:#f92672">(</span>123<span style="color:#f92672">);</span>
+    <span style="color:#75715e">//list.add(&#34;哈哈&#34;);//因为有泛型类型的约束
+</span><span style="color:#75715e"></span>    System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span>list<span style="color:#f92672">);</span>
+
+
+    <span style="color:#75715e">//通过反射技术，实现添加任意类型的元素
+</span><span style="color:#75715e"></span>    <span style="color:#75715e">//1, 获取字节码文件对象
+</span><span style="color:#75715e"></span>    <span style="color:#75715e">//Class c = list.getClass();
+</span><span style="color:#75715e"></span>    <span style="color:#75715e">//Class c = ArrayList.class;
+</span><span style="color:#75715e"></span>    Class c <span style="color:#f92672">=</span> Class<span style="color:#f92672">.</span><span style="color:#a6e22e">forName</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;java.util.ArrayList&#34;</span><span style="color:#f92672">);</span>
+
+    <span style="color:#75715e">//2, 找到add()方法
+</span><span style="color:#75715e"></span>    <span style="color:#75715e">// public boolean add(E e)
+</span><span style="color:#75715e"></span>    Method addMethod <span style="color:#f92672">=</span> c<span style="color:#f92672">.</span><span style="color:#a6e22e">getMethod</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;add&#34;</span><span style="color:#f92672">,</span> Object<span style="color:#f92672">.</span><span style="color:#a6e22e">class</span><span style="color:#f92672">);</span>
+
+    <span style="color:#75715e">//3， 执行add()方法
+</span><span style="color:#75715e"></span>    addMethod<span style="color:#f92672">.</span><span style="color:#a6e22e">invoke</span><span style="color:#f92672">(</span>list<span style="color:#f92672">,</span> <span style="color:#e6db74">&#34;哈哈&#34;</span><span style="color:#f92672">);</span><span style="color:#75715e">// list.add(&#34;哈哈&#34;);
+</span><span style="color:#75715e"></span>    System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span>list<span style="color:#f92672">);</span>
+
+  <span style="color:#f92672">}</span>
+
+<span style="color:#f92672">}</span>
+</code></pre></div><h5 id="反射配置文件">反射配置文件</h5>
+<p>通过反射配置文件，运行配置文件中指定类的对应方法</p>
+<p>读取Peoperties.txt文件中的数据，通过反射技术，来完成Person对象的创建</p>
+<p>​     Peoperties.txt文件内容如下：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java">className<span style="color:#f92672">=</span>cn<span style="color:#f92672">.</span><span style="color:#a6e22e">xh</span><span style="color:#f92672">.</span><span style="color:#a6e22e">demo01</span><span style="color:#f92672">.</span><span style="color:#a6e22e">Person</span>
+methodName<span style="color:#f92672">=</span>method1
+</code></pre></div><p>读取配置文件，调用指定类中的对应方法</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">ReflectTest2</span> <span style="color:#f92672">{</span>
+
+  <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">main</span><span style="color:#f92672">(</span>String<span style="color:#f92672">[]</span> args<span style="color:#f92672">)</span> <span style="color:#66d9ef">throws</span> FileNotFoundException<span style="color:#f92672">,</span> IOException<span style="color:#f92672">,</span> ClassNotFoundException<span style="color:#f92672">,</span> NoSuchMethodException<span style="color:#f92672">,</span> SecurityException<span style="color:#f92672">,</span>InstantiationException<span style="color:#f92672">,</span> IllegalAccessException<span style="color:#f92672">,</span> IllegalArgumentException<span style="color:#f92672">,</span> InvocationTargetException <span style="color:#f92672">{</span>
+
+    <span style="color:#75715e">// 通过Properties集合从文件中读取数据
+</span><span style="color:#75715e"></span>    Properties prop <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> Properties<span style="color:#f92672">();</span>
+
+    <span style="color:#75715e">// 读取文件中的数据到集合中
+</span><span style="color:#75715e"></span>    prop<span style="color:#f92672">.</span><span style="color:#a6e22e">load</span><span style="color:#f92672">(</span><span style="color:#66d9ef">new</span> FileInputStream<span style="color:#f92672">(</span><span style="color:#e6db74">&#34;properties.txt&#34;</span><span style="color:#f92672">));</span>
+
+    <span style="color:#75715e">// 获取键所对应的值
+</span><span style="color:#75715e"></span>    String className <span style="color:#f92672">=</span> prop<span style="color:#f92672">.</span><span style="color:#a6e22e">getProperty</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;className&#34;</span><span style="color:#f92672">);</span>
+    System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span>className<span style="color:#f92672">);</span>
+
+    <span style="color:#75715e">// 1，获取Person.class 字节码文件对象
+</span><span style="color:#75715e"></span>    Class c <span style="color:#f92672">=</span> Class<span style="color:#f92672">.</span><span style="color:#a6e22e">forName</span><span style="color:#f92672">(</span>className<span style="color:#f92672">);</span>
+
+    <span style="color:#75715e">// 2，获取构造方法
+</span><span style="color:#75715e"></span>    <span style="color:#75715e">// public Person(String name, int age, String address)
+</span><span style="color:#75715e"></span>    Constructor con <span style="color:#f92672">=</span> c<span style="color:#f92672">.</span><span style="color:#a6e22e">getConstructor</span><span style="color:#f92672">(</span>String<span style="color:#f92672">.</span><span style="color:#a6e22e">class</span><span style="color:#f92672">,</span> <span style="color:#66d9ef">int</span><span style="color:#f92672">.</span><span style="color:#a6e22e">class</span><span style="color:#f92672">,</span> String<span style="color:#f92672">.</span><span style="color:#a6e22e">class</span><span style="color:#f92672">);</span>
+
+    <span style="color:#75715e">// 3,创建对象
+</span><span style="color:#75715e"></span>    Object obj <span style="color:#f92672">=</span> con<span style="color:#f92672">.</span><span style="color:#a6e22e">newInstance</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;小明&#34;</span><span style="color:#f92672">,</span> 20<span style="color:#f92672">,</span> <span style="color:#e6db74">&#34;中国&#34;</span><span style="color:#f92672">);</span>
+    System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span>obj<span style="color:#f92672">);</span>
+
+    <span style="color:#75715e">// 4，获取指定的方法
+</span><span style="color:#75715e"></span>    <span style="color:#75715e">// private void method5(){}
+</span><span style="color:#75715e"></span>    String methodName <span style="color:#f92672">=</span> prop<span style="color:#f92672">.</span><span style="color:#a6e22e">getProperty</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;methodName&#34;</span><span style="color:#f92672">);</span>
+    Method m5 <span style="color:#f92672">=</span> c<span style="color:#f92672">.</span><span style="color:#a6e22e">getDeclaredMethod</span><span style="color:#f92672">(</span>methodName<span style="color:#f92672">,</span> <span style="color:#66d9ef">null</span><span style="color:#f92672">);</span>
+
+    <span style="color:#75715e">// 5,开启暴力访问
+</span><span style="color:#75715e"></span>    m5<span style="color:#f92672">.</span><span style="color:#a6e22e">setAccessible</span><span style="color:#f92672">(</span><span style="color:#66d9ef">true</span><span style="color:#f92672">);</span>
+
+    <span style="color:#75715e">// 6，执行找到的方法
+</span><span style="color:#75715e"></span>    m5<span style="color:#f92672">.</span><span style="color:#a6e22e">invoke</span><span style="color:#f92672">(</span>obj<span style="color:#f92672">,</span> <span style="color:#66d9ef">null</span><span style="color:#f92672">);</span>
+
+  <span style="color:#f92672">}</span>
+
+<span style="color:#f92672">}</span>
+</code></pre></div><hr>
+<h3 id="第二章">第二章</h3>
+<hr>
+<h5 id="本章内容-1">本章内容</h5>
+<ul>
+<li>注解</li>
+<li>Junit测试</li>
+</ul>
+<hr>
+<h4 id="21-注解">2.1 注解</h4>
+<p>定义: 注解(Annotation)是一种标记性的接口，注解本质上是一个接口，它继承了Annotation接口，注解相当于一种标记，在程序中加了注解就等于为程序打上了某种标记，没加，则等于没有某种标记，它可以声明在包、类、字段、方法、局部变量、方法参数等的前面，用来对这些元素进行说明，注释！</p>
+<h4 id="java-预置的注解">Java 预置的注解</h4>
+<h5 id="deprecated">@Deprecated</h5>
+<p>这个注解是用来标记过时的元素，想必大家在日常开发中经常碰到。编译器在编译阶段遇到这个注解时会发出提醒警告，告诉开发者正在调用一个过时的元素比如过时的方法、过时的类、过时的成员变量。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Hero</span> <span style="color:#f92672">{</span>
+    <span style="color:#a6e22e">@Deprecated</span>
+    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">say</span><span style="color:#f92672">(){</span>
+        System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;Noting has to say!&#34;</span><span style="color:#f92672">);</span>
+    <span style="color:#f92672">}</span>
+    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">speak</span><span style="color:#f92672">(){</span>
+        System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;I have a dream!&#34;</span><span style="color:#f92672">);</span>
+    <span style="color:#f92672">}</span>
+<span style="color:#f92672">}</span>
+</code></pre></div><p>定义了一个 Hero 类，它有两个方法 say() 和 speak() ，其中 say() 被 @Deprecated 注解。然后我们在 IDE 中分别调用它们。
+<img src="/img/image-20201223112912194.png" alt="image-20201223112912194"></p>
+<p>可以看到，say() 方法上面被一条直线划了一条，这其实就是编译器识别后的提醒效果。</p>
+<h5 id="override">@Override</h5>
+<p>这个大家应该很熟悉了，提示子类要复写父类中被 @Override 修饰的方法</p>
+<h5 id="注解的定义">注解的定义</h5>
+<p>注解通过 @interface 关键字进行定义。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="color:#66d9ef">public</span> <span style="color:#a6e22e">@interface</span> TestAnnotation <span style="color:#f92672">{</span>
+
+<span style="color:#f92672">}</span>
+</code></pre></div><p>它的形式跟接口很类似，不过前面多了一个 @ 符号。上面的代码就创建了一个名字为 TestAnnotaion 的注解。</p>
+<p>你可以简单理解为创建了一张名字为 TestAnnotation 的标签</p>
+<h5 id="注解的应用">注解的应用</h5>
+<p>上面创建了一个注解，那么注解的的使用方法是什么呢。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="color:#a6e22e">@TestAnnotation</span>
+<span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Test</span> <span style="color:#f92672">{</span>
+
+<span style="color:#f92672">}</span>
+</code></pre></div><p>创建一个类 Test,然后在类定义的地方加上 @TestAnnotation 就可以用 TestAnnotation 注解这个类了。</p>
+<p>你可以简单理解为将 TestAnnotation 这张标签贴到 Test 这个类上面。</p>
+<p>不过，要想注解能够正常工作，还需要介绍一下一个新的概念那就是元注解。</p>
+<h5 id="元注解">元注解</h5>
+<p>元注解是什么意思呢？</p>
+<p>元注解是可以注解到注解上的注解，或者说元注解是一种基本注解，但是它能够应用到其它的注解上面。</p>
+<p>如果难于理解的话，你可以这样理解。元注解也是一张标签，但是它是一张特殊的标签，它的作用和目的就是给其他普通的标签进行解释说明的。</p>
+<p>元标签有 @Retention、@Documented、@Target、@Inherited。</p>
+<h5 id="retention">@Retention</h5>
+<p>Retention 的英文意为保留期的意思。当 @Retention 应用到一个注解上的时候，它解释说明了这个注解的的存活时间。</p>
+<p>它的取值如下：</p>
+<ul>
+<li>RetentionPolicy.SOURCE 注解只在源码阶段保留，在编译器进行编译时它将被丢弃忽视</li>
+<li>RetentionPolicy.CLASS 注解只被保留到编译进行的时候，它并不会被加载到 JVM 中。</li>
+<li>RetentionPolicy.RUNTIME 注解可以保留到程序运行的时候，它会被加载进入到 JVM 中，所以在程序运行时可以获取到它们。</li>
+</ul>
+<p>我们可以这样的方式来加深理解，@Retention 去给一张标签解释的时候，它指定了这张标签张贴的时间。@Retention 相当于给一张标签上面盖了一张时间戳，时间戳指明了标签张贴的时间周期。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="color:#a6e22e">@Retention</span><span style="color:#f92672">(</span>RetentionPolicy<span style="color:#f92672">.</span><span style="color:#a6e22e">RUNTIME</span><span style="color:#f92672">)</span>
+<span style="color:#66d9ef">public</span> <span style="color:#a6e22e">@interface</span> TestAnnotation <span style="color:#f92672">{</span>
+<span style="color:#f92672">}</span>
+</code></pre></div><p>上面的代码中，我们指定 TestAnnotation 可以在程序运行周期被获取到，因此它的生命周期非常的长。</p>
+<h5 id="documented">@Documented</h5>
+<p>顾名思义，这个元注解肯定是和文档有关。它的作用是能够将注解中的元素包含到 Javadoc 中去。</p>
+<h5 id="target">@Target</h5>
+<p>Target 是目标的意思，@Target 指定了注解运用的地方。</p>
+<p>你可以这样理解，当一个注解被 @Target 注解时，这个注解就被限定了运用的场景。</p>
+<p>类比到标签，原本标签是你想张贴到哪个地方就到哪个地方，但是因为 @Target 的存在，它张贴的地方就非常具体了，比如只能张贴到方法上、类上、方法参数上等等。@Target 有下面的取值</p>
+<ul>
+<li>
+<p>ElementType.ANNOTATION_TYPE 可以给一个注解进行注解</p>
+</li>
+<li>
+<p>ElementType.CONSTRUCTOR 可以给构造方法进行注解</p>
+</li>
+<li>
+<p>ElementType.FIELD 可以给属性进行注解</p>
+</li>
+<li>
+<p>ElementType.LOCAL_VARIABLE 可以给局部变量进行注解</p>
+</li>
+<li>
+<p>ElementType.METHOD 可以给方法进行注解</p>
+</li>
+<li>
+<p>ElementType.PACKAGE 可以给一个包进行注解</p>
+</li>
+<li>
+<p>ElementType.PARAMETER 可以给一个方法内的参数进行注解</p>
+</li>
+<li>
+<p>ElementType.TYPE 可以给一个类型进行注解，比如类、接口、枚举</p>
+</li>
+</ul>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="color:#a6e22e">@Retention</span><span style="color:#f92672">(</span>RetentionPolicy<span style="color:#f92672">.</span><span style="color:#a6e22e">RUNTIME</span><span style="color:#f92672">)</span>
+<span style="color:#a6e22e">@Target</span><span style="color:#f92672">(</span>ElementType<span style="color:#f92672">.</span><span style="color:#a6e22e">TYPE</span><span style="color:#f92672">)</span>
+<span style="color:#66d9ef">public</span> <span style="color:#a6e22e">@interface</span> TestAnnotation <span style="color:#f92672">{</span>
+<span style="color:#f92672">}</span>
+</code></pre></div><h5 id="inherited">@Inherited</h5>
+<p>Inherited 是继承的意思，但是它并不是说注解本身可以继承，而是说如果一个超类被 @Inherited 注解过的注解进行注解的话，那么如果它的子类没有被任何注解应用的话，那么这个子类就继承了超类的注解。
+说的比较抽象。代码来解释。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="color:#a6e22e">@Inherited</span>
+<span style="color:#a6e22e">@interface</span> Test <span style="color:#f92672">{}</span>
+</code></pre></div><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="color:#a6e22e">@Test</span>
+<span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">A</span> <span style="color:#f92672">{}</span>
+</code></pre></div><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">B</span> <span style="color:#66d9ef">extends</span> A <span style="color:#f92672">{}</span>
+</code></pre></div><p>注解 Test 被 @Inherited 修饰，之后类 A 被 Test 注解，类 B 继承 A,类 B 也拥有 Test 这个注解。</p>
+<h5 id="注解的属性">注解的属性</h5>
+<p>注解既然本质上是接口，那么注解里面自然就是抽象方法，也被叫做属性。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="color:#a6e22e">@Target</span><span style="color:#f92672">(</span>ElementType<span style="color:#f92672">.</span><span style="color:#a6e22e">TYPE</span><span style="color:#f92672">)</span>
+<span style="color:#a6e22e">@Retention</span><span style="color:#f92672">(</span>RetentionPolicy<span style="color:#f92672">.</span><span style="color:#a6e22e">RUNTIME</span><span style="color:#f92672">)</span>
+<span style="color:#66d9ef">public</span> <span style="color:#a6e22e">@interface</span> TestAnnotation <span style="color:#f92672">{</span>
+ <span style="color:#66d9ef">int</span> <span style="color:#a6e22e">id</span><span style="color:#f92672">();</span>
+ String <span style="color:#a6e22e">msg</span><span style="color:#f92672">();</span>
+<span style="color:#f92672">}</span>
+</code></pre></div><p>上面代码定义了 TestAnnotation 这个注解中拥有 id 和 msg 两个属性。在使用的时候，我们应该给它们进行赋值。赋值的方式是在注解的括号内以 value=”” 形式，多个属性之间用 ，隔开。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="color:#a6e22e">@TestAnnotation</span><span style="color:#f92672">(</span>id<span style="color:#f92672">=</span>3<span style="color:#f92672">,</span>msg<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;hello annotation&#34;</span><span style="color:#f92672">)</span>
+<span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Test</span> <span style="color:#f92672">{</span>
+
+<span style="color:#f92672">}</span>
+</code></pre></div><p>需要注意的是，在注解中定义属性时它的类型必须是 8 种基本数据类型外加 类、接口、注解及它们的数组。</p>
+<p>注解中属性可以有默认值，默认值需要用 default 关键值指定。比如：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="color:#a6e22e">@Target</span><span style="color:#f92672">(</span>ElementType<span style="color:#f92672">.</span><span style="color:#a6e22e">TYPE</span><span style="color:#f92672">)</span>
+<span style="color:#a6e22e">@Retention</span><span style="color:#f92672">(</span>RetentionPolicy<span style="color:#f92672">.</span><span style="color:#a6e22e">RUNTIME</span><span style="color:#f92672">)</span>
+<span style="color:#66d9ef">public</span> <span style="color:#a6e22e">@interface</span> TestAnnotation <span style="color:#f92672">{</span>
+
+  <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">int</span> <span style="color:#a6e22e">id</span><span style="color:#f92672">()</span> <span style="color:#66d9ef">default</span> <span style="color:#f92672">-</span>1<span style="color:#f92672">;</span>
+  <span style="color:#66d9ef">public</span> String <span style="color:#a6e22e">msg</span><span style="color:#f92672">()</span> <span style="color:#66d9ef">default</span> <span style="color:#e6db74">&#34;Hi&#34;</span><span style="color:#f92672">;</span>
+
+<span style="color:#f92672">}</span>
+</code></pre></div><p>TestAnnotation 中 id 属性默认值为 -1，msg 属性默认值为 Hi。 它可以这样应用：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="color:#a6e22e">@TestAnnotation</span><span style="color:#f92672">()</span>
+<span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Test</span> <span style="color:#f92672">{}</span>
+</code></pre></div><p>因为有默认值，所以无需要再在 @TestAnnotation 后面的括号里面进行赋值了，这一步可以省略。</p>
+<p>另外，还有一种情况。如果一个注解内仅仅只有一个名字为 value 的属性时，应用这个注解时可以直接接属性值填写到括号内。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="color:#66d9ef">public</span> <span style="color:#a6e22e">@interface</span> Check <span style="color:#f92672">{</span>
+
+  String <span style="color:#a6e22e">value</span><span style="color:#f92672">();</span>
+
+<span style="color:#f92672">}</span>
+</code></pre></div><p>上面代码中，Check 这个注解只有 value 这个属性。所以可以这样应用：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="color:#a6e22e">@Check</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;hi&#34;</span><span style="color:#f92672">)</span>
+<span style="color:#66d9ef">int</span> a<span style="color:#f92672">;</span>
+</code></pre></div><p>这和下面的效果是一样的</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="color:#a6e22e">@Check</span><span style="color:#f92672">(</span>value<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;hi&#34;</span><span style="color:#f92672">)</span>
+<span style="color:#66d9ef">int</span> a<span style="color:#f92672">;</span>
+</code></pre></div><p>最后，还需要注意的一种情况是一个注解没有任何属性。比如</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="color:#66d9ef">public</span> <span style="color:#a6e22e">@interface</span> Perform <span style="color:#f92672">{}</span>
+</code></pre></div><p>那么在应用这个注解的时候，括号都可以省略。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="color:#a6e22e">@Perform</span>
+<span style="color:#66d9ef">public</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">testMethod</span><span style="color:#f92672">(){}</span>
+</code></pre></div><h4 id="注解的提取">注解的提取</h4>
+<p>我通过用标签来比作注解，前面的内容是讲怎么写注解，然后贴到哪个地方去，而现在我们要做的工作就是检阅这些标签内容。 形象的比喻就是你把这些注解标签在合适的时候撕下来，然后检阅上面的内容信息。</p>
+<p>要想正确检阅注解，离不开一个手段，那就是反射。</p>
+<h5 id="注解与反射">注解与反射</h5>
+<p>注解通过反射获取。首先可以通过 Class 对象的 isAnnotationPresent() 方法判断它是否应用了某个注解</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">boolean</span> <span style="color:#a6e22e">isAnnotationPresent</span><span style="color:#f92672">(</span>Class<span style="color:#f92672">&lt;?</span> <span style="color:#66d9ef">extends</span> Annotation<span style="color:#f92672">&gt;</span> annotationClass<span style="color:#f92672">)</span> <span style="color:#f92672">{}</span>
+</code></pre></div><p>然后通过 getAnnotation() 方法来获取 Annotation 对象：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"> <span style="color:#66d9ef">public</span> <span style="color:#f92672">&lt;</span>A <span style="color:#66d9ef">extends</span> Annotation<span style="color:#f92672">&gt;</span> A <span style="color:#a6e22e">getAnnotation</span><span style="color:#f92672">(</span>Class<span style="color:#f92672">&lt;</span>A<span style="color:#f92672">&gt;</span> annotationClass<span style="color:#f92672">)</span> <span style="color:#f92672">{}</span>
+</code></pre></div><p>或者是 getAnnotations() 方法：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="color:#66d9ef">public</span> Annotation<span style="color:#f92672">[]</span> <span style="color:#a6e22e">getAnnotations</span><span style="color:#f92672">()</span> <span style="color:#f92672">{}</span>
+</code></pre></div><p>前一种方法返回指定类型的注解，后一种方法返回注解到这个元素上的所有注解。</p>
+<p>如果获取到的 Annotation 如果不为 null，则就可以调用它们的属性方法了。比如</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="color:#a6e22e">@TestAnnotation</span><span style="color:#f92672">()</span>
+<span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Test</span> <span style="color:#f92672">{</span>
+    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">main</span><span style="color:#f92672">(</span>String<span style="color:#f92672">[]</span> args<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+ 
+        <span style="color:#66d9ef">boolean</span> hasAnnotation <span style="color:#f92672">=</span> Test<span style="color:#f92672">.</span><span style="color:#a6e22e">class</span><span style="color:#f92672">.</span><span style="color:#a6e22e">isAnnotationPresent</span><span style="color:#f92672">(</span>TestAnnotation<span style="color:#f92672">.</span><span style="color:#a6e22e">class</span><span style="color:#f92672">);</span>
+        <span style="color:#66d9ef">if</span> <span style="color:#f92672">(</span> hasAnnotation <span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+            TestAnnotation testAnnotation <span style="color:#f92672">=</span> Test<span style="color:#f92672">.</span><span style="color:#a6e22e">class</span><span style="color:#f92672">.</span><span style="color:#a6e22e">getAnnotation</span><span style="color:#f92672">(</span>TestAnnotation<span style="color:#f92672">.</span><span style="color:#a6e22e">class</span><span style="color:#f92672">);</span>
+            System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;id:&#34;</span><span style="color:#f92672">+</span>testAnnotation<span style="color:#f92672">.</span><span style="color:#a6e22e">id</span><span style="color:#f92672">());</span>
+            System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;msg:&#34;</span><span style="color:#f92672">+</span>testAnnotation<span style="color:#f92672">.</span><span style="color:#a6e22e">msg</span><span style="color:#f92672">());</span>
+        <span style="color:#f92672">}</span>
+    <span style="color:#f92672">}</span>
+<span style="color:#f92672">}</span>
+</code></pre></div><p>程序的运行结果是：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java">id:<span style="color:#f92672">-</span>1
+msg:
+</code></pre></div><p>这个正是 TestAnnotation 中 id 和 msg 的默认值。</p>
+<p>上面的例子中，只是检阅出了注解在类上的注解，其实属性、方法上的注解照样是可以的。同样还是要假手于反射</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="color:#a6e22e">@TestAnnotation</span><span style="color:#f92672">(</span>msg<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;hello&#34;</span><span style="color:#f92672">)</span>
+<span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Test</span> <span style="color:#f92672">{</span>
+    <span style="color:#a6e22e">@Check</span><span style="color:#f92672">(</span>value<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;hi&#34;</span><span style="color:#f92672">)</span>
+    <span style="color:#66d9ef">int</span> a<span style="color:#f92672">;</span>
+    <span style="color:#a6e22e">@Perform</span>
+    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">testMethod</span><span style="color:#f92672">(){}</span>
+    
+    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">main</span><span style="color:#f92672">(</span>String<span style="color:#f92672">[]</span> args<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+        <span style="color:#66d9ef">try</span> <span style="color:#f92672">{</span>
+            Field a <span style="color:#f92672">=</span> Test<span style="color:#f92672">.</span><span style="color:#a6e22e">class</span><span style="color:#f92672">.</span><span style="color:#a6e22e">getDeclaredField</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;a&#34;</span><span style="color:#f92672">);</span>
+            a<span style="color:#f92672">.</span><span style="color:#a6e22e">setAccessible</span><span style="color:#f92672">(</span><span style="color:#66d9ef">true</span><span style="color:#f92672">);</span>
+            <span style="color:#75715e">//获取一个成员变量上的注解
+</span><span style="color:#75715e"></span>            Check check <span style="color:#f92672">=</span> a<span style="color:#f92672">.</span><span style="color:#a6e22e">getAnnotation</span><span style="color:#f92672">(</span>Check<span style="color:#f92672">.</span><span style="color:#a6e22e">class</span><span style="color:#f92672">);</span>
+ 
+            <span style="color:#66d9ef">if</span> <span style="color:#f92672">(</span> check <span style="color:#f92672">!=</span> <span style="color:#66d9ef">null</span> <span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+                System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;check value:&#34;</span><span style="color:#f92672">+</span>check<span style="color:#f92672">.</span><span style="color:#a6e22e">value</span><span style="color:#f92672">());</span>
+            <span style="color:#f92672">}</span>
+ 
+            Method testMethod <span style="color:#f92672">=</span> Test<span style="color:#f92672">.</span><span style="color:#a6e22e">class</span><span style="color:#f92672">.</span><span style="color:#a6e22e">getDeclaredMethod</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;testMethod&#34;</span><span style="color:#f92672">);</span>
+ 
+            <span style="color:#66d9ef">if</span> <span style="color:#f92672">(</span> testMethod <span style="color:#f92672">!=</span> <span style="color:#66d9ef">null</span> <span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+                <span style="color:#75715e">// 获取方法中的注解
+</span><span style="color:#75715e"></span>                Annotation<span style="color:#f92672">[]</span> ans <span style="color:#f92672">=</span> testMethod<span style="color:#f92672">.</span><span style="color:#a6e22e">getAnnotations</span><span style="color:#f92672">();</span>
+                <span style="color:#66d9ef">for</span><span style="color:#f92672">(</span> <span style="color:#66d9ef">int</span> i <span style="color:#f92672">=</span> 0<span style="color:#f92672">;</span>i <span style="color:#f92672">&lt;</span> ans<span style="color:#f92672">.</span><span style="color:#a6e22e">length</span><span style="color:#f92672">;</span>i<span style="color:#f92672">++)</span> <span style="color:#f92672">{</span>
+                    System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;method testMethod annotation:&#34;</span><span style="color:#f92672">+</span>ans<span style="color:#f92672">[</span>i<span style="color:#f92672">].</span><span style="color:#a6e22e">annotationType</span><span style="color:#f92672">().</span><span style="color:#a6e22e">getSimpleName</span><span style="color:#f92672">());</span>
+                <span style="color:#f92672">}</span>
+            <span style="color:#f92672">}</span>
+        <span style="color:#f92672">}</span> <span style="color:#66d9ef">catch</span> <span style="color:#f92672">(</span>NoSuchFieldException e<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+            <span style="color:#75715e">// TODO Auto-generated catch block
+</span><span style="color:#75715e"></span>            e<span style="color:#f92672">.</span><span style="color:#a6e22e">printStackTrace</span><span style="color:#f92672">();</span>
+            System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span>e<span style="color:#f92672">.</span><span style="color:#a6e22e">getMessage</span><span style="color:#f92672">());</span>
+        <span style="color:#f92672">}</span> <span style="color:#66d9ef">catch</span> <span style="color:#f92672">(</span>SecurityException e<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+            <span style="color:#75715e">// TODO Auto-generated catch block
+</span><span style="color:#75715e"></span>            e<span style="color:#f92672">.</span><span style="color:#a6e22e">printStackTrace</span><span style="color:#f92672">();</span>
+            System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span>e<span style="color:#f92672">.</span><span style="color:#a6e22e">getMessage</span><span style="color:#f92672">());</span>
+        <span style="color:#f92672">}</span> <span style="color:#66d9ef">catch</span> <span style="color:#f92672">(</span>NoSuchMethodException e<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+            <span style="color:#75715e">// TODO Auto-generated catch block
+</span><span style="color:#75715e"></span>            e<span style="color:#f92672">.</span><span style="color:#a6e22e">printStackTrace</span><span style="color:#f92672">();</span>
+            System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span>e<span style="color:#f92672">.</span><span style="color:#a6e22e">getMessage</span><span style="color:#f92672">());</span>
+        <span style="color:#f92672">}</span>
+    <span style="color:#f92672">}</span>
+<span style="color:#f92672">}</span>
+</code></pre></div><p>它们的结果如下：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java">id:<span style="color:#f92672">-</span>1
+msg:hello
+check value<span style="color:#f92672">:</span>hi
+method testMethod annotation<span style="color:#f92672">:</span>Perform
+</code></pre></div><p>需要注意的是，如果一个注解要在运行时被成功提取，那么 @Retention(RetentionPolicy.RUNTIME) 是必须的。</p>
+<h4 id="注解的使用场景">注解的使用场景</h4>
+<p>注解到底有什么用？</p>
+<p>当开发者使用了Annotation 修饰了类、方法、Field 等成员之后，这些 Annotation 不会自己生效，必须由开发者提供相应的代码来提取并处理 Annotation 信息。</p>
+<h5 id="亲手自定义注解完成某个目的">亲手自定义注解完成某个目的</h5>
+<p>我要写一个测试框架，测试程序员的代码有无异常。</p>
+<ul>
+<li>程序员 A : 我写了一个类，它的名字叫做D_Calculater，因为它所有的方法都没有错误。</li>
+<li>我：自信是好事，不过为了防止意外，让我测试一下如何？</li>
+<li>程序员 A: 怎么测试？</li>
+<li>我：把你写的代码的方法都加上 @D_Annotation 这个注解就好了。</li>
+<li>程序员 A: 好的。</li>
+</ul>
+<p>D_Calculater.java</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">D_Calculater</span> <span style="color:#f92672">{</span>
+
+    <span style="color:#a6e22e">@D_Annotation</span>
+    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">add</span><span style="color:#f92672">(){</span>
+        System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;add&#34;</span><span style="color:#f92672">);</span>
+    <span style="color:#f92672">}</span>
+
+    <span style="color:#a6e22e">@D_Annotation</span>
+    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">sub</span><span style="color:#f92672">(){</span>
+        <span style="color:#66d9ef">int</span> i<span style="color:#f92672">=</span>1<span style="color:#f92672">/</span>0<span style="color:#f92672">;</span>
+        System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;sub&#34;</span><span style="color:#f92672">);</span>
+    <span style="color:#f92672">}</span>
+
+    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">times</span><span style="color:#f92672">(){</span>
+        System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;times&#34;</span><span style="color:#f92672">);</span>
+    <span style="color:#f92672">}</span>
+<span style="color:#f92672">}</span>
+
+</code></pre></div><p>上面的代码，有些方法上面运用了 @D_Annotation 注解。</p>
+<p>这个注解是我写的测试软件框架中定义的注解。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="color:#f92672">import</span> java.lang.annotation.Retention<span style="color:#f92672">;</span>
+<span style="color:#f92672">import</span> java.lang.annotation.RetentionPolicy<span style="color:#f92672">;</span>
+
+<span style="color:#a6e22e">@Retention</span><span style="color:#f92672">(</span>RetentionPolicy<span style="color:#f92672">.</span><span style="color:#a6e22e">RUNTIME</span><span style="color:#f92672">)</span>
+<span style="color:#66d9ef">public</span> <span style="color:#a6e22e">@interface</span> D_Annotation <span style="color:#f92672">{</span>
+<span style="color:#f92672">}</span>
+</code></pre></div><p>然后，我再编写一个测试类 Test 就可以测试 D_Annotation 相应的方法了。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="color:#f92672">import</span> java.lang.reflect.Method<span style="color:#f92672">;</span>
+
+<span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">D_Test</span> <span style="color:#f92672">{</span>
+    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">main</span><span style="color:#f92672">(</span>String<span style="color:#f92672">[]</span> args<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+        D_Calculater cal<span style="color:#f92672">=</span><span style="color:#66d9ef">new</span> D_Calculater<span style="color:#f92672">();</span>
+        <span style="color:#75715e">//获取Calculater的字节码对象
+</span><span style="color:#75715e"></span>        Class c<span style="color:#f92672">=</span>cal<span style="color:#f92672">.</span><span style="color:#a6e22e">getClass</span><span style="color:#f92672">();</span>
+
+        <span style="color:#75715e">//获取Calculater中的所有方法
+</span><span style="color:#75715e"></span>        Method<span style="color:#f92672">[]</span> methods<span style="color:#f92672">=</span>c<span style="color:#f92672">.</span><span style="color:#a6e22e">getMethods</span><span style="color:#f92672">();</span>
+
+
+        <span style="color:#66d9ef">int</span> errNum<span style="color:#f92672">=</span>0<span style="color:#f92672">;</span><span style="color:#75715e">//记录出错次数
+</span><span style="color:#75715e"></span>        StringBuilder builder<span style="color:#f92672">=</span><span style="color:#66d9ef">new</span> StringBuilder<span style="color:#f92672">();</span><span style="color:#75715e">//记录出错信息
+</span><span style="color:#75715e"></span>
+        <span style="color:#66d9ef">for</span> <span style="color:#f92672">(</span>Method method<span style="color:#f92672">:</span>methods<span style="color:#f92672">){</span>
+            <span style="color:#66d9ef">if</span><span style="color:#f92672">(</span>method<span style="color:#f92672">.</span><span style="color:#a6e22e">isAnnotationPresent</span><span style="color:#f92672">(</span>D_Annotation<span style="color:#f92672">.</span><span style="color:#a6e22e">class</span><span style="color:#f92672">)){</span>
+                <span style="color:#66d9ef">try</span><span style="color:#f92672">{</span>
+                    method<span style="color:#f92672">.</span><span style="color:#a6e22e">invoke</span><span style="color:#f92672">(</span>cal<span style="color:#f92672">,</span><span style="color:#66d9ef">null</span><span style="color:#f92672">);</span>
+                <span style="color:#f92672">}</span><span style="color:#66d9ef">catch</span><span style="color:#f92672">(</span>Exception ex<span style="color:#f92672">){</span>
+                    errNum<span style="color:#f92672">++;</span>
+                    builder<span style="color:#f92672">.</span><span style="color:#a6e22e">append</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;出错的方法是：&#34;</span><span style="color:#f92672">+</span>method<span style="color:#f92672">.</span><span style="color:#a6e22e">getName</span><span style="color:#f92672">()+</span><span style="color:#e6db74">&#34;错误是：&#34;</span><span style="color:#f92672">+</span>ex<span style="color:#f92672">.</span><span style="color:#a6e22e">getCause</span><span style="color:#f92672">().</span><span style="color:#a6e22e">getMessage</span><span style="color:#f92672">());</span>
+                <span style="color:#f92672">}</span>
+            <span style="color:#f92672">}</span>
+        <span style="color:#f92672">}</span>
+        System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;出错了&#34;</span><span style="color:#f92672">+</span>errNum<span style="color:#f92672">+</span><span style="color:#e6db74">&#34;次&#34;</span><span style="color:#f92672">);</span>
+        System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span>builder<span style="color:#f92672">.</span><span style="color:#a6e22e">toString</span><span style="color:#f92672">());</span>
+    <span style="color:#f92672">}</span>
+    
+<span style="color:#f92672">}</span>
+
+</code></pre></div><p>测试的结果是：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java">add
+出错了1次
+出错的方法是<span style="color:#960050;background-color:#1e0010">：</span>sub错误是<span style="color:#960050;background-color:#1e0010">：</span><span style="color:#f92672">/</span> by zero
+</code></pre></div><p>提示 D_Calculater类中的 sub() 这个方法有异常，这个异常名称叫做 ArithmeticException，原因是运算过程中进行了除 0 的操作。所以，D_Calculater这个类有 Bug。</p>
+<p>这样，通过注解我完成了我自己的目的，那就是对别人的代码进行测试。所以，再问我注解什么时候用？我只能告诉你，这取决于你想利用它干什么用。</p>
+<h5 id="注解应用实例">注解应用实例</h5>
+<p>注解运用的地方太多了。</p>
+<h3 id="heading"></h3>
+<h4 id="22-junit测试框架">2.2 Junit测试框架</h4>
+<p>测试分类：</p>
+<ol>
+<li>
+<p>黑盒测试：功能性测试，不需要写代码，给输入值，看程序是否能够输出期望的值。</p>
+</li>
+<li>
+<p>白盒测试：需要写代码的。关注程序具体的执行流程。</p>
+</li>
+</ol>
+<h5 id="junit使用白盒测试">Junit使用：白盒测试</h5>
+<p>步骤：</p>
+<ol>
+<li>
+<p>定义一个测试类(测试用例)</p>
+<p>建议：</p>
+<p>包名：xxx.xxx.xx.test       cn.xh.test</p>
+<p>测试类名：TestCalculator；被测试的类名Calculator</p>
+</li>
+<li>
+<p>定义测试方法：可以独立运行</p>
+<p>建议：</p>
+<p>方法名：test测试的方法名      testAdd()</p>
+<p>返回值：void</p>
+<p>参数列表：空参</p>
+</li>
+<li>
+<p>给方法加@Test</p>
+</li>
+<li>
+<p>导入junit依赖环境</p>
+</li>
+</ol>
+<p>一般我们会使用断言操作来处理结果： Assert.assertEquals(期望的结果,运算的结果);</p>
+<p>补充：</p>
+<p>​	 @Before: 修饰的方法会在测试方法之前被自动执行</p>
+<p>​	 @After: 修饰的方法会在测试方法执行之后自动被执行</p>
+<p>代码如下：</p>
+<p>Calculator</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="color:#f92672">package</span> com.iNuo.Demo.test<span style="color:#f92672">;</span>
+
+<span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Calculator</span> <span style="color:#f92672">{</span>
+
+    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">int</span> <span style="color:#a6e22e">add</span><span style="color:#f92672">(</span><span style="color:#66d9ef">int</span> num1<span style="color:#f92672">,</span><span style="color:#66d9ef">int</span> num2<span style="color:#f92672">){</span>
+        <span style="color:#66d9ef">return</span> num1<span style="color:#f92672">+</span>num2<span style="color:#f92672">;</span>
+    <span style="color:#f92672">}</span>
+
+    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">int</span> <span style="color:#a6e22e">sub</span><span style="color:#f92672">(</span><span style="color:#66d9ef">int</span> num1<span style="color:#f92672">,</span><span style="color:#66d9ef">int</span> num2<span style="color:#f92672">){</span>
+        <span style="color:#66d9ef">return</span> num1<span style="color:#f92672">-</span>num2<span style="color:#f92672">;</span>
+    <span style="color:#f92672">}</span>
+
+    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">int</span> <span style="color:#a6e22e">mul</span><span style="color:#f92672">(</span><span style="color:#66d9ef">int</span> num1<span style="color:#f92672">,</span><span style="color:#66d9ef">int</span> num2<span style="color:#f92672">){</span>
+        <span style="color:#66d9ef">return</span> num1<span style="color:#f92672">*</span>num2<span style="color:#f92672">;</span>
+    <span style="color:#f92672">}</span>
+<span style="color:#f92672">}</span>
+
+</code></pre></div><p>TestCalculator</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="color:#f92672">package</span> com.iNuo.Demo.test<span style="color:#f92672">;</span>
+
+<span style="color:#f92672">import</span> org.junit.After<span style="color:#f92672">;</span>
+<span style="color:#f92672">import</span> org.junit.Assert<span style="color:#f92672">;</span>
+<span style="color:#f92672">import</span> org.junit.Before<span style="color:#f92672">;</span>
+<span style="color:#f92672">import</span> org.junit.Test<span style="color:#f92672">;</span>
+
+<span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">TestCalculator</span> <span style="color:#f92672">{</span>
+
+    <span style="color:#a6e22e">@Test</span>
+    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">testAdd</span><span style="color:#f92672">(){</span>
+        Calculator c<span style="color:#f92672">=</span><span style="color:#66d9ef">new</span> Calculator<span style="color:#f92672">();</span>
+        <span style="color:#75715e">//System.out.println(c.add(1,1));
+</span><span style="color:#75715e"></span>        
+        <span style="color:#75715e">//断言
+</span><span style="color:#75715e"></span>        Assert<span style="color:#f92672">.</span><span style="color:#a6e22e">assertEquals</span><span style="color:#f92672">(</span>2<span style="color:#f92672">,</span>c<span style="color:#f92672">.</span><span style="color:#a6e22e">add</span><span style="color:#f92672">(</span>1<span style="color:#f92672">,</span>1<span style="color:#f92672">));</span>
+        
+    <span style="color:#f92672">}</span>
+    
+    <span style="color:#a6e22e">@Before</span>
+    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">init</span><span style="color:#f92672">(){</span>
+        System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;初始化&#34;</span><span style="color:#f92672">);</span>
+    <span style="color:#f92672">}</span>
+    
+    <span style="color:#a6e22e">@After</span>
+    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">finish</span><span style="color:#f92672">(){</span>
+        System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;结果&#34;</span><span style="color:#f92672">);</span>
+    <span style="color:#f92672">}</span>
+<span style="color:#f92672">}</span>
+</code></pre></div><p>判定结果：</p>
+<p>​	红色：失败</p>
+<p>​	绿色：成功</p>
+</div>
+  
+</article></main>
+<footer class="footer">
+  <span>&copy; 2021 <a href="https://xshi000.github.io/">及时当勉励，岁月不待人！@iNuo</a></span>
+  <span>&middot;</span>
+  <span>Powered by <a href="https://gohugo.io/" rel="noopener" target="_blank">Hugo️️</a>️</span>
+  <span>&middot;</span>
+  <span>Theme️ <a href="https://github.com/nanxiaobei/hugo-paper" rel="noopener" target="_blank">Paper</a></span>
+</footer>
+<script src="https://xshi000.github.io/highlight.min.js"></script>
+<script>
+  hljs.initHighlightingOnLoad();
+</script>
+</body>
+</html>
+
