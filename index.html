@@ -79,6 +79,32 @@
 
 <article class="first-entry">
   <header class="entry-header">
+    <h2>极简Java七：多线程与网络编程</h2>
+  </header>
+  <section class="entry-content">
+   <p>第一章  本章内容  多线程 线程安全 线程状态   1.1 多线程 现在想要设计一个程序，边打游戏边听歌，怎么设计？
+要解决上述问题,咱们得使用多进程或者多线程来解决.
+并发与并行   并行：指两个或多个事件在同一时刻发生（同时发生）。
+  并发：指两个或多个事件在同一个时间段内发生。
+  线程与进程   进程：是指一个内存中运行的应用程序，每个进程都有一个独立的内存空间，一个应用程序可以同时运行多个进程；进程也是程序的一次执行过程，是系统运行程序的基本单位；系统运行一个程序即是一个进程从创建、运行到消亡的过程。
+  线程：线程是进程中的一个执行单元，负责当前进程中程序的执行，一个进程中至少有一个线程。一个进程中是可以有多个线程的，这个应用程序也可以称之为多线程程序。
+  简而言之：一个程序运行后至少有一个进程，一个进程中可以包含多个线程
+我们可以在电脑底部任务栏，右键&gt;打开任务管理器,可以查看当前任务的进程：
+进程
+线程：
+调度方式   分时调度：所有线程轮流使用 CPU 的使用权，平均分配每个线程占用 CPU 的时间。
+  抢占式调度：优先让优先级高的线程使用 CPU，如果线程的优先级相同，那么会随机选择一个(线程随机性)，Java使用的为抢占式调度。
+  其实，多线程程序并不能提高程序的运行速度，但能够提高程序运行效率，让CPU的使用率更高。
+主线程 回想我们以前学习中写过的代码，当我们在dos命令行中输入java空格类名回车后，启动JVM，并且加载对应的class文件。虚拟机并会从main方法开始执行我们的程序代码，一直把main方法的代码执行结束。如果在执行过程遇到循环时间比较长的代码，那么在循环之后的其他代码是不会被马上执行的。如下代码演示：
+public class A_Thread { void show() { for (int i=1;i&lt;=10000 ;i&#43;&#43; ) { System.out.println(&#34;i=&#34;&#43;i); } } } public class A_MainThread { public static void main(String[] args) { A_Thread t=new A_Thread(); t....</p>
+  </section>
+  <footer class="entry-footer">
+    <time>January 24, 2021</time>
+  </footer>
+  <a class="entry-link" href="https://xshi000.github.io/java_7/"></a>
+</article>
+<article class="post-entry">
+  <header class="entry-header">
     <h2>极简Java六：反射注解</h2>
   </header>
   <section class="entry-content">
@@ -242,53 +268,6 @@ Java发展历史中的版本 1995年Sun公司发布Java1.0版本 1997年发布Ja
     <time>September 29, 2020</time>
   </footer>
   <a class="entry-link" href="https://xshi000.github.io/pymendpic/"></a>
-</article>
-<article class="post-entry">
-  <header class="entry-header">
-    <h2>Python项目：pygame游戏开发之飞机大战</h2>
-  </header>
-  <section class="entry-content">
-   <p>第一章、编写pygame HelloWorld程序 1. 搭建开发环境
- Python 、集成开发环境PyCharm 、用于游戏开发的第三方库pygame
-pip install -i https://pypi.tuna.tsinghua.edu.cn/simple pygame //指定下载路径
- 2. HelloWorld程序的运行效果和实现步骤
- 实现步骤：
-1、创建并显示一个固定尺寸的窗口
-2、处理用户关闭窗口从而退出程序的事件
-3、设置窗口的标题和背景色
-4、在窗口的底部居中位置绘制一架飞机
-5、让飞机向上匀速移动
- 3. HelloWorld1创建并显示一个固定尺寸的窗口
- 创建项目PlaneWar
-添加Main.py
-导入pygame-初始化-调用pygame.display.set_mode()
-编写游戏运行函数run_game()-调用
- 4. HelloWorld2处理用户关闭窗口以退出程序的事件
- Main：
-While循环等待关闭事件触发，卸载pygame库，退出程序（sys库）
- 5. HelloWorld3设置窗体的标题和背景色
- 标题：调用pygame.display.set_caption()
-图标：加载图片-设置set_icon（）
-背景色：接收窗体对象为window-调用fill（）—刷新flip（）
- 6. HelloWorld4绘制飞机
- 新建Directory-导入飞机图片
-Main，加载图片pygame.image.load（）赋予my_plane
-窗体中，绘制window.blit（）
-窗口坐标系：左上角为坐标原点，右向为X轴，下向为Y轴
-本例：窗口（500，700） 飞机（102，126）
-飞机的初始位置：X=（500-102）/2 Y=700-126 即（199，574）
- 7. HelloWorld5飞机移动
- 游戏开发帧率至少30帧/秒，常规60帧/秒，75以上，无法分辨！
-时间测试：导入datetime，开始、结束时间打点datetime.datetime.now()，相减
-创建时钟对象clock-设置动画最大帧率clock.tick(30)
-飞机移动过程，只Y改变，抽取Y为pos_y 并替换初始位置的Y坐标
-将绘制飞机和刷新置于while中，并将Y坐标作为循环变量，减少一个值
-将绘制背景颜色置于while中，绘制飞机之前！（消除残影）...</p>
-  </section>
-  <footer class="entry-footer">
-    <time>September 29, 2020</time>
-  </footer>
-  <a class="entry-link" href="https://xshi000.github.io/pygame/"></a>
 </article>
 <footer class="page-footer">
   <nav class="pagination">

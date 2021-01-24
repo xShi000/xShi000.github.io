@@ -1,0 +1,1569 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    
+    <title>极简Java七：多线程与网络编程 - 及时当勉励，岁月不待人！@iNuo</title>
+    
+    <meta name="description" content="第一章  本章内容  多线程 线程安全 线程状态   1.1 多线程 现在想要设计一个程序，边打游戏边听歌，怎么设计？
+要解决上述问题,咱们得使用多进程或者多线程来解决.
+并发与并行   并行：指两个或多个事件在同一时刻发生（同时发生）。
+  并发：指两个或多个事件在同一个时间段内发生。
+  线程与进程   进程：是指一个内存中运行的应用程序，每个进程都有一个独立的内存空间，一个应用程序可以同时运行多个进程；进程也是程序的一次执行过程，是系统运行程序的基本单位；系统运行一个程序即是一个进程从创建、运行到消亡的过程。
+  线程：线程是进程中的一个执行单元，负责当前进程中程序的执行，一个进程中至少有一个线程。一个进程中是可以有多个线程的，这个应用程序也可以称之为多线程程序。
+  简而言之：一个程序运行后至少有一个进程，一个进程中可以包含多个线程
+我们可以在电脑底部任务栏，右键&gt;打开任务管理器,可以查看当前任务的进程：
+进程
+线程：
+调度方式   分时调度：所有线程轮流使用 CPU 的使用权，平均分配每个线程占用 CPU 的时间。
+  抢占式调度：优先让优先级高的线程使用 CPU，如果线程的优先级相同，那么会随机选择一个(线程随机性)，Java使用的为抢占式调度。
+  其实，多线程程序并不能提高程序的运行速度，但能够提高程序运行效率，让CPU的使用率更高。
+主线程 回想我们以前学习中写过的代码，当我们在dos命令行中输入java空格类名回车后，启动JVM，并且加载对应的class文件。虚拟机并会从main方法开始执行我们的程序代码，一直把main方法的代码执行结束。如果在执行过程遇到循环时间比较长的代码，那么在循环之后的其他代码是不会被马上执行的。如下代码演示：
+public class A_Thread { void show() { for (int i=1;i&lt;=10000 ;i&#43;&#43; ) { System.out.println(&#34;i=&#34;&#43;i); } } } public class A_MainThread { public static void main(String[] args) { A_Thread t=new A_Thread(); t.">
+    <meta name="author" content="">
+    
+    <link href="https://xshi000.github.io/an-old-hope.min.css" rel="stylesheet">
+    <link href="https://xshi000.github.io/style.css" rel="stylesheet">
+    <link href="https://xshi000.github.io/custom.css" rel="stylesheet">
+    
+    <link rel="apple-touch-icon" href="https://xshi000.github.io/apple-touch-icon.png">
+    <link rel="icon" href="https://xshi000.github.io/favicon.ico">
+    <meta name="generator" content="Hugo 0.65.3" />
+    
+    
+    
+    <script>
+      function setTheme() {
+        const time = new Date();
+
+        const prev = localStorage.getItem('date');
+        const date = String(time.getMonth() + 1) + '.' + String(time.getDate());
+
+        const now = time.getTime();
+        let sunrise;
+        let sunset;
+
+        function setBodyClass() {
+          if (now > sunrise && now < sunset) return;
+          document.body.classList.add('dark');
+        }
+
+        if (date !== prev) {
+          fetch('https://api.ipgeolocation.io/astronomy?apiKey=5ed37d85103e4defa5df4c5298ed5215')
+            .then(res => res.json())
+            .then(data => {
+              sunrise = data.sunrise.split(':').map(Number);
+              sunset = data.sunset.split(':').map(Number);
+            })
+            .catch(() => {
+              sunrise = [7, 0];
+              sunset = [19, 0];
+            })
+            .finally(() => {
+              sunrise = time.setHours(sunrise[0], sunrise[1], 0);
+              sunset = time.setHours(sunset[0], sunset[1], 0);
+              setBodyClass();
+              localStorage.setItem('sunrise', sunrise);
+              localStorage.setItem('sunset', sunset);
+            });
+          localStorage.setItem('date', date);
+        } else {
+          sunrise = Number(localStorage.getItem('sunrise'));
+          sunset = Number(localStorage.getItem('sunset'));
+          setBodyClass();
+        }
+      }
+    </script>
+  </head>
+  <body class="single">
+    <script>
+      setTheme();
+    </script>
+    <header class="header">
+      <nav class="nav">
+        <p class="logo"><a href="https://xshi000.github.io/">及时当勉励，岁月不待人！@iNuo</a></p>
+      </nav>
+    </header>
+    <main class="main">
+
+
+<article class="post-single">
+  <header class="post-header">
+    <h1 class="post-title">极简Java七：多线程与网络编程</h1>
+    <div class="post-meta">January 24, 2021</div>
+  </header>
+  <div class="post-content"><hr>
+<h3 id="第一章">第一章</h3>
+<hr>
+<h5 id="本章内容">本章内容</h5>
+<ul>
+<li>多线程</li>
+<li>线程安全</li>
+<li>线程状态</li>
+</ul>
+<hr>
+<h4 id="11-多线程">1.1 多线程</h4>
+<p>现在想要设计一个程序，边打游戏边听歌，怎么设计？</p>
+<p>要解决上述问题,咱们得使用多进程或者多线程来解决.</p>
+<h5 id="并发与并行">并发与并行</h5>
+<ul>
+<li>
+<p>并行：指两个或多个事件在同一时刻发生（同时发生）。</p>
+</li>
+<li>
+<p>并发：指两个或多个事件在同一个时间段内发生。</p>
+</li>
+</ul>
+<p><img src="/img/image-20201223162928123.png" alt="image-20201223162928123"></p>
+<p><img src="/img/image-20201223162949645.png" alt="image-20201223162928123"></p>
+<p><img src="/img/image-20201223162938455.png" alt="image-20201223162928123"></p>
+<h5 id="线程与进程">线程与进程</h5>
+<ul>
+<li>
+<p>进程：是指一个内存中运行的应用程序，每个进程都有一个独立的内存空间，一个应用程序可以同时运行多个进程；进程也是程序的一次执行过程，是系统运行程序的基本单位；系统运行一个程序即是一个进程从创建、运行到消亡的过程。</p>
+</li>
+<li>
+<p>线程：线程是进程中的一个执行单元，负责当前进程中程序的执行，一个进程中至少有一个线程。一个进程中是可以有多个线程的，这个应用程序也可以称之为多线程程序。</p>
+</li>
+</ul>
+<p>简而言之：一个程序运行后至少有一个进程，一个进程中可以包含多个线程</p>
+<p>我们可以在电脑底部任务栏，右键&gt;打开任务管理器,可以查看当前任务的进程：</p>
+<p>进程</p>
+<p><img src="/img/image-20201223163111232.png" alt="image-20201223163111232"></p>
+<p>线程：</p>
+<p><img src="/img/image-20201223163126837.png" alt="image-20201223163126837"></p>
+<p><img src="/img/image-20201223163135889.png" alt="image-20201223163135889"></p>
+<h5 id="调度方式">调度方式</h5>
+<ul>
+<li>
+<p>分时调度：所有线程轮流使用 CPU 的使用权，平均分配每个线程占用 CPU 的时间。</p>
+</li>
+<li>
+<p>抢占式调度：优先让优先级高的线程使用 CPU，如果线程的优先级相同，那么会随机选择一个(线程随机性)，Java使用的为抢占式调度。</p>
+</li>
+</ul>
+<p><img src="/img/image-20201223163203141.png" alt="image-20201223163203141"></p>
+<p>其实，多线程程序并不能提高程序的运行速度，但能够提高程序运行效率，让CPU的使用率更高。</p>
+<h5 id="主线程">主线程</h5>
+<p>回想我们以前学习中写过的代码，当我们在dos命令行中输入java空格类名回车后，启动JVM，并且加载对应的class文件。虚拟机并会从main方法开始执行我们的程序代码，一直把main方法的代码执行结束。如果在执行过程遇到循环时间比较长的代码，那么在循环之后的其他代码是不会被马上执行的。如下代码演示：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">A_Thread</span> <span style="color:#f92672">{</span>
+
+    <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">show</span><span style="color:#f92672">()</span> <span style="color:#f92672">{</span>
+
+        <span style="color:#66d9ef">for</span> <span style="color:#f92672">(</span><span style="color:#66d9ef">int</span> i<span style="color:#f92672">=</span>1<span style="color:#f92672">;</span>i<span style="color:#f92672">&lt;=</span>10000 <span style="color:#f92672">;</span>i<span style="color:#f92672">++</span> <span style="color:#f92672">)</span>    <span style="color:#f92672">{</span>
+            System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;i=&#34;</span><span style="color:#f92672">+</span>i<span style="color:#f92672">);</span>
+        <span style="color:#f92672">}</span>
+
+    <span style="color:#f92672">}</span>
+<span style="color:#f92672">}</span>
+
+</code></pre></div><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">A_MainThread</span> <span style="color:#f92672">{</span>
+
+    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">main</span><span style="color:#f92672">(</span>String<span style="color:#f92672">[]</span> args<span style="color:#f92672">)</span>  <span style="color:#f92672">{</span>
+
+        A_Thread t<span style="color:#f92672">=</span><span style="color:#66d9ef">new</span> A_Thread<span style="color:#f92672">();</span>
+        t<span style="color:#f92672">.</span><span style="color:#a6e22e">show</span><span style="color:#f92672">();</span>
+        System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;Hello World!&#34;</span><span style="color:#f92672">);</span>
+
+    <span style="color:#f92672">}</span>
+<span style="color:#f92672">}</span>
+
+</code></pre></div><p>若在上述代码中show方法中的循环执行次数很多，这时在d.show();下面的代码是不会马上执行的，并且在dos窗口会看到不停的输出,i=值，这样的语句。为什么会这样呢？</p>
+<p>原因是：jvm启动后，必然有一个执行路径(线程)从main方法开始的，一直执行到main方法结束，这个线程在java中称之为主线程。当程序的主线程执行时，如果遇到了循环而导致程序在指定位置停留时间过长，则无法马上执行下面的程序，需要等待循环结束后能够执行。</p>
+<p>那么，能否实现一个主线程负责执行其中一个循环，再由另一个线程负责其他代码的执行，最终实现多部分代码同时执行的效果？</p>
+<p>能够实现同时执行，通过Java中的多线程技术来解决该问题。</p>
+<h5 id="创建线程类">创建线程类</h5>
+<p>Java使用<code>java.lang.Thread</code>类代表线程，所有的线程对象都必须是Thread类或其子类的实例。每个线程的作用是完成一定的任务，实际上就是执行一段程序流（即一段顺序执行的代码）Java使用线程执行体来代表这段程序流。Java中通过继承Thread类来创建并启动多线程的步骤如下：</p>
+<ol>
+<li>
+<p>定义Thread类的子类，并重写该类的run()方法，该run()方法的方法体就代表了线程需要完成的任务,因此把run()方法称为线程执行体。</p>
+</li>
+<li>
+<p>创建Thread子类的实例，即创建了线程对象</p>
+</li>
+<li>
+<p>调用线程对象的start()方法来启动该线程</p>
+</li>
+</ol>
+<p>代码如下：</p>
+<p>测试类：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Demo01</span> <span style="color:#f92672">{</span>
+    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">main</span><span style="color:#f92672">(</span>String<span style="color:#f92672">[]</span> args<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+
+        System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;这里是主线程”);
+</span><span style="color:#e6db74">        //创建自定义线程对象
+</span><span style="color:#e6db74">        MyThread mt = new MyThread();
+</span><span style="color:#e6db74">        //开启新线程
+</span><span style="color:#e6db74">        mt.start();
+</span><span style="color:#e6db74">        //在主方法中执行for循环
+</span><span style="color:#e6db74">        for (int i = 0; i &lt; 10000; i++) {
+</span><span style="color:#e6db74">            System.out.println(&#34;</span>主线程<span style="color:#960050;background-color:#1e0010">！&#34;</span><span style="color:#f92672">+</span>i<span style="color:#f92672">);</span>
+        <span style="color:#f92672">}</span>
+    <span style="color:#f92672">}</span>
+<span style="color:#f92672">}</span>
+</code></pre></div><p>自定义线程类：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">MyThread</span> <span style="color:#66d9ef">extends</span> Thread <span style="color:#f92672">{</span>
+
+   <span style="color:#75715e">/*
+</span><span style="color:#75715e">    \ 重写run方法，完成该线程执行的逻辑
+</span><span style="color:#75715e">   */</span>
+
+   <span style="color:#a6e22e">@Override</span>
+   <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">run</span><span style="color:#f92672">()</span> <span style="color:#f92672">{</span>
+
+      <span style="color:#66d9ef">for</span> <span style="color:#f92672">(</span><span style="color:#66d9ef">int</span> i <span style="color:#f92672">=</span> 0<span style="color:#f92672">;</span> i <span style="color:#f92672">&lt;</span> 10000<span style="color:#f92672">;</span> i<span style="color:#f92672">++)</span> <span style="color:#f92672">{</span>
+          System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span><span style="color:#960050;background-color:#1e0010">“</span>子线程<span style="color:#960050;background-color:#1e0010">”</span><span style="color:#f92672">+</span><span style="color:#e6db74">&#34;：正在执行！&#34;</span><span style="color:#f92672">+</span>i<span style="color:#f92672">);</span>
+      <span style="color:#f92672">}</span>
+
+    <span style="color:#f92672">}</span>
+<span style="color:#f92672">}</span>
+</code></pre></div><h5 id="多线程原理">多线程原理</h5>
+<p>流程图：</p>
+<p><img src="/img/image-20201223163332025.png" alt="image-20201223163332025"></p>
+<p>程序启动运行main时候，java虚拟机启动一个进程，主线程main在main()调用时候被创建。随着调用mt的对象的</p>
+<p>start方法，另外一个新的线程也启动了，这样，整个应用就在多线程下运行。</p>
+<p>通过这张图我们可以很清晰的看到多线程的执行流程，那么为什么可以完成并发执行呢？我们再来讲一讲原理。多线程执行时，到底在内存中是如何运行的呢？以上个程序为例，进行图解说明：</p>
+<p>多线程执行时，在栈内存中，其实每一个执行线程都有一片自己所属的栈内存空间。进行方法的压栈和弹栈。</p>
+<p>​     <img src="/img/image-20201223163352886.png" alt="image-20201223163352886"></p>
+<p>当执行线程的任务结束了，线程自动在栈内存中释放了。但是当所有的执行线程都结束了，那么进程就结束了。</p>
+<h5 id="创建线程方式二">创建线程方式二</h5>
+<p>采用java.lang.Runnable也是非常常见的一种，我们只需要重写run方法即可。</p>
+<p>步骤如下：</p>
+<ol>
+<li>
+<p>定义Runnable接口的实现类，并重写该接口的run()方法，该run()方法的方法体同样是该线程的线程执行体。</p>
+</li>
+<li>
+<p>创建Runnable实现类的实例，并以此实例作为Thread的target来创建Thread对象，该Thread对象才是真正的线程对象。</p>
+</li>
+<li>
+<p>调用线程对象的start()方法来启动线程。</p>
+</li>
+</ol>
+<p>代码如下：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"> <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">MyRunnable</span> <span style="color:#66d9ef">implements</span> Runnable<span style="color:#f92672">{</span>    
+     
+     <span style="color:#a6e22e">@Override</span>      
+     <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">run</span><span style="color:#f92672">()</span> <span style="color:#f92672">{</span>     
+         
+         <span style="color:#66d9ef">for</span> <span style="color:#f92672">(</span><span style="color:#66d9ef">int</span> i<span style="color:#f92672">=</span> 0<span style="color:#f92672">;</span> i <span style="color:#f92672">&lt;</span> 20<span style="color:#f92672">;</span> i<span style="color:#f92672">++)</span> <span style="color:#f92672">{</span> 		
+             System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span>Thread<span style="color:#f92672">.</span><span style="color:#a6e22e">currentThread</span><span style="color:#f92672">().</span><span style="color:#a6e22e">getName</span><span style="color:#f92672">()+</span><span style="color:#e6db74">&#34;  &#34;</span><span style="color:#f92672">+</span>i<span style="color:#f92672">);</span>      
+         <span style="color:#f92672">}</span>     
+     <span style="color:#f92672">}</span>      
+ <span style="color:#f92672">}</span>     
+</code></pre></div><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"> <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Demo</span> <span style="color:#f92672">{</span>      
+     <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">main</span><span style="color:#f92672">(</span>String<span style="color:#f92672">[]</span> args<span style="color:#f92672">)</span> <span style="color:#f92672">{</span> 
+         
+         <span style="color:#75715e">//创建自定义类对象 线程任务对象      
+</span><span style="color:#75715e"></span>         MyRunnable mr <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> MyRunnable<span style="color:#f92672">();</span>      
+         <span style="color:#75715e">//创建线程对象      
+</span><span style="color:#75715e"></span>         Thread t <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> Thread<span style="color:#f92672">(</span>mr<span style="color:#f92672">);</span> 
+         t<span style="color:#f92672">.</span><span style="color:#a6e22e">start</span><span style="color:#f92672">();</span>      
+         
+         <span style="color:#66d9ef">for</span> <span style="color:#f92672">(</span><span style="color:#66d9ef">int</span> i <span style="color:#f92672">=</span> 0<span style="color:#f92672">;</span> i <span style="color:#f92672">&lt;</span> 20<span style="color:#f92672">;</span> i<span style="color:#f92672">++)</span> <span style="color:#f92672">{</span>      
+             System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;主线程 &#34;</span>      <span style="color:#f92672">+</span> i<span style="color:#f92672">);</span>      
+         <span style="color:#f92672">}</span>      
+     <span style="color:#f92672">}</span>      
+ <span style="color:#f92672">}</span>     
+</code></pre></div><p>通过实现Runnable接口，使得该类有了多线程类的特征。run()方法是多线程程序的一个执行目标。所有的多线程代码都在run方法里面。Thread类实际上也是实现了Runnable接口的类。</p>
+<p>在启动的多线程的时候，需要先通过Thread类的构造方法Thread(Runnable target) 构造出对象，然后调用Thread对象的start()方法来运行多线程代码。</p>
+<p>实际上所有的多线程代码都是通过运行Thread的start()方法来运行的。因此，不管是继承Thread类还是实现</p>
+<p>Runnable接口来实现多线程，最终还是通过Thread的对象的API来控制线程的，熟悉Thread类的API是进行多线程编程的基础。</p>
+<p>Tips: Runnable对象仅仅作为Thread对象的target，Runnable实现类里包含的run()方法仅作为线程执行体。而实际的线程对象依然是Thread实例，只是该Thread线程负责执行其target的run()方法。</p>
+<h5 id="thread和runnable的区别">Thread和Runnable的区别</h5>
+<p>如果一个类继承Thread，则不适合资源共享。但是如果实现了Runable接口的话，则很容易的实现资源共享。</p>
+<p>总结：实现Runnable接口比继承Thread类所具有的优势</p>
+<ol>
+<li>
+<p>可以避免java中的单继承的局限性。</p>
+</li>
+<li>
+<p>增加程序的健壮性，实现解耦操作，代码可以被多个线程共享，代码和线程独立。</p>
+</li>
+<li>
+<p>线程池只能放入实现Runable或Callable类线程，不能直接放入继承Thread的类。</p>
+</li>
+</ol>
+<p>扩充：在java中，每次程序运行至少启动2个线程。一个是main线程，一个是垃圾收集线程。因为每当使用</p>
+<p>java命令执行一个类的时候，实际上都会启动一个JVM，每一个JVM其实在就是在操作系统中启动了一个进程。</p>
+<h5 id="匿名内部类方式实现线程的创建">匿名内部类方式实现线程的创建</h5>
+<p>使用线程的内匿名内部类方式，可以方便的实现每个线程执行不同的线程任务操作。使用匿名内部类的方式实现Runnable接口，重新Runnable接口中的run方法：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">NoNameInnerClassThread</span> <span style="color:#f92672">{</span>      
+    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">main</span><span style="color:#f92672">(</span>String<span style="color:#f92672">[]</span> args<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>      
+        <span style="color:#75715e">//    new Runnable(){      
+</span><span style="color:#75715e"></span>        <span style="color:#75715e">//      public void run(){      
+</span><span style="color:#75715e"></span>        <span style="color:#75715e">//        for (int i = 0; i &lt; 20;      i++) {      
+</span><span style="color:#75715e"></span>        <span style="color:#75715e">//           System.out.println(&#34;张宇:&#34;+i);      
+</span><span style="color:#75715e"></span>        <span style="color:#75715e">//        }      
+</span><span style="color:#75715e"></span>        <span style="color:#75715e">//      }      
+</span><span style="color:#75715e"></span>        <span style="color:#75715e">//    };      
+</span><span style="color:#75715e"></span>        <span style="color:#75715e">//‐‐‐这个整体  相当于new MyRunnable() 
+</span><span style="color:#75715e"></span>        Runnable r <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> Runnable<span style="color:#f92672">(){</span>      
+        	<span style="color:#66d9ef">public</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">run</span><span style="color:#f92672">(){</span>      
+            	<span style="color:#66d9ef">for</span> <span style="color:#f92672">(</span><span style="color:#66d9ef">int</span>      i <span style="color:#f92672">=</span> 0<span style="color:#f92672">;</span> i <span style="color:#f92672">&lt;</span> 20<span style="color:#f92672">;</span> i<span style="color:#f92672">++)</span> <span style="color:#f92672">{</span>      
+                System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;张宇:&#34;</span><span style="color:#f92672">+</span>i<span style="color:#f92672">);</span>      
+            	<span style="color:#f92672">}</span>      
+        	<span style="color:#f92672">}</span>      
+    	<span style="color:#f92672">};</span>             
+    	<span style="color:#66d9ef">new</span> Thread<span style="color:#f92672">(</span>r<span style="color:#f92672">).</span><span style="color:#a6e22e">start</span><span style="color:#f92672">();</span>            
+
+
+        <span style="color:#66d9ef">for</span><span style="color:#f92672">(</span><span style="color:#66d9ef">int</span> i <span style="color:#f92672">=</span> 0<span style="color:#f92672">;</span> i <span style="color:#f92672">&lt;</span> 20<span style="color:#f92672">;</span> i<span style="color:#f92672">++)</span> <span style="color:#f92672">{</span>     
+    		System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;费玉清:&#34;</span><span style="color:#f92672">+</span>i<span style="color:#f92672">);</span>     
+		<span style="color:#f92672">}</span>          
+
+	<span style="color:#f92672">}</span>          
+
+<span style="color:#f92672">}</span>          
+</code></pre></div><h4 id="13-线程安全">1.3 线程安全</h4>
+<h5 id="线程安全">线程安全</h5>
+<p>如果有多个线程在同时运行，而这些线程可能会同时运行这段代码。程序每次运行结果和单线程运行的结果是一样的，而且其他的变量的值也和预期的是一样的，就是线程安全的。</p>
+<p>我们通过一个案例，演示线程的安全问题：</p>
+<p>电影院要卖票，我们模拟电影院的卖票过程。假设要播放的电影是  “葫芦娃大战奥特曼”，本次电影的座位共100个</p>
+<p>(本场电影只能卖100张票)。我们来模拟电影院的售票窗口，实现多个窗口同时卖  “葫芦娃大战奥特曼”这场电影票(多个窗口一起卖这100张票)</p>
+<p>需要窗口，采用线程对象来模拟</p>
+<p>需要票，Runnable接口子类来模拟模拟票</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"> <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Ticket</span> <span style="color:#66d9ef">implements</span> Runnable <span style="color:#f92672">{</span> 
+     
+     <span style="color:#66d9ef">private</span> <span style="color:#66d9ef">int</span> ticket <span style="color:#f92672">=</span> 100<span style="color:#f92672">;</span>  
+     
+     <span style="color:#75715e">/*       执行卖票操作      */</span>      
+     <span style="color:#a6e22e">@Override</span>      
+     <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">run</span><span style="color:#f92672">()</span> <span style="color:#f92672">{</span>   
+         <span style="color:#75715e">//每个窗口卖票的操作      
+</span><span style="color:#75715e"></span>         <span style="color:#75715e">//窗口 永远开启      
+</span><span style="color:#75715e"></span>         <span style="color:#66d9ef">while</span> <span style="color:#f92672">(</span><span style="color:#66d9ef">true</span><span style="color:#f92672">)</span>      <span style="color:#f92672">{</span>      
+             <span style="color:#66d9ef">if</span>      <span style="color:#f92672">(</span>ticket <span style="color:#f92672">&gt;</span> 0<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+                 <span style="color:#75715e">//有票 可以卖      
+</span><span style="color:#75715e"></span>                 <span style="color:#75715e">//出票操作      
+</span><span style="color:#75715e"></span>                 <span style="color:#75715e">//使用sleep模拟一下出票时间 
+</span><span style="color:#75715e"></span>                 <span style="color:#66d9ef">try</span> <span style="color:#f92672">{</span>      
+                     Thread<span style="color:#f92672">.</span><span style="color:#a6e22e">sleep</span><span style="color:#f92672">(</span>100<span style="color:#f92672">);</span>      
+                 <span style="color:#f92672">}</span> <span style="color:#66d9ef">catch</span>      <span style="color:#f92672">(</span>InterruptedException e<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>      
+                     <span style="color:#75715e">//      TODO Auto‐generated catch block      
+</span><span style="color:#75715e"></span>                     e<span style="color:#f92672">.</span><span style="color:#a6e22e">printStackTrace</span><span style="color:#f92672">();</span>      
+                 <span style="color:#f92672">}</span>      
+                 <span style="color:#75715e">//获取当前线程对象的名字      
+</span><span style="color:#75715e"></span>                 String name <span style="color:#f92672">=</span> Thread<span style="color:#f92672">.</span><span style="color:#a6e22e">currentThread</span><span style="color:#f92672">().</span><span style="color:#a6e22e">getName</span><span style="color:#f92672">();</span> 		
+                 System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span>name <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;正在卖票：&#34;</span> <span style="color:#f92672">+</span> ticket<span style="color:#960050;background-color:#1e0010">‐‐</span><span style="color:#f92672">);</span>      
+             <span style="color:#f92672">}</span>      
+         <span style="color:#f92672">}</span>      
+     <span style="color:#f92672">}</span>      
+ <span style="color:#f92672">}</span>          
+</code></pre></div><p>测试类：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java">  <span style="color:#66d9ef">public</span>      <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Demo</span> <span style="color:#f92672">{</span>      
+      <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">void</span>      <span style="color:#a6e22e">main</span><span style="color:#f92672">(</span>String<span style="color:#f92672">[]</span> args<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>      
+          <span style="color:#75715e">//创建线程任务对象      
+</span><span style="color:#75715e"></span>          Ticket ticket <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> Ticket<span style="color:#f92672">();</span>      
+          <span style="color:#75715e">//创建三个窗口对象      
+</span><span style="color:#75715e"></span>          Thread t1 <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> Thread<span style="color:#f92672">(</span>ticket<span style="color:#f92672">,</span> <span style="color:#e6db74">&#34;窗口1&#34;</span><span style="color:#f92672">);</span> 
+          Thread t2 <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> Thread<span style="color:#f92672">(</span>ticket<span style="color:#f92672">,</span> <span style="color:#e6db74">&#34;窗口2&#34;</span><span style="color:#f92672">);</span> 
+          Thread t3 <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> Thread<span style="color:#f92672">(</span>ticket<span style="color:#f92672">,</span> <span style="color:#e6db74">&#34;窗口3&#34;</span><span style="color:#f92672">);</span>             
+          <span style="color:#75715e">//同时卖票 
+</span><span style="color:#75715e"></span>          t1<span style="color:#f92672">.</span><span style="color:#a6e22e">start</span><span style="color:#f92672">();</span>      
+          t2<span style="color:#f92672">.</span><span style="color:#a6e22e">start</span><span style="color:#f92672">();</span>      
+          t3<span style="color:#f92672">.</span><span style="color:#a6e22e">start</span><span style="color:#f92672">();</span>      
+      <span style="color:#f92672">}</span>      
+  <span style="color:#f92672">}</span>          
+</code></pre></div><p>结果中有一部分这样现象：</p>
+<p>​     <img src="/img/image-20201223164357032.png" alt="image-20201223164357032"></p>
+<p>发现程序出现了两个问题：</p>
+<ol>
+<li>
+<p>相同的票数,比如5这张票被卖了两回。</p>
+</li>
+<li>
+<p>不存在的票，比如0票与-1票，是不存在的。</p>
+</li>
+</ol>
+<p>这种问题，几个窗口(线程)票数不同步了，这种问题称为线程不安全。</p>
+<p><img src="/img/image-20201223164407033.png" alt="image-20201223164407033"></p>
+<p>线程安全问题都是由全局变量及静态变量引起的。若每个线程中对全局变量、静态变量只有读操作，而无写操作，一般来说，这个全局变量是线程安全的；若有多个线程同时执行写操作，一般都需要考虑线程同步，否则的话就可能影响线程安全。</p>
+<h5 id="线程同步">线程同步</h5>
+<p>当我们使用多个线程访问同一资源的时候，且多个线程中对资源有写的操作，就容易出现线程安全问题。</p>
+<p>要解决上述多线程并发访问一个资源的安全性问题，也就是解决重复票与不存在票问题，Java中提供了同步机制</p>
+<p>(synchronized)来解决。</p>
+<p>根据案例简述：窗口1线程进入操作的时候，窗口2和窗口3线程只能在外等着，窗口1操作结束，窗口1和窗口2和窗口3才有机会进入代码去执行。也就是说在某个线程修改共享资源的时候，其他线程不能修改该资源，等待修改完毕同步之后，才能去抢夺CPU资源，完成对应的操作，保证了数据的同步性，解决了线程不安全的现象。</p>
+<p>为了保证每个线程都能正常执行原子操作,Java引入了线程同步机制。那么怎么去使用呢？有三种方式完成同步操作：</p>
+<ol>
+<li>
+<p>同步代码块。</p>
+</li>
+<li>
+<p>同步方法。</p>
+</li>
+<li>
+<p>锁机制。</p>
+</li>
+</ol>
+<h5 id="同步代码块">同步代码块</h5>
+<p>synchronized关键字可以用于方法中的某个区块中，表示只对这个区块的资源实行互斥访问。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="color:#66d9ef">synchronized</span><span style="color:#f92672">(</span>同步锁<span style="color:#f92672">){</span>     
+    需要同步操作的代码     
+<span style="color:#f92672">}</span>       
+</code></pre></div><h5 id="同步锁">同步锁:</h5>
+<p>对象的同步锁只是一个概念,可以想象为在对象上标记了一个锁</p>
+<ol>
+<li>
+<p>锁对象 可以是任意类型。</p>
+</li>
+<li>
+<p>多个线程对象 要使用同一把锁。</p>
+</li>
+</ol>
+<p>注意: 在任何时候，最多允许一个线程拥有同步锁，谁拿到锁就进入代码块，其他的线程只能在外等(BLOCKED)。</p>
+<p>使用同步代码块解决代码：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"> <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Ticket</span> <span style="color:#66d9ef">implements</span> Runnable<span style="color:#f92672">{</span> 
+     <span style="color:#66d9ef">private</span> <span style="color:#66d9ef">int</span> ticket <span style="color:#f92672">=</span> 100<span style="color:#f92672">;</span>             
+     Object lock <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> Object<span style="color:#f92672">();</span>      
+     <span style="color:#75715e">/*       执行卖票操作      */</span>      
+     <span style="color:#a6e22e">@Override</span>      
+     <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">run</span><span style="color:#f92672">()</span> <span style="color:#f92672">{</span>      
+         <span style="color:#75715e">//每个窗口卖票的操作      
+</span><span style="color:#75715e"></span>         <span style="color:#75715e">//窗口 永远开启      
+</span><span style="color:#75715e"></span>         <span style="color:#66d9ef">while</span><span style="color:#f92672">(</span><span style="color:#66d9ef">true</span><span style="color:#f92672">){</span>      
+             <span style="color:#66d9ef">synchronized</span> <span style="color:#f92672">(</span>lock<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>      
+                 <span style="color:#66d9ef">if</span><span style="color:#f92672">(</span>ticket<span style="color:#f92672">&gt;</span>0<span style="color:#f92672">){</span>
+                     <span style="color:#75715e">//有票 可以卖      
+</span><span style="color:#75715e"></span>                     <span style="color:#75715e">//出票操作      
+</span><span style="color:#75715e"></span>                     <span style="color:#75715e">//使用sleep模拟一下出票时间 
+</span><span style="color:#75715e"></span>                     <span style="color:#66d9ef">try</span> <span style="color:#f92672">{</span>      
+                         Thread<span style="color:#f92672">.</span><span style="color:#a6e22e">sleep</span><span style="color:#f92672">(</span>50<span style="color:#f92672">);</span>      
+                     <span style="color:#f92672">}</span> <span style="color:#66d9ef">catch</span>      <span style="color:#f92672">(</span>InterruptedException e<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>      
+                         <span style="color:#75715e">//      TODO Auto‐generated catch block
+</span><span style="color:#75715e"></span>                         e<span style="color:#f92672">.</span><span style="color:#a6e22e">printStackTrace</span><span style="color:#f92672">();</span>      
+                     <span style="color:#f92672">}</span>      
+                     <span style="color:#75715e">//获取当前线程对象的名字      
+</span><span style="color:#75715e"></span>                     String name <span style="color:#f92672">=</span> Thread<span style="color:#f92672">.</span><span style="color:#a6e22e">currentThread</span><span style="color:#f92672">().</span><span style="color:#a6e22e">getName</span><span style="color:#f92672">();</span>
+                     System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span>name<span style="color:#f92672">+</span><span style="color:#e6db74">&#34;正在卖:&#34;</span><span style="color:#f92672">+</span>ticket<span style="color:#960050;background-color:#1e0010">‐‐</span><span style="color:#f92672">);</span>      
+                 <span style="color:#f92672">}</span>             
+             <span style="color:#f92672">}</span>            
+
+          <span style="color:#f92672">}</span>          
+       <span style="color:#f92672">}</span>          
+ <span style="color:#f92672">}</span>         
+</code></pre></div><p>当使用了同步代码块后，上述的线程的安全问题，解决了。</p>
+<h5 id="同步方法">同步方法</h5>
+<p>使用synchronized修饰的方法，就叫做同步方法，保证A线程执行该方法的时候，其他线程只能在方法外等着。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"> <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">synchronized</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">method</span><span style="color:#f92672">(){</span>      
+ 	可能会产生线程安全问题的代码      
+ <span style="color:#f92672">}</span>          
+</code></pre></div><p>同步锁是谁?</p>
+<ul>
+<li>
+<p>对于非static方法，同步锁就是this。</p>
+</li>
+<li>
+<p>对于static方法，我们使用当前方法所在类的字节码对象(类名.class)。</p>
+</li>
+</ul>
+<p>使用同步方法代码如下：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"> <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Ticket</span> <span style="color:#66d9ef">implements</span> Runnable<span style="color:#f92672">{</span> 
+     <span style="color:#66d9ef">private</span> <span style="color:#66d9ef">int</span> ticket <span style="color:#f92672">=</span> 100<span style="color:#f92672">;</span>      
+     <span style="color:#75715e">/*       执行卖票操作      */</span>      
+     <span style="color:#a6e22e">@Override</span>      
+     <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">run</span><span style="color:#f92672">()</span> <span style="color:#f92672">{</span>      
+         <span style="color:#75715e">//每个窗口卖票的操作      
+</span><span style="color:#75715e"></span>         <span style="color:#75715e">//窗口 永远开启      
+</span><span style="color:#75715e"></span>         <span style="color:#66d9ef">while</span><span style="color:#f92672">(</span><span style="color:#66d9ef">true</span><span style="color:#f92672">){</span>      
+             sellTicket<span style="color:#f92672">();</span>      
+         <span style="color:#f92672">}</span>      
+     <span style="color:#f92672">}</span>             
+     <span style="color:#75715e">/*     
+</span><span style="color:#75715e">      锁对象 是 谁调用这个方法 就是谁      
+</span><span style="color:#75715e">      隐含 锁对象 就是  this         
+</span><span style="color:#75715e">     */</span>      
+     <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">synchronized</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">sellTicket</span><span style="color:#f92672">(){</span>      
+         <span style="color:#66d9ef">if</span><span style="color:#f92672">(</span>ticket<span style="color:#f92672">&gt;</span>0<span style="color:#f92672">){</span>
+             <span style="color:#75715e">//有票 可以卖      
+</span><span style="color:#75715e"></span>             <span style="color:#75715e">//出票操作      
+</span><span style="color:#75715e"></span>             <span style="color:#75715e">//使用sleep模拟一下出票时间 
+</span><span style="color:#75715e"></span>             <span style="color:#66d9ef">try</span> <span style="color:#f92672">{</span>      
+                 Thread<span style="color:#f92672">.</span><span style="color:#a6e22e">sleep</span><span style="color:#f92672">(</span>100<span style="color:#f92672">);</span>      
+             <span style="color:#f92672">}</span> <span style="color:#66d9ef">catch</span>      <span style="color:#f92672">(</span>InterruptedException e<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>      
+                 <span style="color:#75715e">// TODO Auto‐generated catch block      
+</span><span style="color:#75715e"></span>                 e<span style="color:#f92672">.</span><span style="color:#a6e22e">printStackTrace</span><span style="color:#f92672">();</span>            
+             <span style="color:#f92672">}</span>     
+             <span style="color:#75715e">//获取当前线程对象的名字     
+</span><span style="color:#75715e"></span>             String name <span style="color:#f92672">=</span> Thread<span style="color:#f92672">.</span><span style="color:#a6e22e">currentThread</span><span style="color:#f92672">().</span><span style="color:#a6e22e">getName</span><span style="color:#f92672">();</span>
+             System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span>name<span style="color:#f92672">+</span><span style="color:#e6db74">&#34;正在卖:&#34;</span><span style="color:#f92672">+</span>ticket<span style="color:#960050;background-color:#1e0010">‐‐</span><span style="color:#f92672">);</span>          
+
+          <span style="color:#f92672">}</span>          
+   <span style="color:#f92672">}</span>          
+<span style="color:#f92672">}</span>          
+</code></pre></div><h5 id="lock锁">Lock锁</h5>
+<p>​          java.util.concurrent.locks.Lock机制提供了比synchronized代码块和synchronized方法更广泛的锁定操作,同步代码块/同步方法具有的功能Lock都有,除此之外更强大,更体现面向对象。</p>
+<p>Lock锁也称同步锁，加锁与释放锁方法化了，如下：</p>
+<ul>
+<li>
+<p>public void lock() :加同步锁。</p>
+</li>
+<li>
+<p>public void unlock() :释放同步锁。</p>
+</li>
+</ul>
+<p>使用如下：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java">  <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Ticket</span> <span style="color:#66d9ef">implements</span> Runnable<span style="color:#f92672">{</span> 
+      <span style="color:#66d9ef">private</span> <span style="color:#66d9ef">int</span> ticket <span style="color:#f92672">=</span> 100<span style="color:#f92672">;</span>             
+      Lock lock <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> ReentrantLock<span style="color:#f92672">();</span>      
+      <span style="color:#75715e">/*       执行卖票操作      */</span>      
+      <span style="color:#a6e22e">@Override</span>      
+      <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">run</span><span style="color:#f92672">()</span> <span style="color:#f92672">{</span>      
+          <span style="color:#75715e">//每个窗口卖票的操作      
+</span><span style="color:#75715e"></span>          <span style="color:#75715e">//窗口 永远开启      
+</span><span style="color:#75715e"></span>          <span style="color:#66d9ef">while</span><span style="color:#f92672">(</span><span style="color:#66d9ef">true</span><span style="color:#f92672">){</span>      
+              lock<span style="color:#f92672">.</span><span style="color:#a6e22e">lock</span><span style="color:#f92672">();</span>      
+              <span style="color:#66d9ef">if</span><span style="color:#f92672">(</span>ticket<span style="color:#f92672">&gt;</span>0<span style="color:#f92672">){</span>
+                  <span style="color:#75715e">//有票 可以卖      
+</span><span style="color:#75715e"></span>                  <span style="color:#75715e">//出票操作      
+</span><span style="color:#75715e"></span>                  <span style="color:#75715e">//使用sleep模拟一下出票时间 
+</span><span style="color:#75715e"></span>                  <span style="color:#66d9ef">try</span> <span style="color:#f92672">{</span>      
+                      Thread<span style="color:#f92672">.</span><span style="color:#a6e22e">sleep</span><span style="color:#f92672">(</span>50<span style="color:#f92672">);</span>      
+                  <span style="color:#f92672">}</span> <span style="color:#66d9ef">catch</span>      <span style="color:#f92672">(</span>InterruptedException e<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>      
+                      <span style="color:#75715e">//      TODO Auto‐generated catch block
+</span><span style="color:#75715e"></span>                      e<span style="color:#f92672">.</span><span style="color:#a6e22e">printStackTrace</span><span style="color:#f92672">();</span>      <span style="color:#f92672">}</span>      
+                  <span style="color:#75715e">//获取当前线程对象的名字      
+</span><span style="color:#75715e"></span>                  String name <span style="color:#f92672">=</span> Thread<span style="color:#f92672">.</span><span style="color:#a6e22e">currentThread</span><span style="color:#f92672">().</span><span style="color:#a6e22e">getName</span><span style="color:#f92672">();</span>
+                  System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span>name<span style="color:#f92672">+</span><span style="color:#e6db74">&#34;正在卖:&#34;</span><span style="color:#f92672">+</span>ticket<span style="color:#960050;background-color:#1e0010">‐‐</span><span style="color:#f92672">);</span>      
+              <span style="color:#f92672">}</span>      
+              lock<span style="color:#f92672">.</span><span style="color:#a6e22e">unlock</span><span style="color:#f92672">();</span>      
+          <span style="color:#f92672">}</span>      
+      <span style="color:#f92672">}</span>      
+  <span style="color:#f92672">}</span>            
+</code></pre></div><h5 id="死锁">死锁</h5>
+<p>同步锁使用的弊端：当线程任务中出现了多个同步(多个锁)时，如果同步中嵌套了其他的同步。这时容易引发一种现象&ndash;程序出现无限等待，这种现象我们称为死锁。这种情况能避免就避免掉。</p>
+<p><img src="/img/image-20201223165450597.png" alt="image-20201223165450597"></p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java">synchronzied<span style="color:#f92672">(</span>A锁<span style="color:#f92672">){</span>
+  <span style="color:#66d9ef">synchronized</span><span style="color:#f92672">(</span>B锁<span style="color:#f92672">){</span>
+  <span style="color:#f92672">}</span>
+<span style="color:#f92672">}</span>
+</code></pre></div><p>我们进行下死锁情况的代码演示：</p>
+<p>定义锁对象类</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">MyLock</span> <span style="color:#f92672">{</span>
+
+  <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">final</span> Object lockA <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> Object<span style="color:#f92672">();</span>
+  <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">final</span> Object lockB <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> Object<span style="color:#f92672">();</span>
+
+<span style="color:#f92672">}</span>
+</code></pre></div><p>线程任务类</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">MyThread1</span> <span style="color:#66d9ef">implements</span> Runnable <span style="color:#f92672">{</span>
+
+  <span style="color:#a6e22e">@Override</span>
+  <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">run</span><span style="color:#f92672">()</span> <span style="color:#f92672">{</span>
+
+    <span style="color:#66d9ef">synchronized</span> <span style="color:#f92672">(</span>MyLock<span style="color:#f92672">.</span><span style="color:#a6e22e">lockA</span><span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+      System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span>Thread<span style="color:#f92672">.</span><span style="color:#a6e22e">currentThread</span><span style="color:#f92672">().</span><span style="color:#a6e22e">getName</span><span style="color:#f92672">()+</span><span style="color:#e6db74">&#34;拿到A锁&#34;</span><span style="color:#f92672">);</span>
+
+      <span style="color:#66d9ef">synchronized</span> <span style="color:#f92672">(</span>MyLock<span style="color:#f92672">.</span><span style="color:#a6e22e">lokeB</span><span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+        System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span>Thread<span style="color:#f92672">.</span><span style="color:#a6e22e">currentThread</span><span style="color:#f92672">().</span><span style="color:#a6e22e">getName</span><span style="color:#f92672">()+</span><span style="color:#e6db74">&#34;拿到B锁&#34;</span><span style="color:#f92672">);</span>
+      <span style="color:#f92672">}</span>
+    <span style="color:#f92672">}</span>
+
+  <span style="color:#f92672">}</span>
+
+<span style="color:#f92672">}</span>
+</code></pre></div><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">MyThread2</span> <span style="color:#66d9ef">implements</span> Runnable <span style="color:#f92672">{</span>
+
+  <span style="color:#a6e22e">@Override</span>
+  <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">run</span><span style="color:#f92672">()</span> <span style="color:#f92672">{</span>
+
+    <span style="color:#66d9ef">synchronized</span> <span style="color:#f92672">(</span>MyLock<span style="color:#f92672">.</span><span style="color:#a6e22e">lokeB</span><span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+      System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span>Thread<span style="color:#f92672">.</span><span style="color:#a6e22e">currentThread</span><span style="color:#f92672">().</span><span style="color:#a6e22e">getName</span><span style="color:#f92672">()+</span><span style="color:#e6db74">&#34;拿到B锁&#34;</span><span style="color:#f92672">);</span>
+
+      <span style="color:#66d9ef">synchronized</span> <span style="color:#f92672">(</span>MyLock<span style="color:#f92672">.</span><span style="color:#a6e22e">lockA</span><span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+        System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span>Thread<span style="color:#f92672">.</span><span style="color:#a6e22e">currentThread</span><span style="color:#f92672">().</span><span style="color:#a6e22e">getName</span><span style="color:#f92672">()+</span><span style="color:#e6db74">&#34;拿到A锁&#34;</span><span style="color:#f92672">);</span>
+
+      <span style="color:#f92672">}</span>
+
+    <span style="color:#f92672">}</span>
+
+  <span style="color:#f92672">}</span>  
+
+<span style="color:#f92672">}</span>
+</code></pre></div><p>测试类</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">ThreadDemo</span> <span style="color:#f92672">{</span>
+
+  <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">main</span><span style="color:#f92672">(</span>String<span style="color:#f92672">[]</span> args<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+
+    Thread t1 <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> Thread<span style="color:#f92672">(</span><span style="color:#66d9ef">new</span> MyThread1<span style="color:#f92672">());</span>
+    Thread t2 <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> Thread<span style="color:#f92672">(</span><span style="color:#66d9ef">new</span> MyThread2<span style="color:#f92672">());</span>
+
+    t1<span style="color:#f92672">.</span><span style="color:#a6e22e">start</span><span style="color:#f92672">();</span>
+    t2<span style="color:#f92672">.</span><span style="color:#a6e22e">start</span><span style="color:#f92672">();</span> 
+  <span style="color:#f92672">}</span>
+
+<span style="color:#f92672">}</span>
+</code></pre></div><h4 id="13-线程状态">1.3 线程状态</h4>
+<h5 id="线程状态概述">线程状态概述</h5>
+<p>当线程被创建并启动以后，它既不是一启动就进入了执行状态，也不是一直处于执行状态。在线程的生命周期中，</p>
+<p>有几种状态呢？在API中 java.lang.Thread.State这个枚举中给出了六种线程状态：</p>
+<p>这里先列出各个线程状态发生的条件，下面将会对每种状态进行详细解析</p>
+<table>
+<thead>
+<tr>
+<th>线程状态</th>
+<th>导致状态发生条件</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>NEW(新建)</td>
+<td>线程刚被创建，但是并未启动。还没调用start方法。</td>
+</tr>
+<tr>
+<td>Runnable(可运行)</td>
+<td>线程可以在java虚拟机中运行的状态，可能正在运行自己代码，也可能没有，这取决于操作系统处理器。</td>
+</tr>
+<tr>
+<td>Blocked(锁阻塞)</td>
+<td>当一个线程试图获取一个对象锁，而该对象锁被其他的线程持有，则该线程进入Blocked状态；当该线程持有锁时，该线程将变成Runnable状态。</td>
+</tr>
+<tr>
+<td>Timed  Waiting(计时等待)</td>
+<td>同waiting状态，有几个方法有超时参数，调用他们将进入Timed Waiting状态。这一状态将一直保持到超时期满或者接收到唤醒通知。带有超时参数的常用方法有Thread.sleep 、  Object.wait。</td>
+</tr>
+<tr>
+<td>Waiting(无限等待)</td>
+<td>一个线程在等待另一个线程执行一个（唤醒）动作时，该线程进入Waiting状态。进入这个状态后是不能自动唤醒的，必须等待另一个线程调用notify或者notifyAll方法才能够唤醒。</td>
+</tr>
+<tr>
+<td>Teminated(被终止)</td>
+<td>因为run方法正常退出而死亡，或者因为没有捕获的异常终止了run方法而死亡。</td>
+</tr>
+</tbody>
+</table>
+<p>我们不需要去研究这几种状态的实现原理，我们只需知道在做线程操作中存在这样的状态。那我们怎么去理解这几个状态呢，新建与被终止还是很容易理解的，我们就研究一下线程从Runnable（可运行）状态与非运行状态之间的转换问题。</p>
+<h5 id="blocked锁阻塞">BLOCKED（锁阻塞）</h5>
+<p>Blocked状态在API中的介绍为：一个正在阻塞等待一个监视器锁（锁对象）的线程处于这一状态。</p>
+<p>我们已经学完同步机制，那么这个状态是非常好理解的了。比如，线程A与线程B代码中使用同一锁，如果线程A获取到锁，线程A进入到Runnable状态，那么线程B就进入到Blocked锁阻塞状态。</p>
+<p>这是由Runnable状态进入Blocked状态。除此Waiting以及Time Waiting状态也会在某种情况下进入阻塞状态，而这部分内容作为扩充知识点带领大家了解一下。</p>
+<p><img src="/img/image-20201223165734349.png" alt="image-20201223165734349"></p>
+<h5 id="timed-waiting计时等待">Timed Waiting（计时等待）</h5>
+<p>在我们写卖票的案例中，为了减少线程执行太快，现象不明显等问题，我们在run方法中添加了sleep语句，这样就强制当前正在执行的线程休眠（暂停执行），以“减慢线程”。其实当我们调用了sleep方法之后，当前执行的线程就进入到“休眠状态”，其实就是所谓的Timed Waiting(计时等待)</p>
+<p><img src="/img/image-20201223165843629.png" alt="image-20201223165843629"></p>
+<h5 id="waiting无限等待">Waiting（无限等待）</h5>
+<p>Wating状态在API中介绍为：一个正在无限期等待另一个线程执行一个特别的（唤醒）动作的线程处于这一状态。</p>
+<p>其实waiting状态并不是一个线程的操作，它体现的是多个线程间的通信，可以理解为多个线程之间的协作关系，多个线程会争取锁，同时相互之间又存在协作关系。就好比在公司里你和你的同事们，你们可能存在晋升时的竞争，但更多时候你们更多是一起合作以完成某些任务。</p>
+<p>当多个线程协作时，比如A，B线程，如果A线程在Runnable（可运行）状态中调用了wait()方法那么A线程就进入了Waiting（无限等待）状态，同时失去了同步锁。假如这个时候B线程获取到了同步锁，在运行状态中调用了</p>
+<p>notify()方法，那么就会将无限等待的A线程唤醒。注意是唤醒，如果获取到锁对象，那么A线程唤醒后就进入</p>
+<p>Runnable（可运行）状态；如果没有获取锁对象，那么就进入到Blocked（锁阻塞状态）。</p>
+<p><img src="/img/image-20201223165902192.png" alt="image-20201223165902192"></p>
+<h5 id="补充知识点">补充知识点</h5>
+<p>到此为止我们已经对线程状态有了基本的认识，想要有更多的了解，详情可以见下图：</p>
+<p><img src="/img/image-20201223165928900.png" alt="image-20201223165928900"></p>
+<hr>
+<h3 id="第二章">第二章</h3>
+<hr>
+<h5 id="本章内容-1">本章内容</h5>
+<ul>
+<li>线程间通信</li>
+<li>线程池</li>
+</ul>
+<hr>
+<h4 id="21-线程间通信">2.1 线程间通信</h4>
+<p>概念：多个线程在处理同一个资源，但是处理的动作（线程的任务）却不相同。</p>
+<p>比如：线程A用来生产包子的，线程B用来吃包子的，包子可以理解为同一资源，线程A与线程B处理的动作，一个是生产，一个是消费，那么线程A与线程B之间就存在线程通信问题。</p>
+<p><img src="/img/clip_image001-1608713992804.png" alt="img"></p>
+<h5 id="为什么要处理线程间通信">为什么要处理线程间通信：</h5>
+<p>多个线程并发执行时, 在默认情况下CPU是随机切换线程的，当我们需要多个线程来共同完成一件任务，并且我们希望他们有规律的执行, 那么多线程之间需要一些协调通信，以此来帮我们达到多线程共同操作一份数据。</p>
+<h5 id="如何保证线程间通信有效利用资源">如何保证线程间通信有效利用资源：</h5>
+<p>多个线程在处理同一个资源，并且任务不同时，需要线程通信来帮助解决线程之间对同一个变量的使用或操作。 就是多个线程在操作同一份数据时， 避免对同一共享变量的争夺。也就是我们需要通过一定的手段使各个线程能有效的利用资源。而这种手段即—— 等待唤醒机制。</p>
+<h4 id="等待唤醒机制">等待唤醒机制</h4>
+<h5 id="什么是等待唤醒机制">什么是等待唤醒机制</h5>
+<p>这是多个线程间的一种协作机制。谈到线程我们经常想到的是线程间的竞争（race），比如去争夺锁，但这并不是故事的全部，线程间也会有协作机制。</p>
+<p>就是在一个线程进行了规定操作后，就进入等待状态（wait()），等待其他线程执行完他们的指定代码过后 再将其唤醒（notify()）;在有多个线程进行等待时， 如果需要，可以使用 notifyAll()来唤醒所有的等待线程。</p>
+<p>wait/notify 就是线程间的一种协作机制。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">WTest</span> <span style="color:#f92672">{</span>
+
+  <span style="color:#66d9ef">private</span> <span style="color:#66d9ef">static</span> Object obj <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> Object<span style="color:#f92672">();</span>
+
+  <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">main</span><span style="color:#f92672">(</span>String<span style="color:#f92672">[]</span> args<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+
+    <span style="color:#66d9ef">new</span> Thread<span style="color:#f92672">(</span><span style="color:#66d9ef">new</span> Runnable<span style="color:#f92672">()</span> <span style="color:#f92672">{</span>
+      <span style="color:#a6e22e">@Override</span>
+      <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">run</span><span style="color:#f92672">()</span> <span style="color:#f92672">{</span>
+        <span style="color:#66d9ef">while</span> <span style="color:#f92672">(</span><span style="color:#66d9ef">true</span><span style="color:#f92672">){</span>
+          <span style="color:#66d9ef">synchronized</span> <span style="color:#f92672">(</span>obj<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+            System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;获取锁对象，进入等待状态&#34;</span><span style="color:#f92672">);</span>
+            <span style="color:#66d9ef">try</span> <span style="color:#f92672">{</span>
+              obj<span style="color:#f92672">.</span><span style="color:#a6e22e">wait</span><span style="color:#f92672">();</span>
+            <span style="color:#f92672">}</span> <span style="color:#66d9ef">catch</span> <span style="color:#f92672">(</span>InterruptedException e<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+              e<span style="color:#f92672">.</span><span style="color:#a6e22e">printStackTrace</span><span style="color:#f92672">();</span>
+            <span style="color:#f92672">}</span>
+            System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;等待结束继续执行&#34;</span><span style="color:#f92672">);</span>
+          <span style="color:#f92672">}</span>
+        <span style="color:#f92672">}</span>
+      <span style="color:#f92672">}</span>
+    <span style="color:#f92672">},</span><span style="color:#e6db74">&#34;等待线程&#34;</span><span style="color:#f92672">).</span><span style="color:#a6e22e">start</span><span style="color:#f92672">();</span>
+
+
+    <span style="color:#66d9ef">new</span> Thread<span style="color:#f92672">(</span><span style="color:#66d9ef">new</span> Runnable<span style="color:#f92672">()</span> <span style="color:#f92672">{</span>
+      <span style="color:#a6e22e">@Override</span>
+       <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">run</span><span style="color:#f92672">()</span> <span style="color:#f92672">{</span>
+        <span style="color:#66d9ef">while</span> <span style="color:#f92672">(</span><span style="color:#66d9ef">true</span><span style="color:#f92672">){</span>
+            System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;唤醒等待线程&#34;</span><span style="color:#f92672">);</span>
+            <span style="color:#66d9ef">try</span> <span style="color:#f92672">{</span>
+              Thread<span style="color:#f92672">.</span><span style="color:#a6e22e">sleep</span><span style="color:#f92672">(</span>3000<span style="color:#f92672">);</span>
+            <span style="color:#f92672">}</span> <span style="color:#66d9ef">catch</span> <span style="color:#f92672">(</span>InterruptedException e<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+              e<span style="color:#f92672">.</span><span style="color:#a6e22e">printStackTrace</span><span style="color:#f92672">();</span>
+            <span style="color:#f92672">}</span>
+          <span style="color:#66d9ef">synchronized</span> <span style="color:#f92672">(</span>obj<span style="color:#f92672">){</span>
+            obj<span style="color:#f92672">.</span><span style="color:#a6e22e">notify</span><span style="color:#f92672">();</span><span style="color:#75715e">//唤醒等待线程
+</span><span style="color:#75715e"></span>          <span style="color:#f92672">}</span>
+        <span style="color:#f92672">}</span>
+      <span style="color:#f92672">}</span>
+    <span style="color:#f92672">},</span><span style="color:#e6db74">&#34;唤醒线程&#34;</span><span style="color:#f92672">).</span><span style="color:#a6e22e">start</span><span style="color:#f92672">();</span>
+
+  <span style="color:#f92672">}</span>
+
+<span style="color:#f92672">}</span>
+</code></pre></div><h5 id="调用wait和notify方法需要注意的细节">调用wait和notify方法需要注意的细节</h5>
+<ol>
+<li>
+<p>wait方法与notify方法必须要由同一个锁对象调用。因为：对应的锁对象可以通过notify唤醒使用同一个锁对象调用的wait方法后的线程。</p>
+</li>
+<li>
+<p>wait方法与notify方法是属于Object类的方法的。因为：锁对象可以是任意对象，而任意对象的所属类都是继承了Object类的。</p>
+</li>
+<li>
+<p>wait方法与notify方法必须要在同步代码块或者是同步函数中使用。因为：必须要通过锁对象调用这2个方法。</p>
+</li>
+</ol>
+<h5 id="生产者与消费者问题">生产者与消费者问题</h5>
+<p>等待唤醒机制其实就是经典的“生产者与消费者”的问题。</p>
+<p>就拿生产包子消费包子来说等待唤醒机制如何有效利用资源：</p>
+<p>包子铺线程生产包子，吃货线程消费包子。当包子没有时（包子状态为false），吃货线程等待，包子铺线程生产包子（即包子状态为true），并通知吃货线程（解除吃货的等待状态）,因为已经有包子了，那么包子铺线程进入等待状态。接下来，吃货线程能否进一步执行则取决于锁的获取情况。如果吃货获取到锁，那么就执行吃包子动作，包子吃完（包子状态为false），并通知包子铺线程（解除包子铺的等待状态）,吃货线程进入等待。包子铺线程能否进一步执行则取决于锁的获取情况。</p>
+<p>代码演示：</p>
+<p>包子资源类：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"> <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">BaoZi</span> <span style="color:#f92672">{</span>
+   String  xianer <span style="color:#f92672">;</span>
+   <span style="color:#66d9ef">boolean</span>  flag <span style="color:#f92672">=</span> <span style="color:#66d9ef">false</span> <span style="color:#f92672">;</span><span style="color:#75715e">//包子资源 是否存在 包子资源状态
+</span><span style="color:#75715e"></span> <span style="color:#f92672">}</span>
+</code></pre></div><p>吃货线程类：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">ChiHuo</span> <span style="color:#66d9ef">extends</span> Thread<span style="color:#f92672">{</span>
+    
+   <span style="color:#66d9ef">private</span> BaoZi bz<span style="color:#f92672">;</span>
+ 
+   <span style="color:#66d9ef">public</span> <span style="color:#a6e22e">ChiHuo</span><span style="color:#f92672">(</span>String name<span style="color:#f92672">,</span>BaoZi bz<span style="color:#f92672">){</span>
+     <span style="color:#66d9ef">super</span><span style="color:#f92672">(</span>name<span style="color:#f92672">);</span>
+     <span style="color:#66d9ef">this</span><span style="color:#f92672">.</span><span style="color:#a6e22e">bz</span> <span style="color:#f92672">=</span> bz<span style="color:#f92672">;</span>
+   <span style="color:#f92672">}</span>
+    
+   <span style="color:#a6e22e">@Override</span>
+   <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">run</span><span style="color:#f92672">()</span> <span style="color:#f92672">{</span>
+     <span style="color:#66d9ef">while</span><span style="color:#f92672">(</span><span style="color:#66d9ef">true</span><span style="color:#f92672">){</span>
+       <span style="color:#66d9ef">synchronized</span> <span style="color:#f92672">(</span>bz<span style="color:#f92672">){</span>
+         <span style="color:#66d9ef">if</span><span style="color:#f92672">(</span>bz<span style="color:#f92672">.</span><span style="color:#a6e22e">flag</span> <span style="color:#f92672">==</span> <span style="color:#66d9ef">false</span><span style="color:#f92672">){</span><span style="color:#75715e">//没包子
+</span><span style="color:#75715e"></span>           <span style="color:#66d9ef">try</span> <span style="color:#f92672">{</span>
+             bz<span style="color:#f92672">.</span><span style="color:#a6e22e">wait</span><span style="color:#f92672">();</span>
+           <span style="color:#f92672">}</span> <span style="color:#66d9ef">catch</span> <span style="color:#f92672">(</span>InterruptedException e<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+             e<span style="color:#f92672">.</span><span style="color:#a6e22e">printStackTrace</span><span style="color:#f92672">();</span>
+           <span style="color:#f92672">}</span>
+         <span style="color:#f92672">}</span>
+         System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;吃货正在吃&#34;</span><span style="color:#f92672">+</span>bz<span style="color:#f92672">.</span><span style="color:#a6e22e">pier</span><span style="color:#f92672">+</span>bz<span style="color:#f92672">.</span><span style="color:#a6e22e">xianer</span><span style="color:#f92672">+</span><span style="color:#e6db74">&#34;包子&#34;</span><span style="color:#f92672">);</span>
+         bz<span style="color:#f92672">.</span><span style="color:#a6e22e">flag</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">false</span><span style="color:#f92672">;</span>
+         bz<span style="color:#f92672">.</span><span style="color:#a6e22e">notify</span><span style="color:#f92672">();</span>
+       <span style="color:#f92672">}</span>
+     <span style="color:#f92672">}</span>
+   <span style="color:#f92672">}</span>
+ <span style="color:#f92672">}</span>
+</code></pre></div><p>包子铺线程类：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"> <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">BaoZiPu</span> <span style="color:#66d9ef">extends</span> Thread <span style="color:#f92672">{</span>
+ 
+   <span style="color:#66d9ef">private</span> BaoZi bz<span style="color:#f92672">;</span>
+ 
+   <span style="color:#66d9ef">public</span> <span style="color:#a6e22e">BaoZiPu</span><span style="color:#f92672">(</span>String name<span style="color:#f92672">,</span>BaoZi bz<span style="color:#f92672">){</span>
+     <span style="color:#66d9ef">super</span><span style="color:#f92672">(</span>name<span style="color:#f92672">);</span>
+     <span style="color:#66d9ef">this</span><span style="color:#f92672">.</span><span style="color:#a6e22e">bz</span> <span style="color:#f92672">=</span> bz<span style="color:#f92672">;</span>
+   <span style="color:#f92672">}</span>
+ 
+   <span style="color:#a6e22e">@Override</span>
+   <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">run</span><span style="color:#f92672">()</span> <span style="color:#f92672">{</span>
+     <span style="color:#75715e">//造包子
+</span><span style="color:#75715e"></span>     <span style="color:#66d9ef">while</span><span style="color:#f92672">(</span><span style="color:#66d9ef">true</span><span style="color:#f92672">){</span>
+       <span style="color:#75715e">//同步
+</span><span style="color:#75715e"></span>       <span style="color:#66d9ef">synchronized</span> <span style="color:#f92672">(</span>bz<span style="color:#f92672">){</span>
+         <span style="color:#66d9ef">if</span><span style="color:#f92672">(</span>bz<span style="color:#f92672">.</span><span style="color:#a6e22e">flag</span> <span style="color:#f92672">==</span> <span style="color:#66d9ef">true</span><span style="color:#f92672">){</span><span style="color:#75715e">//包子资源 存在
+</span><span style="color:#75715e"></span>           <span style="color:#66d9ef">try</span> <span style="color:#f92672">{</span>
+             bz<span style="color:#f92672">.</span><span style="color:#a6e22e">wait</span><span style="color:#f92672">();</span>
+           <span style="color:#f92672">}</span> <span style="color:#66d9ef">catch</span> <span style="color:#f92672">(</span>InterruptedException e<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+             e<span style="color:#f92672">.</span><span style="color:#a6e22e">printStackTrace</span><span style="color:#f92672">();</span>
+           <span style="color:#f92672">}</span>
+         <span style="color:#f92672">}</span>
+ 
+         <span style="color:#75715e">// 没有包子 造包子
+</span><span style="color:#75715e"></span>         System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;包子铺开始做包子&#34;</span><span style="color:#f92672">);</span>
+        
+         bz<span style="color:#f92672">.</span><span style="color:#a6e22e">flag</span><span style="color:#f92672">=</span><span style="color:#66d9ef">true</span><span style="color:#f92672">;</span>
+         System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;包子造好了：&#34;</span><span style="color:#f92672">+</span> bz<span style="color:#f92672">.</span><span style="color:#a6e22e">xianer</span><span style="color:#f92672">);</span>
+         System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;吃货来吃吧&#34;</span><span style="color:#f92672">);</span>
+         <span style="color:#75715e">//唤醒等待线程 （吃货）
+</span><span style="color:#75715e"></span>         bz<span style="color:#f92672">.</span><span style="color:#a6e22e">notify</span><span style="color:#f92672">();</span>
+       <span style="color:#f92672">}</span>
+     <span style="color:#f92672">}</span>
+   <span style="color:#f92672">}</span>
+ <span style="color:#f92672">}</span>
+</code></pre></div><p>测试类：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"> <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Demo</span> <span style="color:#f92672">{</span>
+   <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">main</span><span style="color:#f92672">(</span>String<span style="color:#f92672">[]</span> args<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+     <span style="color:#75715e">//等待唤醒案例
+</span><span style="color:#75715e"></span>     BaoZi bz <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> BaoZi<span style="color:#f92672">();</span>
+ 
+     ChiHuo ch <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> ChiHuo<span style="color:#f92672">(</span><span style="color:#e6db74">&#34;吃货&#34;</span><span style="color:#f92672">,</span>bz<span style="color:#f92672">);</span>
+     BaoZiPu bzp <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> BaoZiPu<span style="color:#f92672">(</span><span style="color:#e6db74">&#34;包子铺&#34;</span><span style="color:#f92672">,</span>bz<span style="color:#f92672">);</span>
+ 
+     ch<span style="color:#f92672">.</span><span style="color:#a6e22e">start</span><span style="color:#f92672">();</span>
+     bzp<span style="color:#f92672">.</span><span style="color:#a6e22e">start</span><span style="color:#f92672">();</span>
+   <span style="color:#f92672">}</span>
+ <span style="color:#f92672">}</span>
+</code></pre></div><h4 id="22-线程池">2.2 线程池</h4>
+<h5 id="线程池思想概述">线程池思想概述</h5>
+<p>我们使用线程的时候就去创建一个线程，这样实现起来非常简便，但是就会有一个问题：</p>
+<p>如果并发的线程数量很多，并且每个线程都是执行一个时间很短的任务就结束了，这样频繁创建线程就会大大降低系统的效率，因为频繁创建线程和销毁线程需要时间。那么有没有一种办法使得线程可以复用，就是执行完一个任务，并不被销毁，而是可以继续执行其他的任务？</p>
+<p>在Java中可以通过线程池来达到这样的效果。今天我们就来详细讲解一下Java的线程池。</p>
+<h5 id="线程池概念">线程池概念</h5>
+<p>线程池：其实就是一个容纳多个线程的容器，其中的线程可以反复使用，省去了频繁创建线程对象的操作，无需反复创建线程而消耗过多资源。由于线程池中有很多操作都是与优化资源相关的，我们在这里就不多赘述。我们通过一张图来了解线程池的工作原理：</p>
+<p><img src="/img/clip_image002-1608713992806.png" alt="img"></p>
+<p>合理利用线程池能够带来三个好处：</p>
+<ol>
+<li>
+<p>降低资源消耗。减少了创建和销毁线程的次数，每个工作线程都可以被重复利用，可执行多个任务。</p>
+</li>
+<li>
+<p>提高响应速度。当任务到达时，任务可以不需要的等到线程创建就能立即执行。</p>
+</li>
+<li>
+<p>提高线程的可管理性。可以根据系统的承受能力，调整线程池中工作线线程的数目，防止因为消耗过多的内存，而把服务器累趴下(每个线程需要大约1MB内存，线程开的越多，消耗的内存也就越大，最后死机)。</p>
+</li>
+</ol>
+<h5 id="线程池的使用">线程池的使用</h5>
+<p>线程池接口是java.util.concurrent.ExecutorService。</p>
+<p>在java.util.concurrent.Executors线程工厂类里面提供了一些静态工厂，生成一些常用的线程池。官方建议使用Executors工厂类来创建线程池对象。</p>
+<p>Executors类中有个创建线程池的方法如下：</p>
+<ul>
+<li>public static ExecutorService newFixedThreadPool(int nThreads)：返回线程池对象。(创建的是有界线程池,也就是池中的线程个数可以指定最大数量)</li>
+</ul>
+<p>获取到了一个线程池ExecutorService 对象，那么怎么使用呢，在这里定义了一个使用线程池对象的方法如下：</p>
+<ul>
+<li>public Future submit(Runnable task):获取线程池中的某一个线程对象，并执行</li>
+</ul>
+<p>使用线程池中线程对象的步骤：</p>
+<ol>
+<li>
+<p>创建线程池对象。</p>
+</li>
+<li>
+<p>创建Runnable接口子类对象。</p>
+</li>
+<li>
+<p>提交Runnable接口子类对象。</p>
+</li>
+<li>
+<p>关闭线程池(一般不做)。</p>
+</li>
+</ol>
+<p>Runnable实现类代码：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">MyRunnable</span> <span style="color:#66d9ef">implements</span> Runnable <span style="color:#f92672">{</span>
+    <span style="color:#a6e22e">@Override</span>
+    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">run</span><span style="color:#f92672">()</span> <span style="color:#f92672">{</span>
+        System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span>Thread<span style="color:#f92672">.</span><span style="color:#a6e22e">currentThread</span><span style="color:#f92672">().</span><span style="color:#a6e22e">getName</span><span style="color:#f92672">());</span>
+         <span style="color:#f92672">}</span>
+</code></pre></div><p>线程池测试类：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">ThreadPoolDemo</span> <span style="color:#f92672">{</span>
+    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">main</span><span style="color:#f92672">(</span>String<span style="color:#f92672">[]</span> args<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+        <span style="color:#75715e">// 创建线程池对象
+</span><span style="color:#75715e"></span>        ExecutorService service <span style="color:#f92672">=</span> Executors<span style="color:#f92672">.</span><span style="color:#a6e22e">newFixedThreadPool</span><span style="color:#f92672">(</span>2<span style="color:#f92672">);</span><span style="color:#75715e">//包含2个线程对象
+</span><span style="color:#75715e"></span>        <span style="color:#75715e">// 创建Runnable实例对象
+</span><span style="color:#75715e"></span>        MyRunnable r <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> MyRunnable<span style="color:#f92672">();</span>
+
+        <span style="color:#75715e">//自己创建线程对象的方式
+</span><span style="color:#75715e"></span>        <span style="color:#75715e">// Thread t = new Thread(r);
+</span><span style="color:#75715e"></span>        <span style="color:#75715e">// t.start(); ---&gt; 调用MyRunnable中的run()
+</span><span style="color:#75715e"></span>
+        <span style="color:#75715e">// 从线程池中获取线程对象,然后调用MyRunnable中的run()
+</span><span style="color:#75715e"></span>        service<span style="color:#f92672">.</span><span style="color:#a6e22e">submit</span><span style="color:#f92672">(</span>r<span style="color:#f92672">);</span>
+        <span style="color:#75715e">// 再获取个线程对象，调用MyRunnable中的run()
+</span><span style="color:#75715e"></span>        service<span style="color:#f92672">.</span><span style="color:#a6e22e">submit</span><span style="color:#f92672">(</span>r<span style="color:#f92672">);</span>
+        service<span style="color:#f92672">.</span><span style="color:#a6e22e">submit</span><span style="color:#f92672">(</span>r<span style="color:#f92672">);</span>
+        <span style="color:#75715e">// 注意：submit方法调用结束后，程序并不终止，是因为线程池控制了线程的关闭。
+</span><span style="color:#75715e"></span>        <span style="color:#75715e">// 将使用完的线程又归还到了线程池中
+</span><span style="color:#75715e"></span>        <span style="color:#75715e">// 关闭线程池
+</span><span style="color:#75715e"></span>        <span style="color:#75715e">//service.shutdown();
+</span><span style="color:#75715e"></span>    <span style="color:#f92672">}</span>
+<span style="color:#f92672">}</span>
+</code></pre></div><hr>
+<h3 id="第三章">第三章</h3>
+<hr>
+<h5 id="本章内容-2">本章内容</h5>
+<ul>
+<li>软件架构CS／BS</li>
+<li>网络通信三要素</li>
+<li>TCP通信</li>
+<li>Socket套接字</li>
+<li>ServerSocket</li>
+</ul>
+<hr>
+<h4 id="网络编程入门">网络编程入门</h4>
+<h4 id="31-软件结构">3.1 软件结构</h4>
+<ul>
+<li>C/S结构 ：全称为Client/Server结构，是指客户端和服务器结构。常见程序有ＱＱ、迅雷等软件。</li>
+</ul>
+<p><img src="/img/clip_image002-1608714605080.jpg" alt="img"></p>
+<ul>
+<li>B/S结构 ：全称为Browser/Server结构，是指浏览器和服务器结构。常见浏览器有谷歌、火狐等。</li>
+</ul>
+<p><img src="/img/clip_image004-1608714605083.jpg" alt="img"></p>
+<p>两种架构各有优势，但是无论哪种架构，都离不开网络的支持。</p>
+<p>网络编程，就是在一定的协议下，实现两台计算机的通信的程序。</p>
+<h5 id="网络通信协议">网络通信协议</h5>
+<ul>
+<li>
+<p>网络通信协议：通过计算机网络可以使多台计算机实现连接，位于同一个网络中的计算机在进行连接和通信时需要遵守一定的规则，这就好比在道路中行驶的汽车一定要遵守交通规则一样。在计算机网络中，这些连接和通信的规则被称为网络通信协议，它对数据的传输格式、传输速率、传输步骤等做了统一规定，通信双方必须同时遵守才能完成数据交换。</p>
+</li>
+<li>
+<p>TCP/IP协议：传输控制协议/因特网互联协议( Transmission Control Protocol/Internet Protocol)，是Internet最基本、最广泛的协议。它定义了计算机如何连入因特网，以及数据如何在它们之间传输的标准。它的内部包含一系列的用于处理数据通信的协议，并采用了4层的分层模型，每一层都呼叫它的下一层所提供的协议来完成自己的需求。</p>
+</li>
+</ul>
+<p><img src="/img/clip_image005-1608714605083.png" alt="img"></p>
+<p>上图中，TCP/IP协议中的四层分别是应用层、传输层、网络层和链路层，每层分别负责不同的通信功能。链路层：链路层是用于定义物理传输通道，通常是对某些网络连接设备的驱动协议，例如针对光纤、网线提供的驱动。网络层：网络层是整个TCP/IP协议的核心，它主要用于将传输的数据进行分组，将分组数据发送到目标计算机或者网络。运输层：主要使网络程序进行通信，在进行网络通信时，可以采用TCP协议，也可以采用UDP协议。应用层：主要负责应用程序的协议，例如HTTP协议、FTP协议等。</p>
+<h5 id="协议分类">协议分类</h5>
+<p>通信的协议还是比较复杂的，java.net 包中包含的类和接口，它们提供低层次的通信细节。我们可以直接使用这些类和接口，来专注于网络程序开发，而不用考虑通信的细节。</p>
+<p>java.net 包中提供了两种常见的网络协议的支持：</p>
+<ul>
+<li>UDP：用户数据报协议(User Datagram Protocol)。UDP是无连接通信协议，即在数据传输时，数据的发送端和接收端不建立逻辑连接。简单来说，当一台计算机向另外一台计算机发送数据时，发送端不会确认接收端是否存在，就会发出数据，同样接收端在收到数据时，也不会向发送端反馈是否收到数据。</li>
+</ul>
+<p>由于使用UDP协议消耗资源小，通信效率高，所以通常都会用于音频、视频和普通数据的传输例如视频会议都使用UDP协议，因为这种情况即使偶尔丢失一两个数据包，也不会对接收结果产生太大影响。</p>
+<p>但是在使用UDP协议传送数据时，由于UDP的面向无连接性，不能保证数据的完整性，因此在传输重要数据时不建议使用UDP协议。UDP的交换过程如下图所示。</p>
+<p><img src="/img/clip_image006-1608714605083.png" alt="img"></p>
+<p>特点: 数据被限制在64kb以内，超出这个范围就不能发送了。</p>
+<p>数据报(Datagram): 网络传输的基本单位</p>
+<ul>
+<li>TCP：传输控制协议 (Transmission Control Protocol)。TCP协议是面向连接的通信协议，即传输数据之前，在发送端和接收端建立逻辑连接，然后再传输数据，它提供了两台计算机之间可靠无差错的数据传输。</li>
+</ul>
+<p>在TCP连接中必须要明确客户端与服务器端，由客户端向服务端发出连接请求，每次连接的创建都需要经过“三次握手”。三次握手：TCP协议中，在发送数据的准备阶段，客户端与服务器之间的三次交互，以保证连接的可靠。</p>
+<ul>
+<li>
+<p>第一次握手，客户端向服务器端发出连接请求，等待服务器确认。</p>
+</li>
+<li>
+<p>第二次握手，服务器端向客户端回送一个响应，通知客户端收到了连接请求。</p>
+</li>
+<li>
+<p>第三次握手，客户端再次向服务器端发送确认信息，确认连接。整个交互过程如下图所示：</p>
+</li>
+</ul>
+<p><img src="/img/clip_image007-1608714605084.jpg" alt="img"></p>
+<p>完成三次握手，连接建立后，客户端和服务器就可以开始进行数据传输了。由于这种面向连接的特性，TCP协议可以保证传输数据的安全，所以应用十分广泛，例如下载文件、浏览网页等。</p>
+<h4 id="32-网络编程三要素">3.2 网络编程三要素</h4>
+<h5 id="协议">协议</h5>
+<ul>
+<li>协议：计算机网络通信必须遵守的规则，已经介绍过了，不再赘述。</li>
+</ul>
+<h5 id="ip地址">IP地址</h5>
+<ul>
+<li>IP地址：指互联网协议地址（Internet Protocol Address），俗称IP。IP地址用来给一个网络中的计算机设备做唯一的编号。假如我们把“个人电脑”比作“一台电话”的话，那么“IP地址”就相当于“电话号码”。</li>
+</ul>
+<p>IP地址分类</p>
+<ul>
+<li>
+<p>IPv4：是一个32位的二进制数，通常被分为4个字节，表示成a.b.c.d 的形式，例如192.168.65.100 。其中a、b、c、d都是0~255之间的十进制整数，那么最多可以表示42亿个。</p>
+</li>
+<li>
+<p>IPv6：由于互联网的蓬勃发展，IP地址的需求量愈来愈大，但是网络地址资源有限，使得IP的分配越发紧张。</p>
+</li>
+</ul>
+<p>为了扩大地址空间，拟通过IPv6重新定义地址空间，采用128位地址长度，每16个字节一组，分成8组十六进制数，表示成ABCD:EF01:2345:6789:ABCD:EF01:2345:6789，号称可以为全世界的每一粒沙子编上一个网址，这样就解决了网络地址资源数量不够的问题。</p>
+<p>常用命令</p>
+<ul>
+<li>
+<p>查看本机IP地址，在控制台输入：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java">ipconfig
+</code></pre></div></li>
+<li>
+<p>检查网络是否连通，在控制台输入：</p>
+</li>
+</ul>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"> ping 空格 IP地址
+ ping 220<span style="color:#f92672">.</span><span style="color:#a6e22e">181</span><span style="color:#f92672">.</span><span style="color:#a6e22e">57</span><span style="color:#f92672">.</span><span style="color:#a6e22e">216</span>
+</code></pre></div><p>特殊的IP地址</p>
+<ul>
+<li>本机IP地址：127.0.0.1、localhost 。</li>
+</ul>
+<h5 id="端口号">端口号</h5>
+<p>网络的通信，本质上是两个进程（应用程序）的通信。每台计算机都有很多的进程，那么在网络通信时，如何区分这些进程呢？</p>
+<p>如果说IP地址可以唯一标识网络中的设备，那么端口号就可以唯一标识设备中的进程（应用程序）了。</p>
+<ul>
+<li>端口号：用两个字节表示的整数，它的取值范围是0-65535。其中，0~1023之间的端口号用于一些知名的网络服务和应用，普通的应用程序需要使用1024以上的端口号。如果端口号被另外一个服务或应用所占用，会导致当前程序启动失败。</li>
+</ul>
+<p>利用 协议+IP地址+端口号 三元组合，就可以标识网络中的进程了，那么进程间的通信就可以利用这个标识与其它进程进行交互。</p>
+<h4 id="33-tcp通信程序">3.3 TCP通信程序</h4>
+<h5 id="概述">概述</h5>
+<p>TCP通信能实现两台计算机之间的数据交互，通信的两端，要严格区分为客户端（Client）与服务端（Server）。</p>
+<h5 id="两端通信时步骤">两端通信时步骤：</h5>
+<ol>
+<li>
+<p>服务端程序，需要事先启动，等待客户端的连接。</p>
+</li>
+<li>
+<p>客户端主动连接服务器端，连接成功才能通信。服务端不可以主动连接客户端。</p>
+</li>
+</ol>
+<p>在Java中，提供了两个类用于实现TCP通信程序：</p>
+<ol>
+<li>
+<p>客户端：java.net.Socket 类表示。创建Socket对象，向服务端发出连接请求，服务端响应请求，两者建立连接开始通信。</p>
+</li>
+<li>
+<p>服务端：java.net.ServerSocket 类表示。创建ServerSocket对象，相当于开启一个服务，并等待客户端的连接。</p>
+</li>
+</ol>
+<h4 id="socket类">Socket类</h4>
+<p>Socket 类：该类实现客户端套接字，套接字指的是两台设备之间通讯的端点。</p>
+<h5 id="构造方法">构造方法</h5>
+<ul>
+<li>public Socket(String host, int port) : 创建套接字对象并将其连接到指定主机上的指定端口号。如果指定的host是null ，则相当于指定地址为回送地址。</li>
+</ul>
+<p>小贴士：回送地址(127.x.x.x) 是本机回送地址（Loopback Address），主要用于网络软件测试以及本地机进程间通信，无论什么程序，一旦使用回送地址发送数据，立即返回，不进行任何网络传输。</p>
+<p>构造举例，代码如下：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"> Socket client <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> Socket<span style="color:#f92672">(</span><span style="color:#e6db74">&#34;127.0.0.1&#34;</span><span style="color:#f92672">,</span> 6666<span style="color:#f92672">);</span>
+</code></pre></div><h5 id="成员方法">成员方法</h5>
+<ul>
+<li>
+<p>public InputStream getInputStream() ： 返回此套接字的输入流。</p>
+<p>如果此Scoket具有相关联的通道，则生成的InputStream 的所有操作也关联该通道。</p>
+</li>
+</ul>
+<p>​	   关闭生成的InputStream也将关闭相关的Socket。</p>
+<ul>
+<li>
+<p>public OutputStream getOutputStream() ： 返回此套接字的输出流。</p>
+<p>如果此Scoket具有相关联的通道，则生成的OutputStream 的所有操作也关联该通道。</p>
+<p>关闭生成的OutputStream也将关闭相关的Socket。</p>
+</li>
+<li>
+<p>public void close() ：关闭此套接字。</p>
+<p>一旦一个socket被关闭，它不可再使用。</p>
+<p>关闭此socket也将关闭相关的InputStream和OutputStream 。</p>
+</li>
+<li>
+<p>public void shutdownOutput() ： 禁用此套接字的输出流。</p>
+<p>任何先前写出的数据将被发送，随后终止输出流。</p>
+</li>
+</ul>
+<h4 id="serversocket类">ServerSocket类</h4>
+<p>ServerSocket类：这个类实现了服务器套接字，该对象等待通过网络的请求。</p>
+<h5 id="构造方法-1">构造方法</h5>
+<ul>
+<li>public ServerSocket(int port) ：使用该构造方法在创建ServerSocket对象时，就可以将其绑定到一个指定的端口号上，参数port就是端口号。</li>
+</ul>
+<p>构造举例，代码如下：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"> ServerSocket server <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> ServerSocket<span style="color:#f92672">(</span>6666<span style="color:#f92672">);</span>
+</code></pre></div><h5 id="成员方法-1">成员方法</h5>
+<ul>
+<li>public Socket accept() ：侦听并接受连接，返回一个新的Socket对象，用于和客户端实现通信。该方法会一直阻塞直到建立连接。</li>
+</ul>
+<h5 id="简单的tcp网络程序">简单的TCP网络程序</h5>
+<p>TCP通信分析图解</p>
+<ol>
+<li>
+<p>【服务端】启动,创建ServerSocket对象，等待连接。</p>
+</li>
+<li>
+<p>【客户端】启动,创建Socket对象，请求连接。</p>
+</li>
+<li>
+<p>【服务端】接收连接,调用accept方法，并返回一个Socket对象。</p>
+</li>
+<li>
+<p>【客户端】Socket对象，获取OutputStream，向服务端写出数据。</p>
+</li>
+<li>
+<p>【服务端】Scoket对象，获取InputStream，读取客户端发送的数据。</p>
+</li>
+</ol>
+<p>到此，客户端向服务端发送数据成功。</p>
+<p><img src="/img/clip_image009-1608714605084.jpg" alt="img"></p>
+<p>自此，服务端向客户端回写数据。</p>
+<ol start="6">
+<li>
+<p>【服务端】Socket对象，获取OutputStream，向客户端回写数据。</p>
+</li>
+<li>
+<p>【客户端】Scoket对象，获取InputStream，解析回写数据。</p>
+</li>
+<li>
+<p>【客户端】释放资源，断开连接。</p>
+</li>
+</ol>
+<h5 id="客户端向服务器发送数据">客户端向服务器发送数据</h5>
+<p>服务端实现：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"> <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">ServerTCP</span> <span style="color:#f92672">{</span>
+   <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">main</span><span style="color:#f92672">(</span>String<span style="color:#f92672">[]</span> args<span style="color:#f92672">)</span> <span style="color:#66d9ef">throws</span> IOException <span style="color:#f92672">{</span>
+     System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;服务端启动 , 等待连接 .... &#34;</span><span style="color:#f92672">);</span>
+     <span style="color:#75715e">// 1.创建 ServerSocket对象，绑定端口，开始等待连接
+</span><span style="color:#75715e"></span>     ServerSocket ss <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> ServerSocket<span style="color:#f92672">(</span>6666<span style="color:#f92672">);</span>
+     <span style="color:#75715e">// 2.接收连接 accept 方法, 返回 socket 对象.
+</span><span style="color:#75715e"></span>     Socket server <span style="color:#f92672">=</span> ss<span style="color:#f92672">.</span><span style="color:#a6e22e">accept</span><span style="color:#f92672">();</span>
+     <span style="color:#75715e">// 3.通过socket 获取输入流
+</span><span style="color:#75715e"></span>     InputStream is <span style="color:#f92672">=</span> server<span style="color:#f92672">.</span><span style="color:#a6e22e">getInputStream</span><span style="color:#f92672">();</span>
+     <span style="color:#75715e">// 4.一次性读取数据
+</span><span style="color:#75715e"></span>     <span style="color:#75715e">// 4.1 创建字节数组
+</span><span style="color:#75715e"></span>     <span style="color:#66d9ef">byte</span><span style="color:#f92672">[]</span> b <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> <span style="color:#66d9ef">byte</span><span style="color:#f92672">[</span>1024<span style="color:#f92672">];</span>
+     <span style="color:#75715e">// 4.2 据读取到字节数组中.
+</span><span style="color:#75715e"></span>     <span style="color:#66d9ef">int</span> len <span style="color:#f92672">=</span> is<span style="color:#f92672">.</span><span style="color:#a6e22e">read</span><span style="color:#f92672">(</span>b<span style="color:#f92672">)</span><span style="color:#960050;background-color:#1e0010">；</span>
+     <span style="color:#75715e">// 4.3 解析数组,打印字符串信息
+</span><span style="color:#75715e"></span>     String msg <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> String<span style="color:#f92672">(</span>b<span style="color:#f92672">,</span> 0<span style="color:#f92672">,</span> len<span style="color:#f92672">);</span>
+     System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span>msg<span style="color:#f92672">);</span>
+     <span style="color:#75715e">//5.关闭资源.
+</span><span style="color:#75715e"></span>     is<span style="color:#f92672">.</span><span style="color:#a6e22e">close</span><span style="color:#f92672">();</span>
+     server<span style="color:#f92672">.</span><span style="color:#a6e22e">close</span><span style="color:#f92672">();</span>
+   <span style="color:#f92672">}</span>
+ <span style="color:#f92672">}</span>
+</code></pre></div><p>客户端实现：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"> <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">ClientTCP</span> <span style="color:#f92672">{</span>
+   <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">main</span><span style="color:#f92672">(</span>String<span style="color:#f92672">[]</span> args<span style="color:#f92672">)</span> <span style="color:#66d9ef">throws</span> Exception <span style="color:#f92672">{</span>
+     System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;客户端 发送数据&#34;</span><span style="color:#f92672">);</span>
+     <span style="color:#75715e">// 1.创建 Socket ( ip , port ) , 确定连接到哪里.
+</span><span style="color:#75715e"></span>     Socket client <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> Socket<span style="color:#f92672">(</span><span style="color:#e6db74">&#34;localhost&#34;</span><span style="color:#f92672">,</span> 6666<span style="color:#f92672">);</span>
+     <span style="color:#75715e">// 2.获取流对象 . 输出流
+</span><span style="color:#75715e"></span>     OutputStream os <span style="color:#f92672">=</span> client<span style="color:#f92672">.</span><span style="color:#a6e22e">getOutputStream</span><span style="color:#f92672">();</span>
+     <span style="color:#75715e">// 3.写出数据.
+</span><span style="color:#75715e"></span>     os<span style="color:#f92672">.</span><span style="color:#a6e22e">write</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;你好么? tcp ,我来了&#34;</span><span style="color:#f92672">.</span><span style="color:#a6e22e">getBytes</span><span style="color:#f92672">());</span>
+     <span style="color:#75715e">// 4. 关闭资源 .
+</span><span style="color:#75715e"></span>     os<span style="color:#f92672">.</span><span style="color:#a6e22e">close</span><span style="color:#f92672">();</span>
+     client<span style="color:#f92672">.</span><span style="color:#a6e22e">close</span><span style="color:#f92672">();</span>
+   <span style="color:#f92672">}</span>
+ <span style="color:#f92672">}</span>
+</code></pre></div><h5 id="服务器向客户端回写数据">服务器向客户端回写数据</h5>
+<p>服务端实现：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"> <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">ServerTCP</span> <span style="color:#f92672">{</span>
+   <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">main</span><span style="color:#f92672">(</span>String<span style="color:#f92672">[]</span> args<span style="color:#f92672">)</span> <span style="color:#66d9ef">throws</span> IOException <span style="color:#f92672">{</span>
+     System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;服务端启动 , 等待连接 .... &#34;</span><span style="color:#f92672">);</span>
+     <span style="color:#75715e">// 1.创建 ServerSocket对象，绑定端口，开始等待连接
+</span><span style="color:#75715e"></span>     ServerSocket ss <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> ServerSocket<span style="color:#f92672">(</span>6666<span style="color:#f92672">);</span>
+     <span style="color:#75715e">// 2.接收连接 accept 方法, 返回 socket 对象.
+</span><span style="color:#75715e"></span>     Socket server <span style="color:#f92672">=</span> ss<span style="color:#f92672">.</span><span style="color:#a6e22e">accept</span><span style="color:#f92672">();</span>
+     <span style="color:#75715e">// 3.通过socket 获取输入流
+</span><span style="color:#75715e"></span>     InputStream is <span style="color:#f92672">=</span> server<span style="color:#f92672">.</span><span style="color:#a6e22e">getInputStream</span><span style="color:#f92672">();</span>
+     <span style="color:#75715e">// 4.一次性读取数据
+</span><span style="color:#75715e"></span>     <span style="color:#75715e">// 4.1 创建字节数组
+</span><span style="color:#75715e"></span>     <span style="color:#66d9ef">byte</span><span style="color:#f92672">[]</span> b <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> <span style="color:#66d9ef">byte</span><span style="color:#f92672">[</span>1024<span style="color:#f92672">];</span>
+     <span style="color:#75715e">// 4.2 据读取到字节数组中.
+</span><span style="color:#75715e"></span>     <span style="color:#66d9ef">int</span> len <span style="color:#f92672">=</span> is<span style="color:#f92672">.</span><span style="color:#a6e22e">read</span><span style="color:#f92672">(</span>b<span style="color:#f92672">)</span><span style="color:#960050;background-color:#1e0010">；</span>
+     <span style="color:#75715e">// 4.3 解析数组,打印字符串信息
+</span><span style="color:#75715e"></span>     String msg <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> String<span style="color:#f92672">(</span>b<span style="color:#f92672">,</span> 0<span style="color:#f92672">,</span> len<span style="color:#f92672">);</span>
+     System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span>msg<span style="color:#f92672">);</span>
+     <span style="color:#75715e">// =================回写数据=======================
+</span><span style="color:#75715e"></span>     <span style="color:#75715e">// 5. 通过 socket 获取输出流
+</span><span style="color:#75715e"></span>      OutputStream out <span style="color:#f92672">=</span> server<span style="color:#f92672">.</span><span style="color:#a6e22e">getOutputStream</span><span style="color:#f92672">();</span>
+     <span style="color:#75715e">// 6. 回写数据
+</span><span style="color:#75715e"></span>      out<span style="color:#f92672">.</span><span style="color:#a6e22e">write</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;我很好,谢谢你&#34;</span><span style="color:#f92672">.</span><span style="color:#a6e22e">getBytes</span><span style="color:#f92672">());</span>
+     <span style="color:#75715e">// 7.关闭资源.
+</span><span style="color:#75715e"></span>     out<span style="color:#f92672">.</span><span style="color:#a6e22e">close</span><span style="color:#f92672">();</span>
+     is<span style="color:#f92672">.</span><span style="color:#a6e22e">close</span><span style="color:#f92672">();</span>
+     server<span style="color:#f92672">.</span><span style="color:#a6e22e">close</span><span style="color:#f92672">();</span>
+   <span style="color:#f92672">}</span>
+ <span style="color:#f92672">}</span>
+</code></pre></div><p>客户端实现：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"> <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">ClientTCP</span> <span style="color:#f92672">{</span>
+   <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">main</span><span style="color:#f92672">(</span>String<span style="color:#f92672">[]</span> args<span style="color:#f92672">)</span> <span style="color:#66d9ef">throws</span> Exception <span style="color:#f92672">{</span>
+     System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;客户端 发送数据&#34;</span><span style="color:#f92672">);</span>
+     <span style="color:#75715e">// 1.创建 Socket ( ip , port ) , 确定连接到哪里.
+</span><span style="color:#75715e"></span>     Socket client <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> Socket<span style="color:#f92672">(</span><span style="color:#e6db74">&#34;localhost&#34;</span><span style="color:#f92672">,</span> 6666<span style="color:#f92672">);</span>
+     <span style="color:#75715e">// 2.通过Scoket,获取输出流对象 
+</span><span style="color:#75715e"></span>     OutputStream os <span style="color:#f92672">=</span> client<span style="color:#f92672">.</span><span style="color:#a6e22e">getOutputStream</span><span style="color:#f92672">();</span>
+     <span style="color:#75715e">// 3.写出数据.
+</span><span style="color:#75715e"></span>     os<span style="color:#f92672">.</span><span style="color:#a6e22e">write</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;你好么? tcp ,我来了&#34;</span><span style="color:#f92672">.</span><span style="color:#a6e22e">getBytes</span><span style="color:#f92672">());</span>
+     <span style="color:#75715e">// ==============解析回写=========================
+</span><span style="color:#75715e"></span>     <span style="color:#75715e">// 4. 通过Scoket,获取 输入流对象
+</span><span style="color:#75715e"></span>     InputStream in <span style="color:#f92672">=</span> client<span style="color:#f92672">.</span><span style="color:#a6e22e">getInputStream</span><span style="color:#f92672">();</span>
+     <span style="color:#75715e">// 5. 读取数据数据
+</span><span style="color:#75715e"></span>     <span style="color:#66d9ef">byte</span><span style="color:#f92672">[]</span> b <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> <span style="color:#66d9ef">byte</span><span style="color:#f92672">[</span>100<span style="color:#f92672">];</span>
+     <span style="color:#66d9ef">int</span> len <span style="color:#f92672">=</span> in<span style="color:#f92672">.</span><span style="color:#a6e22e">read</span><span style="color:#f92672">(</span>b<span style="color:#f92672">);</span>
+     System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span><span style="color:#66d9ef">new</span> String<span style="color:#f92672">(</span>b<span style="color:#f92672">,</span> 0<span style="color:#f92672">,</span> len<span style="color:#f92672">));</span>
+     <span style="color:#75715e">// 6. 关闭资源 .
+</span><span style="color:#75715e"></span>     in<span style="color:#f92672">.</span><span style="color:#a6e22e">close</span><span style="color:#f92672">();</span>
+     os<span style="color:#f92672">.</span><span style="color:#a6e22e">close</span><span style="color:#f92672">();</span>
+     client<span style="color:#f92672">.</span><span style="color:#a6e22e">close</span><span style="color:#f92672">();</span>
+   <span style="color:#f92672">}</span>
+ <span style="color:#f92672">}</span>
+</code></pre></div><h4 id="综合案例">综合案例</h4>
+<h5 id="文件上传案例">文件上传案例</h5>
+<p>文件上传分析图解</p>
+<ol>
+<li>
+<p>【客户端】输入流，从硬盘读取文件数据到程序中。</p>
+</li>
+<li>
+<p>【客户端】网络输出流，写出文件数据到服务端。</p>
+</li>
+<li>
+<p>【服务端】网络输入流，读取文件数据到服务端程序。</p>
+</li>
+<li>
+<p>【服务端】输出流，写出文件数据到服务器硬盘中。</p>
+</li>
+</ol>
+<p><img src="/img/clip_image011.jpg" alt="img"></p>
+<h5 id="基本实现">基本实现</h5>
+<p>服务端实现：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"> <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">FileUpload_Server</span> <span style="color:#f92672">{</span>
+   <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">main</span><span style="color:#f92672">(</span>String<span style="color:#f92672">[]</span> args<span style="color:#f92672">)</span> <span style="color:#66d9ef">throws</span> IOException <span style="color:#f92672">{</span>
+     System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;服务器 启动..... &#34;</span><span style="color:#f92672">);</span>
+     <span style="color:#75715e">// 1. 创建服务端ServerSocket
+</span><span style="color:#75715e"></span>     ServerSocket serverSocket <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> ServerSocket<span style="color:#f92672">(</span>6666<span style="color:#f92672">);</span>
+     <span style="color:#75715e">// 2. 建立连接 
+</span><span style="color:#75715e"></span>     Socket accept <span style="color:#f92672">=</span> serverSocket<span style="color:#f92672">.</span><span style="color:#a6e22e">accept</span><span style="color:#f92672">();</span>
+     <span style="color:#75715e">// 3. 创建流对象
+</span><span style="color:#75715e"></span>     <span style="color:#75715e">// 3.1 获取输入流,读取文件数据
+</span><span style="color:#75715e"></span>     BufferedInputStream bis <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> BufferedInputStream<span style="color:#f92672">(</span>accept<span style="color:#f92672">.</span><span style="color:#a6e22e">getInputStream</span><span style="color:#f92672">());</span>
+     <span style="color:#75715e">// 3.2 创建输出流,保存到本地 .
+</span><span style="color:#75715e"></span>     BufferedOutputStream bos <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> BufferedOutputStream<span style="color:#f92672">(</span><span style="color:#66d9ef">new</span> FileOutputStream<span style="color:#f92672">(</span><span style="color:#e6db74">&#34;copy.jpg&#34;</span><span style="color:#f92672">));</span>
+     <span style="color:#75715e">// 4. 读写数据
+</span><span style="color:#75715e"></span>     <span style="color:#66d9ef">byte</span><span style="color:#f92672">[]</span> b <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> <span style="color:#66d9ef">byte</span><span style="color:#f92672">[</span>1024  8<span style="color:#f92672">];</span>
+     <span style="color:#66d9ef">int</span> len<span style="color:#f92672">;</span>
+     <span style="color:#66d9ef">while</span> <span style="color:#f92672">((</span>len <span style="color:#f92672">=</span> bis<span style="color:#f92672">.</span><span style="color:#a6e22e">read</span><span style="color:#f92672">(</span>b<span style="color:#f92672">))</span> <span style="color:#f92672">!=</span> <span style="color:#f92672">-</span>1<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+       bos<span style="color:#f92672">.</span><span style="color:#a6e22e">write</span><span style="color:#f92672">(</span>b<span style="color:#f92672">,</span> 0<span style="color:#f92672">,</span> len<span style="color:#f92672">);</span>
+     <span style="color:#f92672">}</span>
+     <span style="color:#75715e">//5. 关闭 资源
+</span><span style="color:#75715e"></span>     bos<span style="color:#f92672">.</span><span style="color:#a6e22e">close</span><span style="color:#f92672">();</span>
+     bis<span style="color:#f92672">.</span><span style="color:#a6e22e">close</span><span style="color:#f92672">();</span>
+     accept<span style="color:#f92672">.</span><span style="color:#a6e22e">close</span><span style="color:#f92672">();</span>
+     System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;文件上传已保存&#34;</span><span style="color:#f92672">);</span>
+   <span style="color:#f92672">}</span>
+ <span style="color:#f92672">}</span>
+</code></pre></div><p>客户端实现：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">FileUPload_Client</span> <span style="color:#f92672">{</span>
+   <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">main</span><span style="color:#f92672">(</span>String<span style="color:#f92672">[]</span> args<span style="color:#f92672">)</span> <span style="color:#66d9ef">throws</span> IOException <span style="color:#f92672">{</span>
+     <span style="color:#75715e">// 1.创建流对象
+</span><span style="color:#75715e"></span>     <span style="color:#75715e">// 1.1 创建输入流,读取本地文件  
+</span><span style="color:#75715e"></span>     BufferedInputStream bis  <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> BufferedInputStream<span style="color:#f92672">(</span><span style="color:#66d9ef">new</span> FileInputStream<span style="color:#f92672">(</span><span style="color:#e6db74">&#34;test.jpg&#34;</span><span style="color:#f92672">));</span>
+     <span style="color:#75715e">// 1.2 创建输出流,写到服务端 
+</span><span style="color:#75715e"></span>     Socket socket <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> Socket<span style="color:#f92672">(</span><span style="color:#e6db74">&#34;localhost&#34;</span><span style="color:#f92672">,</span> 6666<span style="color:#f92672">);</span>
+     BufferedOutputStream  bos  <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> BufferedOutputStream<span style="color:#f92672">(</span>socket<span style="color:#f92672">.</span><span style="color:#a6e22e">getOutputStream</span><span style="color:#f92672">());</span>
+ 
+     <span style="color:#75715e">//2.写出数据. 
+</span><span style="color:#75715e"></span>     <span style="color:#66d9ef">byte</span><span style="color:#f92672">[]</span> b  <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> <span style="color:#66d9ef">byte</span><span style="color:#f92672">[</span>1024  8 <span style="color:#f92672">];</span>
+     <span style="color:#66d9ef">int</span> len <span style="color:#f92672">;</span> 
+     <span style="color:#66d9ef">while</span> <span style="color:#f92672">((</span> len  <span style="color:#f92672">=</span> bis<span style="color:#f92672">.</span><span style="color:#a6e22e">read</span><span style="color:#f92672">(</span>b<span style="color:#f92672">))!=-</span>1<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+       bos<span style="color:#f92672">.</span><span style="color:#a6e22e">write</span><span style="color:#f92672">(</span>b<span style="color:#f92672">,</span> 0<span style="color:#f92672">,</span> len<span style="color:#f92672">);</span>
+       bos<span style="color:#f92672">.</span><span style="color:#a6e22e">flush</span><span style="color:#f92672">();</span>
+     <span style="color:#f92672">}</span>
+     System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;文件发送完毕&#34;</span><span style="color:#f92672">);</span>
+     <span style="color:#75715e">// 3.释放资源
+</span><span style="color:#75715e"></span> 
+     bos<span style="color:#f92672">.</span><span style="color:#a6e22e">close</span><span style="color:#f92672">();</span> 
+     socket<span style="color:#f92672">.</span><span style="color:#a6e22e">close</span><span style="color:#f92672">();</span>
+     bis<span style="color:#f92672">.</span><span style="color:#a6e22e">close</span><span style="color:#f92672">();</span> 
+     System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;文件上传完毕 &#34;</span><span style="color:#f92672">);</span>
+   <span style="color:#f92672">}</span>
+ <span style="color:#f92672">}</span>
+</code></pre></div><h5 id="文件上传优化分析">文件上传优化分析</h5>
+<ol>
+<li>文件名称写死的问题</li>
+</ol>
+<p>服务端，保存文件的名称如果写死，那么最终导致服务器硬盘，只会保留一个文件，建议使用系统时间优化，保证文件名称唯一，代码如下：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="color:#75715e">// 文件名称 
+</span><span style="color:#75715e"></span>FileOutputStream fos <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> FileOutputStream<span style="color:#f92672">(</span>System<span style="color:#f92672">.</span><span style="color:#a6e22e">currentTimeMillis</span><span style="color:#f92672">()+</span><span style="color:#e6db74">&#34;.jpg&#34;</span><span style="color:#f92672">)</span> 
+ BufferedOutputStream bos <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> BufferedOutputStream<span style="color:#f92672">(</span>fos<span style="color:#f92672">);</span>
+</code></pre></div><ol start="2">
+<li>循环接收的问题</li>
+</ol>
+<p>服务端，只保存一个文件就关闭了，之后的用户无法再上传，这是不符合实际的，使用循环改进，可以不断的接收不同用户的文件，代码如下：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"> <span style="color:#75715e">// 每次接收新的连接,创建一个Socket
+</span><span style="color:#75715e"></span> <span style="color:#66d9ef">while</span><span style="color:#960050;background-color:#1e0010">（</span><span style="color:#66d9ef">true</span><span style="color:#960050;background-color:#1e0010">）</span><span style="color:#f92672">{</span>
+   Socket accept <span style="color:#f92672">=</span> serverSocket<span style="color:#f92672">.</span><span style="color:#a6e22e">accept</span><span style="color:#f92672">();</span>
+   <span style="color:#f92672">......</span>
+ <span style="color:#f92672">}</span>
+</code></pre></div><ol start="3">
+<li>效率问题</li>
+</ol>
+<p>服务端，在接收大文件时，可能耗费几秒钟的时间，此时不能接收其他用户上传，所以，使用多线程技术优化，代码如下：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"> <span style="color:#66d9ef">while</span><span style="color:#960050;background-color:#1e0010">（</span><span style="color:#66d9ef">true</span><span style="color:#960050;background-color:#1e0010">）</span><span style="color:#f92672">{</span>
+   Socket accept <span style="color:#f92672">=</span> serverSocket<span style="color:#f92672">.</span><span style="color:#a6e22e">accept</span><span style="color:#f92672">();</span>
+   <span style="color:#75715e">// accept 交给子线程处理.
+</span><span style="color:#75715e"></span>   <span style="color:#66d9ef">new</span> Thread<span style="color:#f92672">(()</span> <span style="color:#f92672">-&gt;</span> <span style="color:#f92672">{</span>
+     <span style="color:#f92672">......</span>
+     InputStream bis <span style="color:#f92672">=</span> accept<span style="color:#f92672">.</span><span style="color:#a6e22e">getInputStream</span><span style="color:#f92672">();</span>
+     <span style="color:#f92672">......</span>
+   <span style="color:#f92672">}).</span><span style="color:#a6e22e">start</span><span style="color:#f92672">();</span>
+ <span style="color:#f92672">}</span>
+</code></pre></div><p>优化实现</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">FileUpload_Server</span> <span style="color:#f92672">{</span>
+   <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">main</span><span style="color:#f92672">(</span>String<span style="color:#f92672">[]</span> args<span style="color:#f92672">)</span> <span style="color:#66d9ef">throws</span> IOException <span style="color:#f92672">{</span>
+     System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;服务器 启动..... &#34;</span><span style="color:#f92672">);</span>
+     <span style="color:#75715e">// 1. 创建服务端ServerSocket
+</span><span style="color:#75715e"></span>     ServerSocket serverSocket <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> ServerSocket<span style="color:#f92672">(</span>6666<span style="color:#f92672">);</span>
+     <span style="color:#75715e">// 2. 循环接收,建立连接
+</span><span style="color:#75715e"></span>     <span style="color:#66d9ef">while</span> <span style="color:#f92672">(</span><span style="color:#66d9ef">true</span><span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+       Socket accept <span style="color:#f92672">=</span> serverSocket<span style="color:#f92672">.</span><span style="color:#a6e22e">accept</span><span style="color:#f92672">();</span>
+       <span style="color:#75715e">/* 
+</span><span style="color:#75715e">       \3. socket对象交给子线程处理,进行读写操作
+</span><span style="color:#75715e">        Runnable接口中,只有一个run方法,使用lambda表达式简化格式
+</span><span style="color:#75715e">       */</span>
+       <span style="color:#66d9ef">new</span> Thread<span style="color:#f92672">(()</span> <span style="color:#f92672">-&gt;</span> <span style="color:#f92672">{</span>
+         <span style="color:#66d9ef">try</span> <span style="color:#f92672">(</span>
+           <span style="color:#75715e">//3.1 获取输入流对象
+</span><span style="color:#75715e"></span>           BufferedInputStream bis <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> BufferedInputStream<span style="color:#f92672">(</span>accept<span style="color:#f92672">.</span><span style="color:#a6e22e">getInputStream</span><span style="color:#f92672">());</span>
+           <span style="color:#75715e">//3.2 创建输出流对象, 保存到本地 .
+</span><span style="color:#75715e"></span>           FileOutputStream fis <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> FileOutputStream<span style="color:#f92672">(</span>System<span style="color:#f92672">.</span><span style="color:#a6e22e">currentTimeMillis</span><span style="color:#f92672">()</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;.jpg&#34;</span><span style="color:#f92672">);</span>
+           BufferedOutputStream bos <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> BufferedOutputStream<span style="color:#f92672">(</span>fis<span style="color:#f92672">);)</span> <span style="color:#f92672">{</span>
+           <span style="color:#75715e">// 3.3 读写数据
+</span><span style="color:#75715e"></span>           <span style="color:#66d9ef">byte</span><span style="color:#f92672">[]</span> b <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> <span style="color:#66d9ef">byte</span><span style="color:#f92672">[</span>1024  8<span style="color:#f92672">];</span>
+           <span style="color:#66d9ef">int</span> len<span style="color:#f92672">;</span>
+           <span style="color:#66d9ef">while</span> <span style="color:#f92672">((</span>len <span style="color:#f92672">=</span> bis<span style="color:#f92672">.</span><span style="color:#a6e22e">read</span><span style="color:#f92672">(</span>b<span style="color:#f92672">))</span> <span style="color:#f92672">!=</span> <span style="color:#f92672">-</span>1<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+            bos<span style="color:#f92672">.</span><span style="color:#a6e22e">write</span><span style="color:#f92672">(</span>b<span style="color:#f92672">,</span> 0<span style="color:#f92672">,</span> len<span style="color:#f92672">);</span>
+           <span style="color:#f92672">}</span>
+           <span style="color:#75715e">//4. 关闭 资源
+</span><span style="color:#75715e"></span>           bos<span style="color:#f92672">.</span><span style="color:#a6e22e">close</span><span style="color:#f92672">();</span>
+           bis<span style="color:#f92672">.</span><span style="color:#a6e22e">close</span><span style="color:#f92672">();</span>
+           accept<span style="color:#f92672">.</span><span style="color:#a6e22e">close</span><span style="color:#f92672">();</span>
+           System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;文件上传已保存&#34;</span><span style="color:#f92672">);</span>
+         <span style="color:#f92672">}</span> <span style="color:#66d9ef">catch</span> <span style="color:#f92672">(</span>IOException e<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+           e<span style="color:#f92672">.</span><span style="color:#a6e22e">printStackTrace</span><span style="color:#f92672">();</span>
+         <span style="color:#f92672">}</span>
+       <span style="color:#f92672">}).</span><span style="color:#a6e22e">start</span><span style="color:#f92672">();</span>
+     <span style="color:#f92672">}</span>
+   <span style="color:#f92672">}</span>
+ <span style="color:#f92672">}</span>
+</code></pre></div><h5 id="信息回写分析图解">信息回写分析图解</h5>
+<p>前四步与基本文件上传一致.</p>
+<ol start="5">
+<li>
+<p>【服务端】获取输出流，回写数据。</p>
+</li>
+<li>
+<p>【客户端】获取输入流，解析回写数据。</p>
+</li>
+</ol>
+<p><img src="/img/clip_image013.jpg" alt="img"></p>
+<p>回写实现</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"> <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">FileUpload_Server</span> <span style="color:#f92672">{</span>
+   <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">main</span><span style="color:#f92672">(</span>String<span style="color:#f92672">[]</span> args<span style="color:#f92672">)</span> <span style="color:#66d9ef">throws</span> IOException <span style="color:#f92672">{</span>
+     System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;服务器 启动..... &#34;</span><span style="color:#f92672">);</span>
+     <span style="color:#75715e">// 1. 创建服务端ServerSocket
+</span><span style="color:#75715e"></span>     ServerSocket serverSocket <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> ServerSocket<span style="color:#f92672">(</span>6666<span style="color:#f92672">);</span>
+     <span style="color:#75715e">// 2. 循环接收,建立连接
+</span><span style="color:#75715e"></span>     <span style="color:#66d9ef">while</span> <span style="color:#f92672">(</span><span style="color:#66d9ef">true</span><span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+       Socket accept <span style="color:#f92672">=</span> serverSocket<span style="color:#f92672">.</span><span style="color:#a6e22e">accept</span><span style="color:#f92672">();</span>
+       
+      <span style="color:#75715e">//3. socket对象交给子线程处理,进行读写操作
+</span><span style="color:#75715e"></span>      <span style="color:#75715e">//Runnable接口中,只有一个run方法,使用lambda表达式简化格式
+</span><span style="color:#75715e"></span>  
+       <span style="color:#66d9ef">new</span> Thread<span style="color:#f92672">(()</span> <span style="color:#f92672">-&gt;</span> <span style="color:#f92672">{</span>
+         <span style="color:#66d9ef">try</span> <span style="color:#f92672">(</span>
+           <span style="color:#75715e">//3.1 获取输入流对象
+</span><span style="color:#75715e"></span>           BufferedInputStream bis <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> BufferedInputStream<span style="color:#f92672">(</span>accept<span style="color:#f92672">.</span><span style="color:#a6e22e">getInputStream</span><span style="color:#f92672">());</span>
+           <span style="color:#75715e">//3.2 创建输出流对象, 保存到本地 .
+</span><span style="color:#75715e"></span>           FileOutputStream fis <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> FileOutputStream<span style="color:#f92672">(</span>System<span style="color:#f92672">.</span><span style="color:#a6e22e">currentTimeMillis</span><span style="color:#f92672">()</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;.jpg&#34;</span><span style="color:#f92672">);</span>
+           BufferedOutputStream bos <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> BufferedOutputStream<span style="color:#f92672">(</span>fis<span style="color:#f92672">);</span>
+         <span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+           <span style="color:#75715e">// 3.3 读写数据
+</span><span style="color:#75715e"></span>           <span style="color:#66d9ef">byte</span><span style="color:#f92672">[]</span> b <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> <span style="color:#66d9ef">byte</span><span style="color:#f92672">[</span>1024  8<span style="color:#f92672">];</span>
+           <span style="color:#66d9ef">int</span> len<span style="color:#f92672">;</span>
+           <span style="color:#66d9ef">while</span> <span style="color:#f92672">((</span>len <span style="color:#f92672">=</span> bis<span style="color:#f92672">.</span><span style="color:#a6e22e">read</span><span style="color:#f92672">(</span>b<span style="color:#f92672">))</span> <span style="color:#f92672">!=</span> <span style="color:#f92672">-</span>1<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+             bos<span style="color:#f92672">.</span><span style="color:#a6e22e">write</span><span style="color:#f92672">(</span>b<span style="color:#f92672">,</span> 0<span style="color:#f92672">,</span> len<span style="color:#f92672">);</span>
+           <span style="color:#f92672">}</span>
+ 
+           <span style="color:#75715e">// 4.=======信息回写===========================
+</span><span style="color:#75715e"></span>           System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;back ........&#34;</span><span style="color:#f92672">);</span>
+           OutputStream out <span style="color:#f92672">=</span> accept<span style="color:#f92672">.</span><span style="color:#a6e22e">getOutputStream</span><span style="color:#f92672">();</span>
+           out<span style="color:#f92672">.</span><span style="color:#a6e22e">write</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;上传成功&#34;</span><span style="color:#f92672">.</span><span style="color:#a6e22e">getBytes</span><span style="color:#f92672">());</span>
+           out<span style="color:#f92672">.</span><span style="color:#a6e22e">close</span><span style="color:#f92672">();</span>
+           <span style="color:#75715e">//================================
+</span><span style="color:#75715e"></span> 
+           <span style="color:#75715e">//5. 关闭 资源
+</span><span style="color:#75715e"></span>           bos<span style="color:#f92672">.</span><span style="color:#a6e22e">close</span><span style="color:#f92672">();</span>
+           bis<span style="color:#f92672">.</span><span style="color:#a6e22e">close</span><span style="color:#f92672">();</span>
+           accept<span style="color:#f92672">.</span><span style="color:#a6e22e">close</span><span style="color:#f92672">();</span>
+           System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;文件上传已保存&#34;</span><span style="color:#f92672">);</span>
+         <span style="color:#f92672">}</span> <span style="color:#66d9ef">catch</span> <span style="color:#f92672">(</span>IOException e<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+           e<span style="color:#f92672">.</span><span style="color:#a6e22e">printStackTrace</span><span style="color:#f92672">();</span>
+         <span style="color:#f92672">}</span>
+       <span style="color:#f92672">}).</span><span style="color:#a6e22e">start</span><span style="color:#f92672">();</span>
+     <span style="color:#f92672">}</span>
+   <span style="color:#f92672">}</span>
+ <span style="color:#f92672">}</span>
+</code></pre></div><p>客户端实现：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"> <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">FileUpload_Client</span> <span style="color:#f92672">{</span>
+   <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">main</span><span style="color:#f92672">(</span>String<span style="color:#f92672">[]</span> args<span style="color:#f92672">)</span> <span style="color:#66d9ef">throws</span> IOException <span style="color:#f92672">{</span>
+     <span style="color:#75715e">// 1.创建流对象
+</span><span style="color:#75715e"></span>     <span style="color:#75715e">// 1.1 创建输入流,读取本地文件
+</span><span style="color:#75715e"></span>     BufferedInputStream bis <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> BufferedInputStream<span style="color:#f92672">(</span><span style="color:#66d9ef">new</span> FileInputStream<span style="color:#f92672">(</span><span style="color:#e6db74">&#34;test.jpg&#34;</span><span style="color:#f92672">));</span>
+     <span style="color:#75715e">// 1.2 创建输出流,写到服务端
+</span><span style="color:#75715e"></span>     Socket socket <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> Socket<span style="color:#f92672">(</span><span style="color:#e6db74">&#34;localhost&#34;</span><span style="color:#f92672">,</span> 6666<span style="color:#f92672">);</span>
+     BufferedOutputStream bos <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> BufferedOutputStream<span style="color:#f92672">(</span>socket<span style="color:#f92672">.</span><span style="color:#a6e22e">getOutputStream</span><span style="color:#f92672">());</span>
+ 
+     <span style="color:#75715e">//2.写出数据.
+</span><span style="color:#75715e"></span>     <span style="color:#66d9ef">byte</span><span style="color:#f92672">[]</span> b  <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> <span style="color:#66d9ef">byte</span><span style="color:#f92672">[</span>1024  8 <span style="color:#f92672">];</span>
+     <span style="color:#66d9ef">int</span> len <span style="color:#f92672">;</span>
+     <span style="color:#66d9ef">while</span> <span style="color:#f92672">((</span> len  <span style="color:#f92672">=</span> bis<span style="color:#f92672">.</span><span style="color:#a6e22e">read</span><span style="color:#f92672">(</span>b<span style="color:#f92672">))!=-</span>1<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+       bos<span style="color:#f92672">.</span><span style="color:#a6e22e">write</span><span style="color:#f92672">(</span>b<span style="color:#f92672">,</span> 0<span style="color:#f92672">,</span> len<span style="color:#f92672">);</span>
+     <span style="color:#f92672">}</span>
+     <span style="color:#75715e">// 关闭输出流,通知服务端,写出数据完毕
+</span><span style="color:#75715e"></span>     socket<span style="color:#f92672">.</span><span style="color:#a6e22e">shutdownOutput</span><span style="color:#f92672">();</span>
+     System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;文件发送完毕&#34;</span><span style="color:#f92672">);</span>
+     <span style="color:#75715e">// 3. =====解析回写============
+</span><span style="color:#75715e"></span>     InputStream in <span style="color:#f92672">=</span> socket<span style="color:#f92672">.</span><span style="color:#a6e22e">getInputStream</span><span style="color:#f92672">();</span>
+     <span style="color:#66d9ef">byte</span><span style="color:#f92672">[]</span> back <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> <span style="color:#66d9ef">byte</span><span style="color:#f92672">[</span>20<span style="color:#f92672">];</span>
+     in<span style="color:#f92672">.</span><span style="color:#a6e22e">read</span><span style="color:#f92672">(</span>back<span style="color:#f92672">);</span>
+     System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span><span style="color:#66d9ef">new</span> String<span style="color:#f92672">(</span>back<span style="color:#f92672">));</span>
+     in<span style="color:#f92672">.</span><span style="color:#a6e22e">close</span><span style="color:#f92672">();</span>
+     <span style="color:#75715e">// ============================
+</span><span style="color:#75715e"></span> 
+     <span style="color:#75715e">// 4.释放资源
+</span><span style="color:#75715e"></span>     socket<span style="color:#f92672">.</span><span style="color:#a6e22e">close</span><span style="color:#f92672">();</span>
+     bis<span style="color:#f92672">.</span><span style="color:#a6e22e">close</span><span style="color:#f92672">();</span>
+   <span style="color:#f92672">}</span>
+ <span style="color:#f92672">}</span>
+</code></pre></div><h4 id="模拟bs服务器扩展知识点">模拟B\S服务器(扩展知识点)</h4>
+<p>模拟网站服务器，使用浏览器访问自己编写的服务端程序，查看网页效果。类似于一个小型的Tomcat！</p>
+<h5 id="案例分析">案例分析</h5>
+<ol>
+<li>准备页面数据，web文件夹。复制到我们Module中</li>
+</ol>
+<p><img src="/img/clip_image015.png" alt="img"></p>
+<ol start="2">
+<li>我们模拟服务器端，ServerSocket类监听端口，使用浏览器访问：http://localhost:8080/src/com/iNuo/Demo/Demo04/Web/game.html</li>
+</ol>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">main</span><span style="color:#f92672">(</span>String<span style="color:#f92672">[]</span> args<span style="color:#f92672">)</span> <span style="color:#66d9ef">throws</span> IOException <span style="color:#f92672">{</span>
+        ServerSocket server <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> ServerSocket<span style="color:#f92672">(</span>8080<span style="color:#f92672">);</span>
+Socket socket <span style="color:#f92672">=</span> server<span style="color:#f92672">.</span><span style="color:#a6e22e">accept</span><span style="color:#f92672">();</span>
+InputStream input <span style="color:#f92672">=</span> socket<span style="color:#f92672">.</span><span style="color:#a6e22e">getInputStream</span><span style="color:#f92672">();</span>
+<span style="color:#66d9ef">byte</span><span style="color:#f92672">[]</span> b <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> <span style="color:#66d9ef">byte</span><span style="color:#f92672">[</span>1024<span style="color:#f92672">];</span>
+<span style="color:#66d9ef">int</span> len<span style="color:#f92672">;</span>
+<span style="color:#66d9ef">while</span><span style="color:#f92672">((</span>len<span style="color:#f92672">=</span>input<span style="color:#f92672">.</span><span style="color:#a6e22e">read</span><span style="color:#f92672">(</span>b<span style="color:#f92672">))!=-</span>1<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+    System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span><span style="color:#66d9ef">new</span> String<span style="color:#f92672">(</span>b<span style="color:#f92672">,</span> 0<span style="color:#f92672">,</span> len<span style="color:#f92672">));</span>
+<span style="color:#f92672">}</span>
+server<span style="color:#f92672">.</span><span style="color:#a6e22e">close</span><span style="color:#f92672">();</span>
+socket<span style="color:#f92672">.</span><span style="color:#a6e22e">close</span><span style="color:#f92672">();</span>
+     <span style="color:#f92672">}</span>
+</code></pre></div><ol start="3">
+<li>
+<p>服务器程序中字节输入流可以读取到浏览器发来的请求信息</p>
+<p><img src="/img/image-20210124223145838.png" alt="image-20210124223145838"></p>
+</li>
+</ol>
+<p><img src="/img/clip_image019-1608714605084.jpg" alt="img"></p>
+<p>GET /src/com/iNuo/Demo/Demo04/Web/game.html HTTP/1.1是浏览器的请求消息。</p>
+<p>/src/com/iNuo/Demo/Demo04/Web/game.html为浏览器想要请求的服务器端的资源,使用字符串切割方式获取到请求的资源。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"> <span style="color:#75715e">//转换流,读取浏览器请求第一行
+</span><span style="color:#75715e"></span> BufferedReader readWb <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> BufferedReader<span style="color:#f92672">(</span><span style="color:#66d9ef">new</span> InputStreamReader<span style="color:#f92672">(</span>socket<span style="color:#f92672">.</span><span style="color:#a6e22e">getInputStream</span><span style="color:#f92672">()));</span>
+ String requst <span style="color:#f92672">=</span> readWb<span style="color:#f92672">.</span><span style="color:#a6e22e">readLine</span><span style="color:#f92672">();</span>
+ <span style="color:#75715e">//取出请求资源的路径
+</span><span style="color:#75715e"></span> String<span style="color:#f92672">[]</span> strArr <span style="color:#f92672">=</span> requst<span style="color:#f92672">.</span><span style="color:#a6e22e">split</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34; &#34;</span><span style="color:#f92672">);</span>
+ <span style="color:#75715e">//去掉web前面的/
+</span><span style="color:#75715e"></span> String path <span style="color:#f92672">=</span> strArr<span style="color:#f92672">[</span>1<span style="color:#f92672">].</span><span style="color:#a6e22e">substring</span><span style="color:#f92672">(</span>1<span style="color:#f92672">);</span>
+ System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span>path<span style="color:#f92672">);</span>
+</code></pre></div><h5 id="案例实现">案例实现</h5>
+<p>服务端实现：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"> <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">SerDemo</span> <span style="color:#f92672">{</span>
+   <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">main</span><span style="color:#f92672">(</span>String<span style="color:#f92672">[]</span> args<span style="color:#f92672">)</span> <span style="color:#66d9ef">throws</span> IOException <span style="color:#f92672">{</span>
+     System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;服务端 启动 , 等待连接 .... &#34;</span><span style="color:#f92672">);</span>
+     <span style="color:#75715e">// 创建ServerSocket 对象
+</span><span style="color:#75715e"></span>     ServerSocket server <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> ServerSocket<span style="color:#f92672">(</span>8888<span style="color:#f92672">);</span>
+     Socket socket <span style="color:#f92672">=</span> server<span style="color:#f92672">.</span><span style="color:#a6e22e">accept</span><span style="color:#f92672">();</span>
+     <span style="color:#75715e">// 转换流读取浏览器的请求消息
+</span><span style="color:#75715e"></span>     BufferedReader readWb <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span>
+     BufferedReader<span style="color:#f92672">(</span><span style="color:#66d9ef">new</span> InputStreamReader<span style="color:#f92672">(</span>socket<span style="color:#f92672">.</span><span style="color:#a6e22e">getInputStream</span><span style="color:#f92672">()));</span>
+     String requst <span style="color:#f92672">=</span> readWb<span style="color:#f92672">.</span><span style="color:#a6e22e">readLine</span><span style="color:#f92672">();</span>
+     <span style="color:#75715e">// 取出请求资源的路径
+</span><span style="color:#75715e"></span>     String<span style="color:#f92672">[]</span> strArr <span style="color:#f92672">=</span> requst<span style="color:#f92672">.</span><span style="color:#a6e22e">split</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34; &#34;</span><span style="color:#f92672">);</span>
+     <span style="color:#75715e">// 去掉web前面的/
+</span><span style="color:#75715e"></span>     String path <span style="color:#f92672">=</span> strArr<span style="color:#f92672">[</span>1<span style="color:#f92672">].</span><span style="color:#a6e22e">substring</span><span style="color:#f92672">(</span>1<span style="color:#f92672">);</span>
+     <span style="color:#75715e">// 读取客户端请求的资源文件
+</span><span style="color:#75715e"></span>     FileInputStream fis <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> FileInputStream<span style="color:#f92672">(</span>path<span style="color:#f92672">);</span>
+     <span style="color:#66d9ef">byte</span><span style="color:#f92672">[]</span> bytes<span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> <span style="color:#66d9ef">byte</span><span style="color:#f92672">[</span>1024<span style="color:#f92672">];</span>
+     <span style="color:#66d9ef">int</span> len <span style="color:#f92672">=</span> 0 <span style="color:#f92672">;</span>
+     <span style="color:#75715e">// 字节输出流,将文件写会客户端
+</span><span style="color:#75715e"></span>     OutputStream out <span style="color:#f92672">=</span> socket<span style="color:#f92672">.</span><span style="color:#a6e22e">getOutputStream</span><span style="color:#f92672">();</span>
+     <span style="color:#75715e">// 写入HTTP协议响应头,固定写法
+</span><span style="color:#75715e"></span>     out<span style="color:#f92672">.</span><span style="color:#a6e22e">write</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;HTTP/1.1 200 OK\r\n&#34;</span><span style="color:#f92672">.</span><span style="color:#a6e22e">getBytes</span><span style="color:#f92672">());</span>
+     out<span style="color:#f92672">.</span><span style="color:#a6e22e">write</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;Content-Type:text/html\r\n&#34;</span><span style="color:#f92672">.</span><span style="color:#a6e22e">getBytes</span><span style="color:#f92672">());</span>
+     <span style="color:#75715e">// 必须要写入空行,否则浏览器不解析
+</span><span style="color:#75715e"></span>     out<span style="color:#f92672">.</span><span style="color:#a6e22e">write</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;\r\n&#34;</span><span style="color:#f92672">.</span><span style="color:#a6e22e">getBytes</span><span style="color:#f92672">());</span>
+     <span style="color:#66d9ef">while</span><span style="color:#f92672">((</span>len <span style="color:#f92672">=</span> fis<span style="color:#f92672">.</span><span style="color:#a6e22e">read</span><span style="color:#f92672">(</span>bytes<span style="color:#f92672">))!=-</span>1<span style="color:#f92672">){</span>
+       out<span style="color:#f92672">.</span><span style="color:#a6e22e">write</span><span style="color:#f92672">(</span>bytes<span style="color:#f92672">,</span>0<span style="color:#f92672">,</span>len<span style="color:#f92672">);</span>
+     <span style="color:#f92672">}</span>
+     fis<span style="color:#f92672">.</span><span style="color:#a6e22e">close</span><span style="color:#f92672">();</span>
+     out<span style="color:#f92672">.</span><span style="color:#a6e22e">close</span><span style="color:#f92672">();</span>
+     readWb<span style="color:#f92672">.</span><span style="color:#a6e22e">close</span><span style="color:#f92672">();</span> 
+     socket<span style="color:#f92672">.</span><span style="color:#a6e22e">close</span><span style="color:#f92672">();</span>
+     server<span style="color:#f92672">.</span><span style="color:#a6e22e">close</span><span style="color:#f92672">();</span>
+   <span style="color:#f92672">}</span>
+ <span style="color:#f92672">}</span>
+</code></pre></div><p>​</p>
+<h5 id="访问效果">访问效果</h5>
+<p>火狐</p>
+<p><img src="/img/clip_image021.png" alt="img"></p>
+<p>小贴士：不同的浏览器，内核不一样，解析效果有可能不一样。</p>
+<p>发现浏览器中出现很多的叉子,说明浏览器没有读取到图片信息导致。</p>
+<p>浏览器工作原理是遇到图片会开启一个线程进行单独的访问,因此在服务器端加入线程技术。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"> <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">ServerDemo</span> <span style="color:#f92672">{</span>
+   <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">main</span><span style="color:#f92672">(</span>String<span style="color:#f92672">[]</span> args<span style="color:#f92672">)</span> <span style="color:#66d9ef">throws</span> IOException <span style="color:#f92672">{</span>
+     ServerSocket server <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> ServerSocket<span style="color:#f92672">(</span>8888<span style="color:#f92672">);</span>
+     <span style="color:#66d9ef">while</span><span style="color:#f92672">(</span><span style="color:#66d9ef">true</span><span style="color:#f92672">){</span>
+       Socket socket <span style="color:#f92672">=</span> server<span style="color:#f92672">.</span><span style="color:#a6e22e">accept</span><span style="color:#f92672">();</span>
+       <span style="color:#66d9ef">new</span> Thread<span style="color:#f92672">(</span><span style="color:#66d9ef">new</span> Web<span style="color:#f92672">(</span>socket<span style="color:#f92672">)).</span><span style="color:#a6e22e">start</span><span style="color:#f92672">();</span>
+     <span style="color:#f92672">}</span>
+   <span style="color:#f92672">}</span>
+   <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Web</span> <span style="color:#66d9ef">implements</span> Runnable<span style="color:#f92672">{</span>
+     <span style="color:#66d9ef">private</span> Socket socket<span style="color:#f92672">;</span>
+ 
+     <span style="color:#66d9ef">public</span> <span style="color:#a6e22e">Web</span><span style="color:#f92672">(</span>Socket socket<span style="color:#f92672">){</span>
+       <span style="color:#66d9ef">this</span><span style="color:#f92672">.</span><span style="color:#a6e22e">socket</span><span style="color:#f92672">=</span>socket<span style="color:#f92672">;</span>
+     <span style="color:#f92672">}</span>
+ 
+     <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">run</span><span style="color:#f92672">()</span> <span style="color:#f92672">{</span>
+       <span style="color:#66d9ef">try</span><span style="color:#f92672">{</span>
+         <span style="color:#75715e">//转换流,读取浏览器请求第一行
+</span><span style="color:#75715e"></span>         BufferedReader readWb <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span>
+             BufferedReader<span style="color:#f92672">(</span><span style="color:#66d9ef">new</span> InputStreamReader<span style="color:#f92672">(</span>socket<span style="color:#f92672">.</span><span style="color:#a6e22e">getInputStream</span><span style="color:#f92672">()));</span>
+         String requst <span style="color:#f92672">=</span> readWb<span style="color:#f92672">.</span><span style="color:#a6e22e">readLine</span><span style="color:#f92672">();</span>
+         <span style="color:#75715e">//取出请求资源的路径
+</span><span style="color:#75715e"></span>         String<span style="color:#f92672">[]</span> strArr <span style="color:#f92672">=</span> requst<span style="color:#f92672">.</span><span style="color:#a6e22e">split</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34; &#34;</span><span style="color:#f92672">);</span>
+         System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span>Arrays<span style="color:#f92672">.</span><span style="color:#a6e22e">toString</span><span style="color:#f92672">(</span>strArr<span style="color:#f92672">));</span>
+         String path <span style="color:#f92672">=</span> strArr<span style="color:#f92672">[</span>1<span style="color:#f92672">].</span><span style="color:#a6e22e">substring</span><span style="color:#f92672">(</span>1<span style="color:#f92672">);</span>
+         System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span>path<span style="color:#f92672">);</span>
+ 
+         FileInputStream fis <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> FileInputStream<span style="color:#f92672">(</span>path<span style="color:#f92672">);</span>
+         System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span>fis<span style="color:#f92672">);</span>
+         <span style="color:#66d9ef">byte</span><span style="color:#f92672">[]</span> bytes<span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> <span style="color:#66d9ef">byte</span><span style="color:#f92672">[</span>1024<span style="color:#f92672">];</span>
+         <span style="color:#66d9ef">int</span> len <span style="color:#f92672">=</span> 0 <span style="color:#f92672">;</span>
+         <span style="color:#75715e">//向浏览器 回写数据
+</span><span style="color:#75715e"></span>         OutputStream out <span style="color:#f92672">=</span> socket<span style="color:#f92672">.</span><span style="color:#a6e22e">getOutputStream</span><span style="color:#f92672">();</span>
+         out<span style="color:#f92672">.</span><span style="color:#a6e22e">write</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;HTTP/1.1 200 OK\r\n&#34;</span><span style="color:#f92672">.</span><span style="color:#a6e22e">getBytes</span><span style="color:#f92672">());</span>
+         out<span style="color:#f92672">.</span><span style="color:#a6e22e">write</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;Content-Type:text/html\r\n&#34;</span><span style="color:#f92672">.</span><span style="color:#a6e22e">getBytes</span><span style="color:#f92672">());</span>
+         out<span style="color:#f92672">.</span><span style="color:#a6e22e">write</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;\r\n&#34;</span><span style="color:#f92672">.</span><span style="color:#a6e22e">getBytes</span><span style="color:#f92672">());</span>
+         <span style="color:#66d9ef">while</span><span style="color:#f92672">((</span>len <span style="color:#f92672">=</span> fis<span style="color:#f92672">.</span><span style="color:#a6e22e">read</span><span style="color:#f92672">(</span>bytes<span style="color:#f92672">))!=-</span>1<span style="color:#f92672">){</span>
+           out<span style="color:#f92672">.</span><span style="color:#a6e22e">write</span><span style="color:#f92672">(</span>bytes<span style="color:#f92672">,</span>0<span style="color:#f92672">,</span>len<span style="color:#f92672">);</span>
+         <span style="color:#f92672">}</span>
+         fis<span style="color:#f92672">.</span><span style="color:#a6e22e">close</span><span style="color:#f92672">();</span>
+         out<span style="color:#f92672">.</span><span style="color:#a6e22e">close</span><span style="color:#f92672">();</span>
+         readWb<span style="color:#f92672">.</span><span style="color:#a6e22e">close</span><span style="color:#f92672">();</span>
+         socket<span style="color:#f92672">.</span><span style="color:#a6e22e">close</span><span style="color:#f92672">();</span>
+       <span style="color:#f92672">}</span><span style="color:#66d9ef">catch</span><span style="color:#f92672">(</span>Exception ex<span style="color:#f92672">){</span>
+ 
+       <span style="color:#f92672">}</span>
+     <span style="color:#f92672">}</span>
+   <span style="color:#f92672">}</span>
+</code></pre></div><p>​</p>
+</div>
+  
+</article></main>
+<footer class="footer">
+  <span>&copy; 2021 <a href="https://xshi000.github.io/">及时当勉励，岁月不待人！@iNuo</a></span>
+  <span>&middot;</span>
+  <span>Powered by <a href="https://gohugo.io/" rel="noopener" target="_blank">Hugo️️</a>️</span>
+  <span>&middot;</span>
+  <span>Theme️ <a href="https://github.com/nanxiaobei/hugo-paper" rel="noopener" target="_blank">Paper</a></span>
+</footer>
+<script src="https://xshi000.github.io/highlight.min.js"></script>
+<script>
+  hljs.initHighlightingOnLoad();
+</script>
+</body>
+</html>
+
