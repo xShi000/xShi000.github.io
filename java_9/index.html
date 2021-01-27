@@ -1,0 +1,1557 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    
+    <title>极简Java九：JDBC与连接池 - 及时当勉励，岁月不待人！@iNuo</title>
+    
+    <meta name="description" content="第一章  本章内容  学习目标 JDBC 入门 DriverManager 类 Connection 接口 Statement 接口 数据库工具类 JdbcUtils PreparedStatement 接口 JDBC 事务的处理   1.1 学习目标 ​	1) 能够理解 JDBC 的概念
+​	2) 能够使用 DriverManager 类
+​	3) 能够使用 Connection 接口
+​	4) 能够使用 Statement 接口
+​	5) 能够使用 ResultSet 接口
+​	6) 能够说出 SQL 注入原因和解决方案
+​	7) 能够通过 PreparedStatement 完成增、删、改、查
+​	8) 能够完成 PreparedStatement 改造登录案例
+1.2 JDBC 入门 客户端操作 MySQL 数据库的方式： ​	1) 使用第三方客户端来访问 MySQL：SQLyog、Navicat、SQLWave、MyDB Studio、EMS SQL Manager for MySQL">
+    <meta name="author" content="">
+    
+    <link href="https://xshi000.github.io/an-old-hope.min.css" rel="stylesheet">
+    <link href="https://xshi000.github.io/style.css" rel="stylesheet">
+    <link href="https://xshi000.github.io/custom.css" rel="stylesheet">
+    
+    <link rel="apple-touch-icon" href="https://xshi000.github.io/apple-touch-icon.png">
+    <link rel="icon" href="https://xshi000.github.io/favicon.ico">
+    <meta name="generator" content="Hugo 0.65.3" />
+    
+    
+    
+    <script>
+      function setTheme() {
+        const time = new Date();
+
+        const prev = localStorage.getItem('date');
+        const date = String(time.getMonth() + 1) + '.' + String(time.getDate());
+
+        const now = time.getTime();
+        let sunrise;
+        let sunset;
+
+        function setBodyClass() {
+          if (now > sunrise && now < sunset) return;
+          document.body.classList.add('dark');
+        }
+
+        if (date !== prev) {
+          fetch('https://api.ipgeolocation.io/astronomy?apiKey=5ed37d85103e4defa5df4c5298ed5215')
+            .then(res => res.json())
+            .then(data => {
+              sunrise = data.sunrise.split(':').map(Number);
+              sunset = data.sunset.split(':').map(Number);
+            })
+            .catch(() => {
+              sunrise = [7, 0];
+              sunset = [19, 0];
+            })
+            .finally(() => {
+              sunrise = time.setHours(sunrise[0], sunrise[1], 0);
+              sunset = time.setHours(sunset[0], sunset[1], 0);
+              setBodyClass();
+              localStorage.setItem('sunrise', sunrise);
+              localStorage.setItem('sunset', sunset);
+            });
+          localStorage.setItem('date', date);
+        } else {
+          sunrise = Number(localStorage.getItem('sunrise'));
+          sunset = Number(localStorage.getItem('sunset'));
+          setBodyClass();
+        }
+      }
+    </script>
+  </head>
+  <body class="single">
+    <script>
+      setTheme();
+    </script>
+    <header class="header">
+      <nav class="nav">
+        <p class="logo"><a href="https://xshi000.github.io/">及时当勉励，岁月不待人！@iNuo</a></p>
+      </nav>
+    </header>
+    <main class="main">
+
+
+<article class="post-single">
+  <header class="post-header">
+    <h1 class="post-title">极简Java九：JDBC与连接池</h1>
+    <div class="post-meta">January 27, 2021</div>
+  </header>
+  <div class="post-content"><hr>
+<h3 id="第一章">第一章</h3>
+<hr>
+<h5 id="本章内容">本章内容</h5>
+<ul>
+<li>学习目标</li>
+<li>JDBC 入门</li>
+<li>DriverManager 类</li>
+<li>Connection 接口</li>
+<li>Statement 接口</li>
+<li>数据库工具类 JdbcUtils</li>
+<li>PreparedStatement 接口</li>
+<li>JDBC 事务的处理</li>
+</ul>
+<hr>
+<h4 id="11-学习目标">1.1 学习目标</h4>
+<p>​	1)  能够理解 JDBC 的概念</p>
+<p>​	2)  能够使用 DriverManager 类</p>
+<p>​	3)  能够使用 Connection 接口</p>
+<p>​	4)  能够使用 Statement 接口</p>
+<p>​	5)  能够使用 ResultSet 接口</p>
+<p>​	6)  能够说出 SQL 注入原因和解决方案</p>
+<p>​	7)  能够通过 PreparedStatement 完成增、删、改、查</p>
+<p>​	8)  能够完成 PreparedStatement 改造登录案例</p>
+<h4 id="12-jdbc-入门">1.2 JDBC 入门</h4>
+<h5 id="客户端操作-mysql-数据库的方式">客户端操作 MySQL 数据库的方式：</h5>
+<p>​	1)  使用第三方客户端来访问 MySQL：SQLyog、Navicat、SQLWave、MyDB Studio、EMS SQL Manager for MySQL</p>
+<p>​              <img src="/img/image-20201224200311247.png" alt="image-20201224200311247"></p>
+<p>​	2)   使用 MySQL 自带的命令行方式</p>
+<p>​	3)  通过 Java 来访问 MySQL 数据库，今天要学习的内容</p>
+<h5 id="什么是-jdbc">什么是 JDBC</h5>
+<p>JDBC 规范定义接口，具体的实现由各大数据库厂商来实现。</p>
+<p>JDBC 是 Java 访问数据库的标准规范，真正怎么操作数据库还需要具体的实现类，也就是数据库驱动。每个数据库厂商根据自家数据库的通信格式编写好自己数据库的驱动。所以我们只需要会调用 JDBC 接口中的方法即可，数据库驱动由数据库厂商提供。</p>
+<p>使用 JDBC 的好处：</p>
+<p>​	1)  程序员如果要开发访问数据库的程序，只需要会调用 JDBC 接口中的方法即可，不用关注类是如何实现的。</p>
+<p>​	2)  使用同一套 Java 代码，进行少量的修改就可以访问其他 JDBC 支持的数据库</p>
+<p><img src="/img/image-20201224200420025.png" alt="image-20201224200420025"></p>
+<h5 id="jdbc-的核心-api">JDBC 的核心 API</h5>
+<table>
+<thead>
+<tr>
+<th>接口或类</th>
+<th>作用</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>DriverManager  类</td>
+<td>1)  管理和注册数据库驱动  <!-- raw HTML omitted -->2)  得到数据库连接对象</td>
+</tr>
+<tr>
+<td>Connection 接口</td>
+<td>一个连接对象，可用于创建  Statement 和 PreparedStatement 对象</td>
+</tr>
+<tr>
+<td>Statement 接口</td>
+<td>一个 SQL 语句对象，用于将 SQL 语句发送给数据库服务器。</td>
+</tr>
+<tr>
+<td>PreparedStatemen 接口</td>
+<td>一个 SQL 语句对象，是 Statement 的子接口</td>
+</tr>
+<tr>
+<td>ResultSet 接口</td>
+<td>用于封装数据库查询的结果集，返回给客户端 Java 程序</td>
+</tr>
+</tbody>
+</table>
+<p>​</p>
+<h5 id="导入驱动-jar-包">导入驱动 Jar 包</h5>
+<p><img src="/img/image-20201224200616874.png" alt="image-20201224200616874"></p>
+<p><img src="/img/image-20201224200640981.png" alt="image-20201224200640981"></p>
+<h5 id="加载和注册驱动">加载和注册驱动</h5>
+<table>
+<thead>
+<tr>
+<th>加载和注册驱动的方法</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Class.forName<!-- raw HTML omitted -->(数据库驱动实现类)</td>
+<td>加载和注册数据库驱动，数据库驱动由 mysql 厂商&quot;com.mysql.jdbc.Driver&rdquo;</td>
+</tr>
+</tbody>
+</table>
+<p>疑问：为什么这样可以注册驱动？</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Demo1</span> <span style="color:#f92672">{</span>      
+    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">main</span><span style="color:#f92672">(</span>String<span style="color:#f92672">[]</span> args<span style="color:#f92672">)</span> <span style="color:#66d9ef">throws</span> ClassNotFoundException <span style="color:#f92672">{</span> <span style="color:#75715e">//抛出类找不到的异常
+</span><span style="color:#75715e"></span>      <span style="color:#75715e">//注册数据库驱动
+</span><span style="color:#75715e"></span>      Class<span style="color:#f92672">.</span><span style="color:#a6e22e">forName</span><span style="color:#f92672">(</span>com<span style="color:#f92672">.</span><span style="color:#a6e22e">mysql</span><span style="color:#f92672">.</span><span style="color:#a6e22e">jbdc</span><span style="color:#f92672">.</span><span style="color:#a6e22e">Driver</span><span style="color:#f92672">);</span>
+    <span style="color:#f92672">}</span>
+<span style="color:#f92672">}</span>
+</code></pre></div><p>com.mysql.jdbc.Driver 源代码：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="color:#75715e">// Driver 接口，所有数据库厂商必须实现的接口，表示这是一个驱动类。
+</span><span style="color:#75715e"></span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Driver</span> <span style="color:#66d9ef">implements</span> java<span style="color:#f92672">.</span><span style="color:#a6e22e">sql</span><span style="color:#f92672">.</span><span style="color:#a6e22e">Driver</span> <span style="color:#f92672">{</span>     
+	<span style="color:#66d9ef">public</span> <span style="color:#a6e22e">Driver</span><span style="color:#f92672">()</span> <span style="color:#66d9ef">throws</span> SQLException <span style="color:#f92672">{</span>  
+        
+	<span style="color:#f92672">}</span>       
+    
+	<span style="color:#66d9ef">static</span> <span style="color:#f92672">{</span>     
+		<span style="color:#66d9ef">try</span> <span style="color:#f92672">{</span>     
+			DriverManager<span style="color:#f92672">.</span><span style="color:#a6e22e">registerDriver</span><span style="color:#f92672">(</span><span style="color:#66d9ef">new</span> Driver<span style="color:#f92672">());</span> <span style="color:#75715e">//注册数据库驱动     
+</span><span style="color:#75715e"></span>		<span style="color:#f92672">}</span> <span style="color:#66d9ef">catch</span> <span style="color:#f92672">(</span>SQLException var1<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>     
+			<span style="color:#66d9ef">throw</span> <span style="color:#66d9ef">new</span> RuntimeException<span style="color:#f92672">(</span><span style="color:#e6db74">&#34;Can&#39;t register driver!&#34;</span><span style="color:#f92672">);</span>     
+		<span style="color:#f92672">}</span>     
+	<span style="color:#f92672">}</span>     
+<span style="color:#f92672">}</span>                        
+</code></pre></div><p>从 JDBC3 开始，目前已经普遍使用的版本。可以不用注册驱动而直接使用。Class.forName这句话可以省略。</p>
+<h4 id="13-drivermanager-类">1.3 DriverManager 类</h4>
+<p>DriverManager 作用：</p>
+<p>​	1)  管理和注册驱动</p>
+<p>​	2)  创建数据库的连接</p>
+<p>类中的方法：</p>
+<table>
+<thead>
+<tr>
+<th>DriverManager 类中的静态方法</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Connection getConnection (String url, String user,  String password)</td>
+<td>通过连接字符串，用户名，密码来得到数据库的连接对象</td>
+</tr>
+</tbody>
+</table>
+<p>使用 JDBC 连接数据库的四个参数：</p>
+<table>
+<thead>
+<tr>
+<th>JDBC 连接数据库参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>用户名</td>
+<td>登录的用户名</td>
+</tr>
+<tr>
+<td>密码</td>
+<td>登录的密码</td>
+</tr>
+<tr>
+<td>连接字符串 URL</td>
+<td>不同的数据库 URL 是不同的<!-- raw HTML omitted -->mysql 的写法  jdbc:mysql://localhost:3306/数据库[?参数名=参数值]</td>
+</tr>
+<tr>
+<td>驱动类的字符串名</td>
+<td>com.mysql.jdbc.Driver</td>
+</tr>
+</tbody>
+</table>
+<p>连接数据库的 URL 地址格式：</p>
+<pre><code>协议名:子协议://服务器名 或 IP地址:端口号/数据库名?参数=参数值                      
+</code></pre><p>MySQL 写法</p>
+<p><img src="/img/image-20201224201151445.png" alt="image-20201224201151445"></p>
+<p>MySQL 中可以简写： //前提：必须是本地服务器，端口号是 3306</p>
+<pre><code>jdbc:mysql:///数据库名   
+</code></pre><p>乱码的处理：如果数据库出现乱码，可以指定参数: ?characterEncoding=utf8，表示让数据库以 UTF-8 编码来处理数据。</p>
+<pre><code>jdbc:mysql://localhost:3306/数据库?characterEncoding=utf8    
+</code></pre><h5 id="案例得到-mysql-的数据库连接对象">案例：得到 MySQL 的数据库连接对象</h5>
+<p>​	1) 使用用户名、密码、URL 得到连接对象</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"> <span style="color:#f92672">import</span> java.sql.Connection<span style="color:#f92672">;</span> 
+ <span style="color:#f92672">import</span> java.sql.DriverManager<span style="color:#f92672">;</span>     
+ <span style="color:#f92672">import</span> java.sql.SQLException<span style="color:#f92672">;</span>           
+
+ <span style="color:#75715e">/*      得到连接对象     */</span>     
+ 
+ <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Demo2</span> <span style="color:#f92672">{</span> 
+ 	<span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">main</span><span style="color:#f92672">(</span>String<span style="color:#f92672">[]</span> args<span style="color:#f92672">)</span> <span style="color:#66d9ef">throws</span> SQLException <span style="color:#f92672">{</span> 
+        
+ 		String url <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;jdbc:mysql://localhost:3306/test&#34;</span><span style="color:#f92672">;</span> 
+        
+ 		<span style="color:#75715e">//使用用户名、密码、URL 得到连接对象     
+</span><span style="color:#75715e"></span> 		Connection connection <span style="color:#f92672">=</span> DriverManager<span style="color:#f92672">.</span><span style="color:#a6e22e">getConnection</span><span style="color:#f92672">(</span>url<span style="color:#f92672">,</span><span style="color:#e6db74">&#34;root&#34;</span><span style="color:#f92672">,</span><span style="color:#e6db74">&#34;123456&#34;</span><span style="color:#f92672">);</span> 
+        
+ 		<span style="color:#75715e">//com.mysql.jdbc.JDBC4Connection@68de145     
+</span><span style="color:#75715e"></span>        System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span>connection<span style="color:#f92672">);</span>     
+ <span style="color:#f92672">}</span>     
+ <span style="color:#f92672">}</span>                         
+</code></pre></div><h4 id="14-connection-接口">1.4 Connection 接口：</h4>
+<p>Connection 作用：Connection 接口，具体的实现类由数据库的厂商实现，代表一个连接对象。</p>
+<p>Connection 方法：</p>
+<table>
+<thead>
+<tr>
+<th>Connection 接口中的方法</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Statement createStatement()</td>
+<td>创建一条 SQL 语句对象</td>
+</tr>
+</tbody>
+</table>
+<h4 id="15-statement-接口">1.5 Statement 接口</h4>
+<p>JDBC 访问数据库的步骤</p>
+<p><img src="/img/image-20201224201532135.png" alt="image-20201224201532135"></p>
+<p>​	1)   注册和加载驱动(可以省略)</p>
+<p>​	2)   获取连接</p>
+<p>​	3)   Connection 获取 Statement 对象</p>
+<p>​	4)   使用 Statement 对象执行 SQL 语句</p>
+<p>​	5)   返回结果集</p>
+<p>​	6)   释放资源</p>
+<p>Statement 作用：代表一条语句对象，用于发送 SQL 语句给服务器，用于执行静态 SQL 语句并返回它所Th成结果的对象。</p>
+<p>Statement 中的方法：</p>
+<table>
+<thead>
+<tr>
+<th>Statement 接口中的方法</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>int executeUpdate(String sql)</td>
+<td>用于发送 DML 语句，增删改的操作：insert、update、delete  <!-- raw HTML omitted -->参数：SQL 语句  <!-- raw HTML omitted -->返回值：返回对数据库影响的行数</td>
+</tr>
+<tr>
+<td>ResultSet  executeQuery(String sql)</td>
+<td>用于发送 DQL 语句，执行查询的操作：select  <!-- raw HTML omitted -->参数：SQL 语句  <!-- raw HTML omitted -->返回值：查询的结果集</td>
+</tr>
+</tbody>
+</table>
+<p>释放资源</p>
+<p>​	1)   需要释放的对象：ResultSet 结果集，Statement 语句，Connection 连接</p>
+<p>​	2)   释放原则：先开的后关，后开的先关。ResultSet &gt; Statement &gt; Connection</p>
+<p>​	3)   放在哪个代码块中：finally 块</p>
+<h5 id="案例使用jdbc完成增删改">案例：使用jdbc完成增删改：</h5>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="color:#f92672">package</span> com.iNuo.Demo.Demo01<span style="color:#f92672">;</span>
+
+<span style="color:#f92672">import</span> java.sql.Statement<span style="color:#f92672">;</span>
+<span style="color:#f92672">import</span> java.sql.Connection<span style="color:#f92672">;</span>
+<span style="color:#f92672">import</span> java.sql.DriverManager<span style="color:#f92672">;</span>
+<span style="color:#f92672">import</span> java.sql.SQLException<span style="color:#f92672">;</span>
+
+<span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">A_JDBC</span> <span style="color:#f92672">{</span>
+    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">main</span><span style="color:#f92672">(</span>String<span style="color:#f92672">[]</span> args<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+
+        Statement st<span style="color:#f92672">=</span><span style="color:#66d9ef">null</span><span style="color:#f92672">;</span>
+        Connection conn<span style="color:#f92672">=</span><span style="color:#66d9ef">null</span><span style="color:#f92672">;</span>
+
+        <span style="color:#66d9ef">try</span> <span style="color:#f92672">{</span>
+            <span style="color:#75715e">//1.加载mysql数据库驱动
+</span><span style="color:#75715e"></span>            Class<span style="color:#f92672">.</span><span style="color:#a6e22e">forName</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;com.mysql.cj.jdbc.Driver&#34;</span><span style="color:#f92672">);</span>
+            <span style="color:#75715e">//2.创建连接   参数：serverTimezone=UTC&amp;useSSL=false 设置东八区 &amp; SSL
+</span><span style="color:#75715e"></span>            conn <span style="color:#f92672">=</span> DriverManager<span style="color:#f92672">.</span><span style="color:#a6e22e">getConnection</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;jdbc:mysql://localhost:3306/test?serverTimezone=UTC&amp;useSSL=false&#34;</span><span style="color:#f92672">,</span><span style="color:#e6db74">&#34;root&#34;</span><span style="color:#f92672">,</span><span style="color:#e6db74">&#34;123456&#34;</span><span style="color:#f92672">);</span>
+            <span style="color:#75715e">//3.创建statement
+</span><span style="color:#75715e"></span>            st <span style="color:#f92672">=</span> conn<span style="color:#f92672">.</span><span style="color:#a6e22e">createStatement</span><span style="color:#f92672">();</span>
+            <span style="color:#75715e">//4.执行sql语句
+</span><span style="color:#75715e"></span>            <span style="color:#66d9ef">int</span> count <span style="color:#f92672">=</span> st<span style="color:#f92672">.</span><span style="color:#a6e22e">executeUpdate</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;insert into account(name,money) values(&#39;赵六&#39;,1000)&#34;</span><span style="color:#f92672">);</span>
+            System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;受影响行数：&#34;</span><span style="color:#f92672">+</span>count<span style="color:#f92672">);</span>
+        <span style="color:#f92672">}</span> <span style="color:#66d9ef">catch</span> <span style="color:#f92672">(</span>ClassNotFoundException e<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+            e<span style="color:#f92672">.</span><span style="color:#a6e22e">printStackTrace</span><span style="color:#f92672">();</span>
+        <span style="color:#f92672">}</span><span style="color:#66d9ef">catch</span> <span style="color:#f92672">(</span>SQLException e<span style="color:#f92672">){</span>
+            e<span style="color:#f92672">.</span><span style="color:#a6e22e">printStackTrace</span><span style="color:#f92672">();</span>
+        <span style="color:#f92672">}</span><span style="color:#66d9ef">finally</span> <span style="color:#f92672">{</span>
+            <span style="color:#66d9ef">if</span><span style="color:#f92672">(</span>st<span style="color:#f92672">!=</span><span style="color:#66d9ef">null</span><span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+                <span style="color:#66d9ef">try</span> <span style="color:#f92672">{</span>
+                    st<span style="color:#f92672">.</span><span style="color:#a6e22e">close</span><span style="color:#f92672">();</span>
+                <span style="color:#f92672">}</span> <span style="color:#66d9ef">catch</span> <span style="color:#f92672">(</span>SQLException e<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+                    e<span style="color:#f92672">.</span><span style="color:#a6e22e">printStackTrace</span><span style="color:#f92672">();</span>
+                <span style="color:#f92672">}</span>
+            <span style="color:#f92672">}</span>
+            <span style="color:#66d9ef">if</span><span style="color:#f92672">(</span>conn<span style="color:#f92672">!=</span><span style="color:#66d9ef">null</span><span style="color:#f92672">){</span>
+                <span style="color:#66d9ef">try</span> <span style="color:#f92672">{</span>
+                    conn<span style="color:#f92672">.</span><span style="color:#a6e22e">close</span><span style="color:#f92672">();</span>
+                <span style="color:#f92672">}</span> <span style="color:#66d9ef">catch</span> <span style="color:#f92672">(</span>SQLException e<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+                    e<span style="color:#f92672">.</span><span style="color:#a6e22e">printStackTrace</span><span style="color:#f92672">();</span>
+                <span style="color:#f92672">}</span>
+            <span style="color:#f92672">}</span>
+        <span style="color:#f92672">}</span>
+    <span style="color:#f92672">}</span>
+<span style="color:#f92672">}</span>
+
+</code></pre></div><h5 id="heading"></h5>
+<h4 id="resultset">ResultSet</h4>
+<table>
+<thead>
+<tr>
+<th>ResultSet 接口中的方法</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>boolean next()</td>
+<td>1) 游标向下移动 1 行  <!-- raw HTML omitted -->2) 返回 boolean 类型，如果还有下一条记录，返回 true，否则返回 false</td>
+</tr>
+<tr>
+<td>数据类型 getXxx()</td>
+<td>1) 通过字段名，参数是  String 类型。返回不同的类型  <!-- raw HTML omitted -->2) 通过列号，参数是整数，从 1 开始。返回不同的类型</td>
+</tr>
+</tbody>
+</table>
+<p><img src="/img/image-20201224201807109.png" alt="image-20201224201807109"></p>
+<p>常用数据类型转换表：</p>
+<table>
+<thead>
+<tr>
+<th>SQL 类型</th>
+<th>Jdbc 对应方法</th>
+<th>返回类型</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>BIT(1) bit(n)</td>
+<td>getBoolean()</td>
+<td>boolean</td>
+</tr>
+<tr>
+<td>TINYINT</td>
+<td>getByte()</td>
+<td>byte</td>
+</tr>
+<tr>
+<td>SMALLINT</td>
+<td>getShort()</td>
+<td>short</td>
+</tr>
+<tr>
+<td>INT</td>
+<td>getInt()</td>
+<td>int</td>
+</tr>
+<tr>
+<td>BIGINT</td>
+<td>getLong()</td>
+<td>long</td>
+</tr>
+<tr>
+<td>CHAR,VARCHAR</td>
+<td>getString()</td>
+<td>String</td>
+</tr>
+<tr>
+<td>Text(Clob)  Blob</td>
+<td>getClob getBlob()</td>
+<td>Clob  Blob</td>
+</tr>
+<tr>
+<td>DATE</td>
+<td>getDate()</td>
+<td>java.sql.Date  只代表日期</td>
+</tr>
+<tr>
+<td>TIME</td>
+<td>getTime()</td>
+<td>java.sql.Time  只表示时间</td>
+</tr>
+<tr>
+<td>TIMESTAMP</td>
+<td>getTimestamp()</td>
+<td>java.sql.Timestamp  同时有日期和时间</td>
+</tr>
+</tbody>
+</table>
+<p>java.sql.Date、Time、Timestamp(时间戳)，三个共同父类是：java.util.Date</p>
+<p>需求：查询account表中所有数据</p>
+<p>步骤：</p>
+<p>​	1)  得到连接对象</p>
+<p>​	2)  得到语句对象</p>
+<p>​	3)  执行 SQL 语句得到结果集 ResultSet 对象</p>
+<p>​	4)  循环遍历取出每一条记录</p>
+<p>​	5)  输出的控制台上</p>
+<p>​	6)  释放资源</p>
+<p>结果：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="color:#f92672">package</span> com.iNuo.Demo.Demo01<span style="color:#f92672">;</span>
+
+<span style="color:#f92672">import</span> java.sql.*<span style="color:#f92672">;</span>
+
+<span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">A_JDBC1</span> <span style="color:#f92672">{</span>
+    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">main</span><span style="color:#f92672">(</span>String<span style="color:#f92672">[]</span> args<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+        Statement st<span style="color:#f92672">=</span><span style="color:#66d9ef">null</span><span style="color:#f92672">;</span>
+        Connection conn<span style="color:#f92672">=</span><span style="color:#66d9ef">null</span><span style="color:#f92672">;</span>
+        <span style="color:#66d9ef">try</span> <span style="color:#f92672">{</span>
+            <span style="color:#75715e">//1.加载mysql数据库驱动
+</span><span style="color:#75715e"></span>            Class<span style="color:#f92672">.</span><span style="color:#a6e22e">forName</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;com.mysql.cj.jdbc.Driver&#34;</span><span style="color:#f92672">);</span>
+            <span style="color:#75715e">//2.创建连接
+</span><span style="color:#75715e"></span>            conn <span style="color:#f92672">=</span> DriverManager<span style="color:#f92672">.</span><span style="color:#a6e22e">getConnection</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;jdbc:mysql://localhost:3306/test?serverTimezone=UTC&amp;useSSL=false&#34;</span><span style="color:#f92672">,</span><span style="color:#e6db74">&#34;root&#34;</span><span style="color:#f92672">,</span><span style="color:#e6db74">&#34;123456&#34;</span><span style="color:#f92672">);</span>
+            <span style="color:#75715e">//3.创建statement
+</span><span style="color:#75715e"></span>            st <span style="color:#f92672">=</span> conn<span style="color:#f92672">.</span><span style="color:#a6e22e">createStatement</span><span style="color:#f92672">();</span>
+            <span style="color:#75715e">//4.执行sql语句
+</span><span style="color:#75715e"></span>            ResultSet result <span style="color:#f92672">=</span> st<span style="color:#f92672">.</span><span style="color:#a6e22e">executeQuery</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;select * from account&#34;</span><span style="color:#f92672">);</span>
+            <span style="color:#66d9ef">while</span><span style="color:#f92672">(</span>result<span style="color:#f92672">.</span><span style="color:#a6e22e">next</span><span style="color:#f92672">())</span> <span style="color:#f92672">{</span>
+                System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">print</span><span style="color:#f92672">(</span>result<span style="color:#f92672">.</span><span style="color:#a6e22e">getInt</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;id&#34;</span><span style="color:#f92672">));</span>
+                System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">print</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;  &#34;</span><span style="color:#f92672">+</span>result<span style="color:#f92672">.</span><span style="color:#a6e22e">getString</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;name&#34;</span><span style="color:#f92672">)+</span><span style="color:#e6db74">&#34;    &#34;</span><span style="color:#f92672">);</span>
+                System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span>result<span style="color:#f92672">.</span><span style="color:#a6e22e">getDouble</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;money&#34;</span><span style="color:#f92672">));</span>
+            <span style="color:#f92672">}</span>
+
+        <span style="color:#f92672">}</span> <span style="color:#66d9ef">catch</span> <span style="color:#f92672">(</span>ClassNotFoundException e<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+            e<span style="color:#f92672">.</span><span style="color:#a6e22e">printStackTrace</span><span style="color:#f92672">();</span>
+        <span style="color:#f92672">}</span><span style="color:#66d9ef">catch</span> <span style="color:#f92672">(</span>SQLException e<span style="color:#f92672">){</span>
+            e<span style="color:#f92672">.</span><span style="color:#a6e22e">printStackTrace</span><span style="color:#f92672">();</span>
+        <span style="color:#f92672">}</span><span style="color:#66d9ef">finally</span> <span style="color:#f92672">{</span>
+            <span style="color:#66d9ef">if</span><span style="color:#f92672">(</span>st<span style="color:#f92672">!=</span><span style="color:#66d9ef">null</span><span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+                <span style="color:#66d9ef">try</span> <span style="color:#f92672">{</span>
+                    st<span style="color:#f92672">.</span><span style="color:#a6e22e">close</span><span style="color:#f92672">();</span>
+                <span style="color:#f92672">}</span> <span style="color:#66d9ef">catch</span> <span style="color:#f92672">(</span>SQLException e<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+                    e<span style="color:#f92672">.</span><span style="color:#a6e22e">printStackTrace</span><span style="color:#f92672">();</span>
+                <span style="color:#f92672">}</span>
+            <span style="color:#f92672">}</span>
+            <span style="color:#66d9ef">if</span><span style="color:#f92672">(</span>conn<span style="color:#f92672">!=</span><span style="color:#66d9ef">null</span><span style="color:#f92672">){</span>
+                <span style="color:#66d9ef">try</span> <span style="color:#f92672">{</span>
+                    conn<span style="color:#f92672">.</span><span style="color:#a6e22e">close</span><span style="color:#f92672">();</span>
+                <span style="color:#f92672">}</span> <span style="color:#66d9ef">catch</span> <span style="color:#f92672">(</span>SQLException e<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+                    e<span style="color:#f92672">.</span><span style="color:#a6e22e">printStackTrace</span><span style="color:#f92672">();</span>
+                <span style="color:#f92672">}</span>
+            <span style="color:#f92672">}</span>
+        <span style="color:#f92672">}</span>
+    <span style="color:#f92672">}</span>
+<span style="color:#f92672">}</span>
+
+</code></pre></div><h5 id="案例查询account表中所有的数据并封装到list集合中">案例：查询account表中所有的数据并封装到list集合中：</h5>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="color:#f92672">package</span> com.iNuo.Demo.Demo01<span style="color:#f92672">;</span>
+
+<span style="color:#f92672">import</span> java.sql.*<span style="color:#f92672">;</span>
+<span style="color:#f92672">import</span> java.util.ArrayList<span style="color:#f92672">;</span>
+<span style="color:#f92672">import</span> java.util.List<span style="color:#f92672">;</span>
+
+<span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">B_JDBC</span> <span style="color:#f92672">{</span>
+    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">main</span><span style="color:#f92672">(</span>String<span style="color:#f92672">[]</span> args<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+
+        Connection conn<span style="color:#f92672">=</span><span style="color:#66d9ef">null</span><span style="color:#f92672">;</span>
+        Statement st<span style="color:#f92672">=</span><span style="color:#66d9ef">null</span><span style="color:#f92672">;</span>
+        ResultSet rs<span style="color:#f92672">=</span><span style="color:#66d9ef">null</span><span style="color:#f92672">;</span>
+
+        <span style="color:#66d9ef">try</span> <span style="color:#f92672">{</span>
+            <span style="color:#75715e">//1.加载驱动
+</span><span style="color:#75715e"></span>            Class<span style="color:#f92672">.</span><span style="color:#a6e22e">forName</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;com.mysql.cj.jdbc.Driver&#34;</span><span style="color:#f92672">);</span>
+            <span style="color:#75715e">//2.创建连接
+</span><span style="color:#75715e"></span>            conn <span style="color:#f92672">=</span> DriverManager<span style="color:#f92672">.</span><span style="color:#a6e22e">getConnection</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;jdbc:mysql:///test?serverTimezone=UTC&amp;useSSL=false&#34;</span><span style="color:#f92672">,</span><span style="color:#e6db74">&#34;root&#34;</span><span style="color:#f92672">,</span><span style="color:#e6db74">&#34;123456&#34;</span><span style="color:#f92672">);</span>
+            <span style="color:#75715e">//3.创建statement
+</span><span style="color:#75715e"></span>            st <span style="color:#f92672">=</span> conn<span style="color:#f92672">.</span><span style="color:#a6e22e">createStatement</span><span style="color:#f92672">();</span>
+            <span style="color:#75715e">//4.执行sql语句
+</span><span style="color:#75715e"></span>            rs <span style="color:#f92672">=</span> st<span style="color:#f92672">.</span><span style="color:#a6e22e">executeQuery</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;select * from account&#34;</span><span style="color:#f92672">);</span>
+            <span style="color:#75715e">//5.创建list集合
+</span><span style="color:#75715e"></span>            List<span style="color:#f92672">&lt;</span>B_Account<span style="color:#f92672">&gt;</span> lst <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> ArrayList<span style="color:#f92672">&lt;</span>B_Account<span style="color:#f92672">&gt;();</span>
+            <span style="color:#75715e">//6.将rs里面的数据封装到lst
+</span><span style="color:#75715e"></span>            <span style="color:#66d9ef">while</span><span style="color:#f92672">(</span>rs<span style="color:#f92672">.</span><span style="color:#a6e22e">next</span><span style="color:#f92672">()){</span>
+                B_Account a <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> B_Account<span style="color:#f92672">();</span>
+                a<span style="color:#f92672">.</span><span style="color:#a6e22e">setId</span><span style="color:#f92672">(</span>rs<span style="color:#f92672">.</span><span style="color:#a6e22e">getInt</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;id&#34;</span><span style="color:#f92672">));</span>
+                a<span style="color:#f92672">.</span><span style="color:#a6e22e">setName</span><span style="color:#f92672">(</span>rs<span style="color:#f92672">.</span><span style="color:#a6e22e">getString</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;name&#34;</span><span style="color:#f92672">));</span>
+                a<span style="color:#f92672">.</span><span style="color:#a6e22e">setMoney</span><span style="color:#f92672">(</span>rs<span style="color:#f92672">.</span><span style="color:#a6e22e">getDouble</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;money&#34;</span><span style="color:#f92672">));</span>
+                lst<span style="color:#f92672">.</span><span style="color:#a6e22e">add</span><span style="color:#f92672">(</span>a<span style="color:#f92672">);</span>
+            <span style="color:#f92672">}</span>
+            System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span>lst<span style="color:#f92672">.</span><span style="color:#a6e22e">toString</span><span style="color:#f92672">());</span>
+
+        <span style="color:#f92672">}</span> <span style="color:#66d9ef">catch</span> <span style="color:#f92672">(</span>ClassNotFoundException e<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+            e<span style="color:#f92672">.</span><span style="color:#a6e22e">printStackTrace</span><span style="color:#f92672">();</span>
+        <span style="color:#f92672">}</span><span style="color:#66d9ef">catch</span> <span style="color:#f92672">(</span>SQLException e<span style="color:#f92672">){</span>
+            e<span style="color:#f92672">.</span><span style="color:#a6e22e">printStackTrace</span><span style="color:#f92672">();</span>
+        <span style="color:#f92672">}</span><span style="color:#66d9ef">finally</span> <span style="color:#f92672">{</span>
+            <span style="color:#66d9ef">if</span><span style="color:#f92672">(</span>rs<span style="color:#f92672">!=</span><span style="color:#66d9ef">null</span><span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+                <span style="color:#66d9ef">try</span> <span style="color:#f92672">{</span>
+                    rs<span style="color:#f92672">.</span><span style="color:#a6e22e">close</span><span style="color:#f92672">();</span>
+                <span style="color:#f92672">}</span> <span style="color:#66d9ef">catch</span> <span style="color:#f92672">(</span>SQLException e<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+                    e<span style="color:#f92672">.</span><span style="color:#a6e22e">printStackTrace</span><span style="color:#f92672">();</span>
+                <span style="color:#f92672">}</span>
+            <span style="color:#f92672">}</span>
+            <span style="color:#66d9ef">if</span><span style="color:#f92672">(</span>st<span style="color:#f92672">!=</span><span style="color:#66d9ef">null</span><span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+                <span style="color:#66d9ef">try</span> <span style="color:#f92672">{</span>
+                    st<span style="color:#f92672">.</span><span style="color:#a6e22e">close</span><span style="color:#f92672">();</span>
+                <span style="color:#f92672">}</span> <span style="color:#66d9ef">catch</span> <span style="color:#f92672">(</span>SQLException e<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+                    e<span style="color:#f92672">.</span><span style="color:#a6e22e">printStackTrace</span><span style="color:#f92672">();</span>
+                <span style="color:#f92672">}</span>
+            <span style="color:#f92672">}</span>
+            <span style="color:#66d9ef">if</span><span style="color:#f92672">(</span>conn<span style="color:#f92672">!=</span><span style="color:#66d9ef">null</span><span style="color:#f92672">){</span>
+                <span style="color:#66d9ef">try</span> <span style="color:#f92672">{</span>
+                    conn<span style="color:#f92672">.</span><span style="color:#a6e22e">close</span><span style="color:#f92672">();</span>
+                <span style="color:#f92672">}</span> <span style="color:#66d9ef">catch</span> <span style="color:#f92672">(</span>SQLException e<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+                    e<span style="color:#f92672">.</span><span style="color:#a6e22e">printStackTrace</span><span style="color:#f92672">();</span>
+                <span style="color:#f92672">}</span>
+            <span style="color:#f92672">}</span>
+        <span style="color:#f92672">}</span>
+    <span style="color:#f92672">}</span>
+<span style="color:#f92672">}</span>
+
+</code></pre></div><p>关于 ResultSet 接口中的注意事项：</p>
+<p>​	1)      如果光标在第一行之前，使用 rs.getXX()获取列值，报错：Before start of result set</p>
+<p>​	2)      如果光标在最后一行之后，使用 rs.getXX()获取列值，报错：After end of result set</p>
+<p>​	3)      使用完毕以后要关闭结果集 ResultSet，再关闭     Statement，再关闭 Connection</p>
+<h4 id="16-数据库工具类-jdbcutils">1.6 数据库工具类 JdbcUtils</h4>
+<p>什么时候自己创建工具类？</p>
+<p>如果一个功能经常要用到，我们建议把这个功能做成一个工具类，可以在不同的地方重用。</p>
+<h5 id="需求">需求：</h5>
+<p>上面写的代码中出现了很多重复的代码，可以把这些公共代码抽取出来。</p>
+<h5 id="创建类-jdbcutil-包含-3-个方法">创建类 JdbcUtil 包含 3 个方法：</h5>
+<p>​	1)  可以把几个字符串定义成常量：用户名，密码，URL，驱动类</p>
+<p>​	2)  得到数据库的连接：getConnection()</p>
+<p>​	3)  关闭所有打开的资源：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-mysql" data-lang="mysql"><span style="color:#a6e22e">close</span>(Connection conn, Statement stmt)
+<span style="color:#a6e22e">close</span>(Connection conn, Statement stmt, ResultSet rs)
+</code></pre></div><p>访问数据库的工具类：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="color:#f92672">package</span> com.iNuo.Demo.Demo01<span style="color:#f92672">;</span>
+
+<span style="color:#f92672">import</span> java.sql.*<span style="color:#f92672">;</span>
+
+<span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">C_JdbcUtil</span> <span style="color:#f92672">{</span>
+
+    <span style="color:#66d9ef">static</span><span style="color:#f92672">{</span>
+        <span style="color:#66d9ef">try</span> <span style="color:#f92672">{</span>
+            Class<span style="color:#f92672">.</span><span style="color:#a6e22e">forName</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;com.mysql.cj.jdbc.Driver&#34;</span><span style="color:#f92672">);</span>
+        <span style="color:#f92672">}</span> <span style="color:#66d9ef">catch</span> <span style="color:#f92672">(</span>ClassNotFoundException e<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+            e<span style="color:#f92672">.</span><span style="color:#a6e22e">printStackTrace</span><span style="color:#f92672">();</span>
+        <span style="color:#f92672">}</span>
+    <span style="color:#f92672">}</span>
+
+
+    <span style="color:#66d9ef">private</span> <span style="color:#66d9ef">static</span> String url<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;jdbc:mysql:///test?serverTimezone=UTC&amp;useSSL=false&#34;</span><span style="color:#f92672">;</span>
+    <span style="color:#66d9ef">private</span> <span style="color:#66d9ef">static</span> String user<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;root&#34;</span><span style="color:#f92672">;</span>
+    <span style="color:#66d9ef">private</span> <span style="color:#66d9ef">static</span> String password<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;123456&#34;</span><span style="color:#f92672">;</span>
+
+    <span style="color:#75715e">// 获取连接对象
+</span><span style="color:#75715e"></span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> Connection <span style="color:#a6e22e">getConn</span><span style="color:#f92672">()</span> <span style="color:#66d9ef">throws</span> SQLException <span style="color:#f92672">{</span>
+        <span style="color:#66d9ef">return</span> DriverManager<span style="color:#f92672">.</span><span style="color:#a6e22e">getConnection</span><span style="color:#f92672">(</span>url<span style="color:#f92672">,</span>user<span style="color:#f92672">,</span>password<span style="color:#f92672">);</span>
+    <span style="color:#f92672">}</span>
+
+
+    <span style="color:#75715e">// 关闭资源
+</span><span style="color:#75715e"></span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">close</span><span style="color:#f92672">(</span>Statement st<span style="color:#f92672">,</span> Connection conn<span style="color:#f92672">){</span>
+        <span style="color:#66d9ef">if</span><span style="color:#f92672">(</span>st<span style="color:#f92672">!=</span><span style="color:#66d9ef">null</span><span style="color:#f92672">){</span>
+            <span style="color:#66d9ef">try</span> <span style="color:#f92672">{</span>
+                st<span style="color:#f92672">.</span><span style="color:#a6e22e">close</span><span style="color:#f92672">();</span>
+            <span style="color:#f92672">}</span> <span style="color:#66d9ef">catch</span> <span style="color:#f92672">(</span>SQLException e<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+                e<span style="color:#f92672">.</span><span style="color:#a6e22e">printStackTrace</span><span style="color:#f92672">();</span>
+            <span style="color:#f92672">}</span>
+        <span style="color:#f92672">}</span>
+        <span style="color:#66d9ef">if</span><span style="color:#f92672">(</span>conn<span style="color:#f92672">!=</span><span style="color:#66d9ef">null</span><span style="color:#f92672">){</span>
+            <span style="color:#66d9ef">try</span> <span style="color:#f92672">{</span>
+                conn<span style="color:#f92672">.</span><span style="color:#a6e22e">close</span><span style="color:#f92672">();</span>
+            <span style="color:#f92672">}</span> <span style="color:#66d9ef">catch</span> <span style="color:#f92672">(</span>SQLException e<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+                e<span style="color:#f92672">.</span><span style="color:#a6e22e">printStackTrace</span><span style="color:#f92672">();</span>
+            <span style="color:#f92672">}</span>
+        <span style="color:#f92672">}</span>
+    <span style="color:#f92672">}</span>
+
+    <span style="color:#75715e">// 重写关闭资源
+</span><span style="color:#75715e"></span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">close</span><span style="color:#f92672">(</span>Statement st<span style="color:#f92672">,</span> Connection conn<span style="color:#f92672">,</span> ResultSet rs<span style="color:#f92672">){</span>
+        close<span style="color:#f92672">(</span>st<span style="color:#f92672">,</span>conn<span style="color:#f92672">);</span>
+        <span style="color:#66d9ef">if</span><span style="color:#f92672">(</span>rs<span style="color:#f92672">!=</span><span style="color:#66d9ef">null</span><span style="color:#f92672">){</span>
+            <span style="color:#66d9ef">try</span> <span style="color:#f92672">{</span>
+                rs<span style="color:#f92672">.</span><span style="color:#a6e22e">close</span><span style="color:#f92672">();</span>
+            <span style="color:#f92672">}</span> <span style="color:#66d9ef">catch</span> <span style="color:#f92672">(</span>SQLException e<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+                e<span style="color:#f92672">.</span><span style="color:#a6e22e">printStackTrace</span><span style="color:#f92672">();</span>
+            <span style="color:#f92672">}</span>
+        <span style="color:#f92672">}</span>
+
+    <span style="color:#f92672">}</span>
+<span style="color:#f92672">}</span>
+
+</code></pre></div><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="color:#f92672">package</span> com.iNuo.Demo.Demo01<span style="color:#f92672">;</span>
+
+<span style="color:#f92672">import</span> java.sql.*<span style="color:#f92672">;</span>
+<span style="color:#f92672">import</span> java.util.ArrayList<span style="color:#f92672">;</span>
+<span style="color:#f92672">import</span> java.util.List<span style="color:#f92672">;</span>
+
+<span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">C_JDBC</span> <span style="color:#f92672">{</span>
+    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">main</span><span style="color:#f92672">(</span>String<span style="color:#f92672">[]</span> args<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+        Connection conn<span style="color:#f92672">=</span><span style="color:#66d9ef">null</span><span style="color:#f92672">;</span>
+        Statement st<span style="color:#f92672">=</span><span style="color:#66d9ef">null</span><span style="color:#f92672">;</span>
+        ResultSet rs<span style="color:#f92672">=</span><span style="color:#66d9ef">null</span><span style="color:#f92672">;</span>
+
+        <span style="color:#66d9ef">try</span> <span style="color:#f92672">{</span>
+
+            <span style="color:#75715e">//2.创建连接
+</span><span style="color:#75715e"></span>            conn <span style="color:#f92672">=</span> C_JdbcUtil<span style="color:#f92672">.</span><span style="color:#a6e22e">getConn</span><span style="color:#f92672">();</span>
+            <span style="color:#75715e">//3.创建statement
+</span><span style="color:#75715e"></span>            st <span style="color:#f92672">=</span> conn<span style="color:#f92672">.</span><span style="color:#a6e22e">createStatement</span><span style="color:#f92672">();</span>
+            <span style="color:#75715e">//4.执行sql语句
+</span><span style="color:#75715e"></span>            rs <span style="color:#f92672">=</span> st<span style="color:#f92672">.</span><span style="color:#a6e22e">executeQuery</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;select * from account&#34;</span><span style="color:#f92672">);</span>
+            <span style="color:#75715e">//5.创建list集合
+</span><span style="color:#75715e"></span>            List<span style="color:#f92672">&lt;</span>B_Account<span style="color:#f92672">&gt;</span> lst <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> ArrayList<span style="color:#f92672">&lt;</span>B_Account<span style="color:#f92672">&gt;();</span>
+            <span style="color:#75715e">//6.将rs里面的数据封装到lst
+</span><span style="color:#75715e"></span>            <span style="color:#66d9ef">while</span><span style="color:#f92672">(</span>rs<span style="color:#f92672">.</span><span style="color:#a6e22e">next</span><span style="color:#f92672">()){</span>
+                B_Account a <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> B_Account<span style="color:#f92672">();</span>
+                a<span style="color:#f92672">.</span><span style="color:#a6e22e">setId</span><span style="color:#f92672">(</span>rs<span style="color:#f92672">.</span><span style="color:#a6e22e">getInt</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;id&#34;</span><span style="color:#f92672">));</span>
+                a<span style="color:#f92672">.</span><span style="color:#a6e22e">setName</span><span style="color:#f92672">(</span>rs<span style="color:#f92672">.</span><span style="color:#a6e22e">getString</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;name&#34;</span><span style="color:#f92672">));</span>
+                a<span style="color:#f92672">.</span><span style="color:#a6e22e">setMoney</span><span style="color:#f92672">(</span>rs<span style="color:#f92672">.</span><span style="color:#a6e22e">getDouble</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;money&#34;</span><span style="color:#f92672">));</span>
+                lst<span style="color:#f92672">.</span><span style="color:#a6e22e">add</span><span style="color:#f92672">(</span>a<span style="color:#f92672">);</span>
+            <span style="color:#f92672">}</span>
+            System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span>lst<span style="color:#f92672">.</span><span style="color:#a6e22e">toString</span><span style="color:#f92672">());</span>
+
+        <span style="color:#f92672">}</span><span style="color:#66d9ef">catch</span> <span style="color:#f92672">(</span>SQLException e<span style="color:#f92672">){</span>
+            e<span style="color:#f92672">.</span><span style="color:#a6e22e">printStackTrace</span><span style="color:#f92672">();</span>
+        <span style="color:#f92672">}</span><span style="color:#66d9ef">finally</span> <span style="color:#f92672">{</span>
+            C_JdbcUtil<span style="color:#f92672">.</span><span style="color:#a6e22e">close</span><span style="color:#f92672">(</span>rs<span style="color:#f92672">,</span>st<span style="color:#f92672">,</span>conn<span style="color:#f92672">);</span>
+        <span style="color:#f92672">}</span>
+    <span style="color:#f92672">}</span>
+<span style="color:#f92672">}</span>
+
+</code></pre></div><h5 id="案例用户登陆">案例：用户登陆</h5>
+<p>需求：</p>
+<p>​	1)   有一张用户表</p>
+<p>​	2)   添加几条用户记录</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-mysql" data-lang="mysql"><span style="color:#66d9ef">create</span> <span style="color:#66d9ef">table</span> <span style="color:#66d9ef">user</span> (     
+	id <span style="color:#66d9ef">int</span> <span style="color:#66d9ef">primary</span> <span style="color:#66d9ef">key</span> <span style="color:#66d9ef">auto_increment</span>, 
+	name <span style="color:#66d9ef">varchar</span>(<span style="color:#ae81ff">20</span>),     
+	password <span style="color:#66d9ef">varchar</span>(<span style="color:#ae81ff">20</span>)     
+)           
+<span style="color:#66d9ef">insert</span> <span style="color:#66d9ef">into</span> <span style="color:#66d9ef">user</span> <span style="color:#66d9ef">values</span> (<span style="color:#66d9ef">null</span>,<span style="color:#e6db74">&#39;jack&#39;</span>,<span style="color:#e6db74">&#39;123&#39;</span>),(<span style="color:#66d9ef">null</span>,<span style="color:#e6db74">&#39;rose&#39;</span>,<span style="color:#e6db74">&#39;456&#39;</span>);  
+
+<span style="color:#75715e">-- 登录, SQL 中大小写不敏感     
+</span><span style="color:#75715e"></span><span style="color:#66d9ef">select</span> <span style="color:#f92672">*</span> <span style="color:#66d9ef">from</span> <span style="color:#66d9ef">user</span> <span style="color:#66d9ef">where</span> name<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;JACK&#39;</span> <span style="color:#66d9ef">and</span> password<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;123&#39;</span>;    
+
+<span style="color:#75715e">-- 登录失败     
+</span><span style="color:#75715e"></span><span style="color:#66d9ef">select</span> <span style="color:#f92672">*</span> <span style="color:#66d9ef">from</span> <span style="color:#66d9ef">user</span> <span style="color:#66d9ef">where</span> name<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;JACK&#39;</span> <span style="color:#66d9ef">and</span> password<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;333&#39;</span>;                 
+</code></pre></div><p>​	3)   使用 Statement 字符串拼接的方式实现用户的登录, 用户在控制台上输入用户名和密码。</p>
+<p>步骤：</p>
+<p>​	1)  得到用户从控制台上输入的用户名和密码来查询数据库</p>
+<p>​	2)  写一个登录的方法</p>
+<p>​		a)   通过工具类得到连接</p>
+<p>​		b)   创建语句对象，使用拼接字符串的方式生成 SQL 语句</p>
+<p>​		c)   查询数据库，如果有记录则表示登录成功，否则登录失败</p>
+<p>​		d)   释放资源</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="color:#f92672">package</span> com.iNuo.Demo.Demo01<span style="color:#f92672">;</span>
+
+<span style="color:#f92672">import</span> java.sql.*<span style="color:#f92672">;</span>
+<span style="color:#f92672">import</span> java.util.Scanner<span style="color:#f92672">;</span>
+
+<span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">D_Login</span> <span style="color:#f92672">{</span>
+    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">main</span><span style="color:#f92672">(</span>String<span style="color:#f92672">[]</span> args<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+
+        Scanner sc <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> Scanner<span style="color:#f92672">(</span>System<span style="color:#f92672">.</span><span style="color:#a6e22e">in</span><span style="color:#f92672">);</span>
+        System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">printf</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;请输入用户名:&#34;</span><span style="color:#f92672">);</span>
+        String name <span style="color:#f92672">=</span> sc<span style="color:#f92672">.</span><span style="color:#a6e22e">nextLine</span><span style="color:#f92672">();</span>
+        System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">printf</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;请输入密码:&#34;</span><span style="color:#f92672">);</span>
+        String password <span style="color:#f92672">=</span> sc<span style="color:#f92672">.</span><span style="color:#a6e22e">nextLine</span><span style="color:#f92672">();</span>
+
+        <span style="color:#75715e">// 登录
+</span><span style="color:#75715e"></span>        login<span style="color:#f92672">(</span>name<span style="color:#f92672">,</span>password<span style="color:#f92672">);</span>
+    <span style="color:#f92672">}</span>
+
+    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">login</span><span style="color:#f92672">(</span>String name<span style="color:#f92672">,</span>String password<span style="color:#f92672">){</span>
+
+        Connection conn<span style="color:#f92672">=</span><span style="color:#66d9ef">null</span><span style="color:#f92672">;</span>
+        Statement st<span style="color:#f92672">=</span><span style="color:#66d9ef">null</span><span style="color:#f92672">;</span>
+        ResultSet rs<span style="color:#f92672">=</span><span style="color:#66d9ef">null</span><span style="color:#f92672">;</span>
+
+
+        <span style="color:#66d9ef">try</span> <span style="color:#f92672">{</span>
+            <span style="color:#75715e">//1.获取连接对象
+</span><span style="color:#75715e"></span>            conn <span style="color:#f92672">=</span> C_JdbcUtil<span style="color:#f92672">.</span><span style="color:#a6e22e">getConn</span><span style="color:#f92672">();</span>
+            <span style="color:#75715e">//2.创建Statement对象
+</span><span style="color:#75715e"></span>            st <span style="color:#f92672">=</span> conn<span style="color:#f92672">.</span><span style="color:#a6e22e">createStatement</span><span style="color:#f92672">();</span>
+            <span style="color:#75715e">//3.执行sql语句
+</span><span style="color:#75715e"></span>            String sql <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;SELECT * FROM USER WHERE NAME=&#39;&#34;</span><span style="color:#f92672">+</span>name<span style="color:#f92672">+</span><span style="color:#e6db74">&#34;&#39; AND PASSWORD =&#39;&#34;</span><span style="color:#f92672">+</span>password<span style="color:#f92672">+</span><span style="color:#e6db74">&#34;&#39; &#34;</span><span style="color:#f92672">;</span>
+            System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">printf</span><span style="color:#f92672">(</span>sql<span style="color:#f92672">);</span>
+            rs <span style="color:#f92672">=</span> st<span style="color:#f92672">.</span><span style="color:#a6e22e">executeQuery</span><span style="color:#f92672">(</span>sql<span style="color:#f92672">);</span>
+
+            <span style="color:#75715e">//如果查询出来结果，说明登录成功
+</span><span style="color:#75715e"></span>            <span style="color:#66d9ef">if</span><span style="color:#f92672">(</span>rs<span style="color:#f92672">.</span><span style="color:#a6e22e">next</span><span style="color:#f92672">()){</span>
+                System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">printf</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;登录成功！&#34;</span><span style="color:#f92672">);</span>
+            <span style="color:#f92672">}</span><span style="color:#66d9ef">else</span><span style="color:#f92672">{</span>
+                System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">printf</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;登录失败！&#34;</span><span style="color:#f92672">);</span>
+            <span style="color:#f92672">}</span>
+        <span style="color:#f92672">}</span> <span style="color:#66d9ef">catch</span> <span style="color:#f92672">(</span>SQLException e<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+            e<span style="color:#f92672">.</span><span style="color:#a6e22e">printStackTrace</span><span style="color:#f92672">();</span>
+        <span style="color:#f92672">}</span><span style="color:#66d9ef">finally</span> <span style="color:#f92672">{</span>
+            C_JdbcUtil<span style="color:#f92672">.</span><span style="color:#a6e22e">close</span><span style="color:#f92672">(</span>rs<span style="color:#f92672">,</span>st<span style="color:#f92672">,</span>conn<span style="color:#f92672">);</span>
+        <span style="color:#f92672">}</span>
+    <span style="color:#f92672">}</span>
+<span style="color:#f92672">}</span>
+
+</code></pre></div><h5 id="sql-注入问题">SQL 注入问题</h5>
+<p>当我们输入以下密码，我们发现我们账号和密码都不对竟然登录成功了</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java">请输入用户名<span style="color:#960050;background-color:#1e0010">：</span>newboy     
+请输入密码<span style="color:#960050;background-color:#1e0010">：</span>a<span style="color:#960050;background-color:#1e0010">&#39;</span> or <span style="color:#e6db74">&#39;1&#39;</span><span style="color:#f92672">=</span><span style="color:#960050;background-color:#1e0010">&#39;</span>1     
+
+<span style="color:#75715e">// 则对应的查询SQL语句为：
+</span><span style="color:#75715e"></span>select <span style="color:#f92672">*</span> from user where name<span style="color:#f92672">=</span><span style="color:#960050;background-color:#1e0010">&#39;</span>newboy<span style="color:#960050;background-color:#1e0010">&#39;</span> and password<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;a&#39;</span> or <span style="color:#e6db74">&#39;1&#39;</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#39;1&#39;</span>     
+登录成功<span style="color:#960050;background-color:#1e0010">，</span>欢迎您<span style="color:#960050;background-color:#1e0010">：</span>newboy 
+</code></pre></div><p>​          问题分析：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"> select <span style="color:#f92672">*</span> from user where name<span style="color:#f92672">=</span><span style="color:#960050;background-color:#1e0010">&#39;</span>newboy<span style="color:#960050;background-color:#1e0010">&#39;</span> and password<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;a&#39;</span> or <span style="color:#e6db74">&#39;1&#39;</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#39;1&#39;</span> 
+ 
+ name<span style="color:#f92672">=</span><span style="color:#960050;background-color:#1e0010">&#39;</span>newboy<span style="color:#960050;background-color:#1e0010">&#39;</span> and password<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;a&#39;</span> <span style="color:#75715e">//【False】     
+</span><span style="color:#75715e"></span> <span style="color:#e6db74">&#39;1&#39;</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#39;1&#39;</span> <span style="color:#75715e">//【True】     
+</span><span style="color:#75715e"></span> 
+ <span style="color:#75715e">//相当于：     
+</span><span style="color:#75715e"></span> select <span style="color:#f92672">*</span> from user where <span style="color:#66d9ef">true</span><span style="color:#f92672">;</span> <span style="color:#75715e">//也就是查询了所有记录  
+</span></code></pre></div><p>我们让用户输入的密码和 SQL 语句进行字符串拼接。用户输入的内容作为了 SQL 语句语法的一部分，改变了原有 SQL 真正的意义，以上问题称为 SQL 注入。要解决 SQL 注入就不能让用户输入的密码和我们的 SQL 语句进行简单的字符串拼接。</p>
+<h4 id="17-preparedstatement-接口">1.7 PreparedStatement 接口</h4>
+<h5 id="继承结构与作用">继承结构与作用：</h5>
+<p>PreparedStatement 是 Statement 接口的子接口，继承于父接口中所有的方法。它是一个预编译的 SQL 语句</p>
+<h5 id="preparedsatement-的执行原理">PreparedSatement 的执行原理</h5>
+<p><img src="/img/image-20201224202721998.png" alt="image-20201224202721998"></p>
+<p>​	1)  因为有预先编译的功能，提高 SQL 的执行效率。</p>
+<p>​	2)  可以有效的防止 SQL 注入的问题，安全性更高。</p>
+<h5 id="connection-创建-preparedstatement-对象">Connection 创建 PreparedStatement 对象</h5>
+<table>
+<thead>
+<tr>
+<th>Connection 接口中的方法</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>PreparedStatement prepareStatement(String sql)</td>
+<td>指定预编译的 SQL 语句，SQL 语句中使用占位符?  创建一个语句对象</td>
+</tr>
+</tbody>
+</table>
+<h5 id="preparedstatement-接口中的方法">PreparedStatement 接口中的方法：</h5>
+<table>
+<thead>
+<tr>
+<th>PreparedStatement 接口中的方法</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>int executeUpdate()</td>
+<td>执行 DML，增删改的操作，返回影响的行数。</td>
+</tr>
+<tr>
+<td>ResultSet  executeQuery()</td>
+<td>执行 DQL，查询的操作，返回结果集</td>
+</tr>
+</tbody>
+</table>
+<h5 id="preparedsatement-的好处">PreparedSatement 的好处</h5>
+<ol>
+<li>
+<p>prepareStatement()会先将 SQL 语句发送给数据库预编译。PreparedStatement 会引用着预编译后的结果。可以多次传入不同的参数给 PreparedStatement 对象并执行。减少 SQL 编译次数，提高效率。</p>
+</li>
+<li>
+<p>安全性更高，没有 SQL 注入的隐患。</p>
+</li>
+<li>
+<p>提高了程序的可读性</p>
+</li>
+</ol>
+<h5 id="使用-preparedstatement-的步骤">使用 PreparedStatement 的步骤：</h5>
+<p>​	1)  编写 SQL 语句，未知内容使用?占位：&ldquo;SELECT * FROM user WHERE name=? AND password=?&quot;;</p>
+<p>​	2)  获得 PreparedStatement 对象</p>
+<p>​	3)  设置实际参数：setXxx(占位符的位置, 真实的值)</p>
+<p>​	4)  执行参数化 SQL 语句</p>
+<p>​	5)  关闭资源</p>
+<table>
+<thead>
+<tr>
+<th>PreparedStatement 中设置参数的方法</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>void setDouble(int parameterIndex, double x)</td>
+<td>将指定参数设置为给定  Java double 值。</td>
+</tr>
+<tr>
+<td>void  setFloat(int parameterIndex, float x)</td>
+<td>将指定参数设置为给定 Java REAL 值。</td>
+</tr>
+<tr>
+<td>void setInt(int parameterIndex, int x)</td>
+<td>将指定参数设置为给定  Java int 值。</td>
+</tr>
+<tr>
+<td>void  setLong(int parameterIndex, long x)</td>
+<td>将指定参数设置为给定 Java long 值。</td>
+</tr>
+<tr>
+<td>void setObject(int parameterIndex, Object x)</td>
+<td>使用给定对象设置指定参数的值。</td>
+</tr>
+<tr>
+<td>void  setString(int parameterIndex, String x)</td>
+<td>将指定参数设置为给定 Java String 值。</td>
+</tr>
+</tbody>
+</table>
+<p>使用 PreparedStatement 改写上面的登录程序，看有没有 SQL 注入的情况</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="color:#f92672">package</span> com.iNuo.Demo.Demo01<span style="color:#f92672">;</span>
+
+<span style="color:#f92672">import</span> java.sql.*<span style="color:#f92672">;</span>
+<span style="color:#f92672">import</span> java.util.Scanner<span style="color:#f92672">;</span>
+
+<span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">E_Login</span> <span style="color:#f92672">{</span>
+    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">main</span><span style="color:#f92672">(</span>String<span style="color:#f92672">[]</span> args<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+
+        Scanner sc <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> Scanner<span style="color:#f92672">(</span>System<span style="color:#f92672">.</span><span style="color:#a6e22e">in</span><span style="color:#f92672">);</span>
+        System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">printf</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;请输入用户名:&#34;</span><span style="color:#f92672">);</span>
+        String name <span style="color:#f92672">=</span> sc<span style="color:#f92672">.</span><span style="color:#a6e22e">nextLine</span><span style="color:#f92672">();</span>
+        System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">printf</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;请输入密码:&#34;</span><span style="color:#f92672">);</span>
+        String password <span style="color:#f92672">=</span> sc<span style="color:#f92672">.</span><span style="color:#a6e22e">nextLine</span><span style="color:#f92672">();</span>
+
+        <span style="color:#75715e">// 登录
+</span><span style="color:#75715e"></span>        login<span style="color:#f92672">(</span>name<span style="color:#f92672">,</span>password<span style="color:#f92672">);</span>
+    <span style="color:#f92672">}</span>
+
+    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">login</span><span style="color:#f92672">(</span>String name<span style="color:#f92672">,</span>String password<span style="color:#f92672">){</span>
+
+        Connection conn<span style="color:#f92672">=</span><span style="color:#66d9ef">null</span><span style="color:#f92672">;</span>
+        PreparedStatement st<span style="color:#f92672">=</span><span style="color:#66d9ef">null</span><span style="color:#f92672">;</span>
+        ResultSet rs<span style="color:#f92672">=</span><span style="color:#66d9ef">null</span><span style="color:#f92672">;</span>
+
+
+        <span style="color:#66d9ef">try</span> <span style="color:#f92672">{</span>
+            <span style="color:#75715e">//1.获取连接对象
+</span><span style="color:#75715e"></span>            conn <span style="color:#f92672">=</span> C_JdbcUtil<span style="color:#f92672">.</span><span style="color:#a6e22e">getConn</span><span style="color:#f92672">();</span>
+            <span style="color:#75715e">//2.创建sql语句
+</span><span style="color:#75715e"></span>            String sql <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;SELECT * FROM USER WHERE NAME=? AND PASSWORD=?&#34;</span><span style="color:#f92672">;</span>
+            <span style="color:#75715e">//3.创建prepareStatement对象
+</span><span style="color:#75715e"></span>            st <span style="color:#f92672">=</span> conn<span style="color:#f92672">.</span><span style="color:#a6e22e">prepareStatement</span><span style="color:#f92672">(</span>sql<span style="color:#f92672">);</span>
+            <span style="color:#75715e">//4.设置参数
+</span><span style="color:#75715e"></span>            st<span style="color:#f92672">.</span><span style="color:#a6e22e">setString</span><span style="color:#f92672">(</span>1<span style="color:#f92672">,</span>name<span style="color:#f92672">);</span>
+            st<span style="color:#f92672">.</span><span style="color:#a6e22e">setString</span><span style="color:#f92672">(</span>2<span style="color:#f92672">,</span>password<span style="color:#f92672">);</span>
+            <span style="color:#75715e">//5.执行sql语句
+</span><span style="color:#75715e"></span>            rs <span style="color:#f92672">=</span> st<span style="color:#f92672">.</span><span style="color:#a6e22e">executeQuery</span><span style="color:#f92672">();</span>
+
+            <span style="color:#75715e">//如果查询出来结果，说明登录成功
+</span><span style="color:#75715e"></span>            <span style="color:#66d9ef">if</span><span style="color:#f92672">(</span>rs<span style="color:#f92672">.</span><span style="color:#a6e22e">next</span><span style="color:#f92672">()){</span>
+                System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">printf</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;登录成功！&#34;</span><span style="color:#f92672">);</span>
+            <span style="color:#f92672">}</span><span style="color:#66d9ef">else</span><span style="color:#f92672">{</span>
+                System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">printf</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;登录失败！&#34;</span><span style="color:#f92672">);</span>
+            <span style="color:#f92672">}</span>
+        <span style="color:#f92672">}</span> <span style="color:#66d9ef">catch</span> <span style="color:#f92672">(</span>SQLException e<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+            e<span style="color:#f92672">.</span><span style="color:#a6e22e">printStackTrace</span><span style="color:#f92672">();</span>
+        <span style="color:#f92672">}</span><span style="color:#66d9ef">finally</span> <span style="color:#f92672">{</span>
+            C_JdbcUtil<span style="color:#f92672">.</span><span style="color:#a6e22e">close</span><span style="color:#f92672">(</span>rs<span style="color:#f92672">,</span>st<span style="color:#f92672">,</span>conn<span style="color:#f92672">);</span>
+        <span style="color:#f92672">}</span>
+    <span style="color:#f92672">}</span>
+<span style="color:#f92672">}</span>
+
+</code></pre></div><h4 id="18-jdbc-事务的处理">1.8 JDBC 事务的处理</h4>
+<p>之前我们是使用 MySQL 的命令来操作事务。接下来我们使用 JDBC 来操作银行转账的事务。</p>
+<h5 id="准备数据">准备数据</h5>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"> CREATE TABLE <span style="color:#a6e22e">account</span> <span style="color:#f92672">(</span>     
+ 	id INT PRIMARY KEY AUTO_INCREMENT<span style="color:#f92672">,</span> 
+ 	NAME <span style="color:#a6e22e">VARCHAR</span><span style="color:#f92672">(</span>10<span style="color:#f92672">),</span>     
+ 	balance DOUBLE     
+ <span style="color:#f92672">);</span>     
+ 
+ <span style="color:#f92672">--</span> 添加数据     
+ INSERT INTO <span style="color:#a6e22e">account</span> <span style="color:#f92672">(</span>NAME<span style="color:#f92672">,</span> balance<span style="color:#f92672">)</span> VALUES <span style="color:#f92672">(</span><span style="color:#960050;background-color:#1e0010">&#39;</span>Jack<span style="color:#960050;background-color:#1e0010">&#39;</span><span style="color:#f92672">,</span> 1000<span style="color:#f92672">),</span> <span style="color:#f92672">(</span><span style="color:#960050;background-color:#1e0010">&#39;</span>Rose<span style="color:#960050;background-color:#1e0010">&#39;</span><span style="color:#f92672">,</span> 1000<span style="color:#f92672">);</span>     
+</code></pre></div><h5 id="api-介绍">API 介绍</h5>
+<table>
+<thead>
+<tr>
+<th>Connection 接口中与事务有关的方法</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>void setAutoCommit(boolean autoCommit)</td>
+<td>参数是 true 或 false  <!-- raw HTML omitted -->如果设置为 false，表示关闭自动提交，相当于开启事务</td>
+</tr>
+<tr>
+<td>void commit()</td>
+<td>提交事务</td>
+</tr>
+<tr>
+<td>void rollback()</td>
+<td>回滚事务</td>
+</tr>
+</tbody>
+</table>
+<h5 id="开发步骤">开发步骤</h5>
+<p>​	1)    获取连接</p>
+<p>​	2)    开启事务</p>
+<p>​	3)    获取到 PreparedStatement</p>
+<p>​	4)    使用 PreparedStatement 执行两次更新操作</p>
+<p>​	5)    正常情况下提交事务</p>
+<p>​	6)    出现异常回滚事务</p>
+<p>​	7)    最后关闭资源</p>
+<p>​    案例代码</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="color:#f92672">package</span> com.iNuo.Demo.Demo01<span style="color:#f92672">;</span>
+
+<span style="color:#f92672">import</span> java.sql.*<span style="color:#f92672">;</span>
+
+<span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">E_Transaction</span> <span style="color:#f92672">{</span>
+    <span style="color:#75715e">//没有异常，提交事务，出现异常回滚事务
+</span><span style="color:#75715e"></span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">main</span><span style="color:#f92672">(</span>String<span style="color:#f92672">[]</span> args<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+
+        Connection conn <span style="color:#f92672">=</span> <span style="color:#66d9ef">null</span><span style="color:#f92672">;</span>
+        PreparedStatement ps1 <span style="color:#f92672">=</span> <span style="color:#66d9ef">null</span><span style="color:#f92672">;</span>
+        PreparedStatement ps2 <span style="color:#f92672">=</span> <span style="color:#66d9ef">null</span><span style="color:#f92672">;</span>
+
+        <span style="color:#66d9ef">try</span> <span style="color:#f92672">{</span>
+            <span style="color:#75715e">// 获取连接
+</span><span style="color:#75715e"></span>            conn <span style="color:#f92672">=</span> C_JdbcUtil<span style="color:#f92672">.</span><span style="color:#a6e22e">getConn</span><span style="color:#f92672">();</span>
+            <span style="color:#75715e">// 获取到 PreparedStatement
+</span><span style="color:#75715e"></span>            <span style="color:#75715e">//从 jack 扣钱
+</span><span style="color:#75715e"></span>            ps1 <span style="color:#f92672">=</span> conn<span style="color:#f92672">.</span><span style="color:#a6e22e">prepareStatement</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;update account set balance = balance - ? where name=?&#34;</span><span style="color:#f92672">);</span>
+            ps1<span style="color:#f92672">.</span><span style="color:#a6e22e">setInt</span><span style="color:#f92672">(</span>1<span style="color:#f92672">,</span> 500<span style="color:#f92672">);</span>
+            ps1<span style="color:#f92672">.</span><span style="color:#a6e22e">setString</span><span style="color:#f92672">(</span>2<span style="color:#f92672">,</span><span style="color:#e6db74">&#34;Jack&#34;</span><span style="color:#f92672">);</span>
+            <span style="color:#75715e">//给 rose 加钱
+</span><span style="color:#75715e"></span>            ps2 <span style="color:#f92672">=</span> conn<span style="color:#f92672">.</span><span style="color:#a6e22e">prepareStatement</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;update account set balance = balance + ? where  name=?&#34;</span><span style="color:#f92672">);</span>
+            ps2<span style="color:#f92672">.</span><span style="color:#a6e22e">setInt</span><span style="color:#f92672">(</span>1<span style="color:#f92672">,</span> 500<span style="color:#f92672">);</span>
+            ps2<span style="color:#f92672">.</span><span style="color:#a6e22e">setString</span><span style="color:#f92672">(</span>2<span style="color:#f92672">,</span><span style="color:#e6db74">&#34;Rose&#34;</span><span style="color:#f92672">);</span>
+
+            <span style="color:#75715e">// 开启事务
+</span><span style="color:#75715e"></span>            conn<span style="color:#f92672">.</span><span style="color:#a6e22e">setAutoCommit</span><span style="color:#f92672">(</span><span style="color:#66d9ef">false</span><span style="color:#f92672">);</span>
+            <span style="color:#75715e">//执行-500
+</span><span style="color:#75715e"></span>            ps1<span style="color:#f92672">.</span><span style="color:#a6e22e">executeUpdate</span><span style="color:#f92672">();</span>
+            <span style="color:#75715e">//出现异常
+</span><span style="color:#75715e"></span>            System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span>100 <span style="color:#f92672">/</span> 0<span style="color:#f92672">);</span>
+            <span style="color:#75715e">//执行+500
+</span><span style="color:#75715e"></span>            ps2<span style="color:#f92672">.</span><span style="color:#a6e22e">executeUpdate</span><span style="color:#f92672">();</span>
+            <span style="color:#75715e">//提交事务
+</span><span style="color:#75715e"></span>            conn<span style="color:#f92672">.</span><span style="color:#a6e22e">commit</span><span style="color:#f92672">();</span>
+
+            System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;转账成功&#34;</span><span style="color:#f92672">);</span>
+
+        <span style="color:#f92672">}</span> <span style="color:#66d9ef">catch</span> <span style="color:#f92672">(</span>Exception e<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+            e<span style="color:#f92672">.</span><span style="color:#a6e22e">printStackTrace</span><span style="color:#f92672">();</span>
+            <span style="color:#66d9ef">try</span> <span style="color:#f92672">{</span>
+                conn<span style="color:#f92672">.</span><span style="color:#a6e22e">rollback</span><span style="color:#f92672">();</span> <span style="color:#75715e">//事务的回滚
+</span><span style="color:#75715e"></span>            <span style="color:#f92672">}</span> <span style="color:#66d9ef">catch</span> <span style="color:#f92672">(</span>SQLException e1<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+                    e1<span style="color:#f92672">.</span><span style="color:#a6e22e">printStackTrace</span><span style="color:#f92672">();</span>
+            <span style="color:#f92672">}</span>
+
+            System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;转账失败&#34;</span><span style="color:#f92672">);</span>
+        <span style="color:#f92672">}</span>
+        <span style="color:#66d9ef">finally</span> <span style="color:#f92672">{</span>
+            <span style="color:#75715e">// 关闭资源
+</span><span style="color:#75715e"></span>            C_JdbcUtil<span style="color:#f92672">.</span><span style="color:#a6e22e">close</span><span style="color:#f92672">(</span>ps1<span style="color:#f92672">,</span>conn<span style="color:#f92672">);</span>
+            C_JdbcUtil<span style="color:#f92672">.</span><span style="color:#a6e22e">close</span><span style="color:#f92672">(</span>ps2<span style="color:#f92672">,</span>conn<span style="color:#f92672">);</span>
+
+        <span style="color:#f92672">}</span>
+
+    <span style="color:#f92672">}</span>
+<span style="color:#f92672">}</span>
+
+</code></pre></div><hr>
+<h3 id="第二章">第二章</h3>
+<hr>
+<h5 id="本章内容-1">本章内容</h5>
+<ul>
+<li>数据库连接池</li>
+<li>Spring JDBC</li>
+</ul>
+<hr>
+<h4 id="21-数据库连接池">2.1 数据库连接池</h4>
+<p>概念：其实就是一个容器(集合)，存放数据库连接的容器。</p>
+<p>当系统初始化好后，容器被创建，容器中会申请一些连接对象，当用户来访问数据库时，从容器中获取连接对象，用户访问完之后，会将连接对象归还给容器。</p>
+<p>好处：节约资源+用户访问高效</p>
+<h5 id="实现">实现：</h5>
+<ul>
+<li>
+<p>标准接口：DataSource  javax.sql 包下的</p>
+<p>方法：</p>
+<p>​	获取连接：getConnection()</p>
+<p>​	归还连接：Connection.close()</p>
+<p>如果连接对象Connection是从连接池中获取的，那么调用Connection.close()方法，则不会再关闭连接了。而是归还连接!</p>
+</li>
+<li>
+<p>一般我们不去实现它，有数据库厂商来实现</p>
+<p>C3P0：数据库连接池技术（旧）</p>
+<p>Druid：数据库连接池实现技术，由阿里巴巴提供的</p>
+</li>
+</ul>
+<h5 id="c3p0数据库连接池技术">C3P0：数据库连接池技术</h5>
+<p>步骤：</p>
+<ol>
+<li>
+<p>导入jar包 (三个) c3p0-0.9.5.2.jar 和 mchange-commons-java-0.2.12.jar。不要忘记导入数据库驱动 jar 包！</p>
+</li>
+<li>
+<p>定义配置文件：</p>
+<p>名称： c3p0.properties 或者 c3p0-config.xml</p>
+<p>路径：直接将文件放在src目录下即可。</p>
+</li>
+<li>
+<p>创建核心对象 数据库连接池对象 ComboPooledDataSource</p>
+</li>
+<li>
+<p>获取连接： getConnection</p>
+<p>代码：</p>
+</li>
+</ol>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="color:#f92672">package</span> com.iNuo.Demo.Demo02<span style="color:#f92672">;</span>
+
+<span style="color:#f92672">import</span> com.mchange.v2.c3p0.ComboPooledDataSource<span style="color:#f92672">;</span>
+
+<span style="color:#f92672">import</span> javax.sql.DataSource<span style="color:#f92672">;</span>
+<span style="color:#f92672">import</span> java.sql.Connection<span style="color:#f92672">;</span>
+<span style="color:#f92672">import</span> java.sql.SQLException<span style="color:#f92672">;</span>
+
+<span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">A_c3p0</span> <span style="color:#f92672">{</span>
+    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">main</span><span style="color:#f92672">(</span>String<span style="color:#f92672">[]</span> args<span style="color:#f92672">)</span> <span style="color:#66d9ef">throws</span> SQLException <span style="color:#f92672">{</span>
+
+        <span style="color:#75715e">//1.创建c3p0连接对象
+</span><span style="color:#75715e"></span>        DataSource ds<span style="color:#f92672">=</span><span style="color:#66d9ef">new</span> ComboPooledDataSource<span style="color:#f92672">();</span>
+
+        <span style="color:#75715e">//2.获取连接对象
+</span><span style="color:#75715e"></span>        Connection conn<span style="color:#f92672">=</span>ds<span style="color:#f92672">.</span><span style="color:#a6e22e">getConnection</span><span style="color:#f92672">();</span>
+        System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">printf</span><span style="color:#f92672">(</span>conn<span style="color:#f92672">.</span><span style="color:#a6e22e">toString</span><span style="color:#f92672">());</span>
+    <span style="color:#f92672">}</span>
+<span style="color:#f92672">}</span>
+
+</code></pre></div><h5 id="druid数据库连接池实现技术由阿里巴巴提供的">Druid：数据库连接池实现技术，由阿里巴巴提供的</h5>
+<p>步骤：</p>
+<ol>
+<li>
+<p>导入jar包 druid-1.0.9.jar</p>
+</li>
+<li>
+<p>定义配置文件：是properties形式的，可以叫任意名称，可以放在任意目录下！</p>
+</li>
+<li>
+<p>加载配置文件：Properties</p>
+</li>
+<li>
+<p>获取数据库连接池对象：通过工厂来来获取 DruidDataSourceFactory</p>
+</li>
+<li>
+<p>获取连接：getConnection</p>
+</li>
+</ol>
+<p>代码：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="color:#f92672">package</span> com.iNuo.Demo.Demo02<span style="color:#f92672">;</span>
+
+<span style="color:#f92672">import</span> com.alibaba.druid.pool.DruidDataSourceFactory<span style="color:#f92672">;</span>
+
+<span style="color:#f92672">import</span> javax.sql.DataSource<span style="color:#f92672">;</span>
+<span style="color:#f92672">import</span> java.io.InputStream<span style="color:#f92672">;</span>
+<span style="color:#f92672">import</span> java.sql.Connection<span style="color:#f92672">;</span>
+<span style="color:#f92672">import</span> java.sql.SQLException<span style="color:#f92672">;</span>
+<span style="color:#f92672">import</span> java.util.Properties<span style="color:#f92672">;</span>
+
+<span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">A_Druid</span> <span style="color:#f92672">{</span>
+    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">main</span><span style="color:#f92672">(</span>String<span style="color:#f92672">[]</span> args<span style="color:#f92672">)</span> <span style="color:#66d9ef">throws</span> Exception <span style="color:#f92672">{</span>
+
+        <span style="color:#75715e">//创建一个Properties集合
+</span><span style="color:#75715e"></span>        Properties pro <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> Properties<span style="color:#f92672">();</span>
+        <span style="color:#75715e">//获取Properties内容流
+</span><span style="color:#75715e"></span>        InputStream is <span style="color:#f92672">=</span> A_Druid<span style="color:#f92672">.</span><span style="color:#a6e22e">class</span><span style="color:#f92672">.</span><span style="color:#a6e22e">getClassLoader</span><span style="color:#f92672">().</span><span style="color:#a6e22e">getResourceAsStream</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;druid.properties&#34;</span><span style="color:#f92672">);</span>
+        <span style="color:#75715e">//加载流
+</span><span style="color:#75715e"></span>        pro<span style="color:#f92672">.</span><span style="color:#a6e22e">load</span><span style="color:#f92672">(</span>is<span style="color:#f92672">);</span>
+
+        <span style="color:#75715e">//获取连接池对象
+</span><span style="color:#75715e"></span>        DataSource ds <span style="color:#f92672">=</span> DruidDataSourceFactory<span style="color:#f92672">.</span><span style="color:#a6e22e">createDataSource</span><span style="color:#f92672">(</span>pro<span style="color:#f92672">);</span>
+
+        <span style="color:#75715e">//获取连接
+</span><span style="color:#75715e"></span>        Connection conn <span style="color:#f92672">=</span> ds<span style="color:#f92672">.</span><span style="color:#a6e22e">getConnection</span><span style="color:#f92672">();</span>
+        System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span>conn<span style="color:#f92672">.</span><span style="color:#a6e22e">toString</span><span style="color:#f92672">());</span>
+    <span style="color:#f92672">}</span>
+<span style="color:#f92672">}</span>
+
+</code></pre></div><h5 id="定义工具类">定义工具类</h5>
+<ol>
+<li>
+<p>定义一个类 B_DruidUtil</p>
+</li>
+<li>
+<p>提供静态代码块加载配置文件，初始化连接池对象</p>
+</li>
+<li>
+<p>提供方法</p>
+<p>获取连接方法：通过数据库连接池获取连接</p>
+<p>释放资源</p>
+<p>获取连接池的方法</p>
+</li>
+</ol>
+<p>工具类代码：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="color:#f92672">package</span> com.iNuo.Demo.Demo02<span style="color:#f92672">;</span>
+
+<span style="color:#f92672">import</span> com.alibaba.druid.pool.DruidDataSourceFactory<span style="color:#f92672">;</span>
+
+<span style="color:#f92672">import</span> javax.sql.DataSource<span style="color:#f92672">;</span>
+<span style="color:#f92672">import</span> java.io.IOException<span style="color:#f92672">;</span>
+<span style="color:#f92672">import</span> java.io.InputStream<span style="color:#f92672">;</span>
+<span style="color:#f92672">import</span> java.sql.Connection<span style="color:#f92672">;</span>
+<span style="color:#f92672">import</span> java.sql.ResultSet<span style="color:#f92672">;</span>
+<span style="color:#f92672">import</span> java.sql.SQLException<span style="color:#f92672">;</span>
+<span style="color:#f92672">import</span> java.sql.Statement<span style="color:#f92672">;</span>
+<span style="color:#f92672">import</span> java.util.Properties<span style="color:#f92672">;</span>
+
+<span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">B_DruidUtil</span> <span style="color:#f92672">{</span>
+
+    <span style="color:#75715e">// 声明连接池对象
+</span><span style="color:#75715e"></span>    <span style="color:#66d9ef">private</span> <span style="color:#66d9ef">static</span> DataSource ds<span style="color:#f92672">;</span>
+
+    <span style="color:#66d9ef">static</span><span style="color:#f92672">{</span>
+        
+        <span style="color:#75715e">//创建一个Properties集合
+</span><span style="color:#75715e"></span>        Properties pro <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> Properties<span style="color:#f92672">();</span>
+
+        <span style="color:#66d9ef">try</span><span style="color:#f92672">{</span>
+            <span style="color:#75715e">//获取Properties内容流
+</span><span style="color:#75715e"></span>            InputStream is <span style="color:#f92672">=</span> B_DruidUtil<span style="color:#f92672">.</span><span style="color:#a6e22e">class</span><span style="color:#f92672">.</span><span style="color:#a6e22e">getClassLoader</span><span style="color:#f92672">().</span><span style="color:#a6e22e">getResourceAsStream</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;druid.properties&#34;</span><span style="color:#f92672">);</span>
+            <span style="color:#75715e">//加载流
+</span><span style="color:#75715e"></span>            pro<span style="color:#f92672">.</span><span style="color:#a6e22e">load</span><span style="color:#f92672">(</span>is<span style="color:#f92672">);</span>
+
+            <span style="color:#75715e">//获取连接池对象
+</span><span style="color:#75715e"></span>            ds <span style="color:#f92672">=</span> DruidDataSourceFactory<span style="color:#f92672">.</span><span style="color:#a6e22e">createDataSource</span><span style="color:#f92672">(</span>pro<span style="color:#f92672">);</span>
+
+        <span style="color:#f92672">}</span> <span style="color:#66d9ef">catch</span> <span style="color:#f92672">(</span>IOException e<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+            e<span style="color:#f92672">.</span><span style="color:#a6e22e">printStackTrace</span><span style="color:#f92672">();</span>
+        <span style="color:#f92672">}</span> <span style="color:#66d9ef">catch</span> <span style="color:#f92672">(</span>Exception e<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+            e<span style="color:#f92672">.</span><span style="color:#a6e22e">printStackTrace</span><span style="color:#f92672">();</span>
+        <span style="color:#f92672">}</span>
+    <span style="color:#f92672">}</span>
+
+    
+    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> Connection <span style="color:#a6e22e">getConnection</span><span style="color:#f92672">()</span> <span style="color:#66d9ef">throws</span> SQLException <span style="color:#f92672">{</span>
+        
+        <span style="color:#75715e">// 获取连接对象
+</span><span style="color:#75715e"></span>        <span style="color:#66d9ef">return</span> ds<span style="color:#f92672">.</span><span style="color:#a6e22e">getConnection</span><span style="color:#f92672">();</span>
+    <span style="color:#f92672">}</span>
+
+    
+    <span style="color:#75715e">// 关闭资源
+</span><span style="color:#75715e"></span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">close</span><span style="color:#f92672">(</span>Statement st<span style="color:#f92672">,</span> Connection conn<span style="color:#f92672">){</span>
+        <span style="color:#66d9ef">if</span><span style="color:#f92672">(</span>st<span style="color:#f92672">!=</span><span style="color:#66d9ef">null</span><span style="color:#f92672">){</span>
+            <span style="color:#66d9ef">try</span> <span style="color:#f92672">{</span>
+                st<span style="color:#f92672">.</span><span style="color:#a6e22e">close</span><span style="color:#f92672">();</span>
+            <span style="color:#f92672">}</span> <span style="color:#66d9ef">catch</span> <span style="color:#f92672">(</span>SQLException e<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+                e<span style="color:#f92672">.</span><span style="color:#a6e22e">printStackTrace</span><span style="color:#f92672">();</span>
+            <span style="color:#f92672">}</span>
+        <span style="color:#f92672">}</span>
+        <span style="color:#66d9ef">if</span><span style="color:#f92672">(</span>conn<span style="color:#f92672">!=</span><span style="color:#66d9ef">null</span><span style="color:#f92672">){</span>
+            <span style="color:#66d9ef">try</span> <span style="color:#f92672">{</span>
+                conn<span style="color:#f92672">.</span><span style="color:#a6e22e">close</span><span style="color:#f92672">();</span>
+            <span style="color:#f92672">}</span> <span style="color:#66d9ef">catch</span> <span style="color:#f92672">(</span>SQLException e<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+                e<span style="color:#f92672">.</span><span style="color:#a6e22e">printStackTrace</span><span style="color:#f92672">();</span>
+            <span style="color:#f92672">}</span>
+        <span style="color:#f92672">}</span>
+    <span style="color:#f92672">}</span>
+
+    <span style="color:#75715e">// 重写关闭资源
+</span><span style="color:#75715e"></span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">close</span><span style="color:#f92672">(</span>ResultSet rs<span style="color:#f92672">,</span> Statement st<span style="color:#f92672">,</span> Connection conn <span style="color:#f92672">){</span>
+
+        <span style="color:#66d9ef">if</span><span style="color:#f92672">(</span>rs<span style="color:#f92672">!=</span><span style="color:#66d9ef">null</span><span style="color:#f92672">){</span>
+            <span style="color:#66d9ef">try</span> <span style="color:#f92672">{</span>
+                rs<span style="color:#f92672">.</span><span style="color:#a6e22e">close</span><span style="color:#f92672">();</span>
+            <span style="color:#f92672">}</span> <span style="color:#66d9ef">catch</span> <span style="color:#f92672">(</span>SQLException e<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+                e<span style="color:#f92672">.</span><span style="color:#a6e22e">printStackTrace</span><span style="color:#f92672">();</span>
+            <span style="color:#f92672">}</span>
+        <span style="color:#f92672">}</span>
+        close<span style="color:#f92672">(</span>st<span style="color:#f92672">,</span>conn<span style="color:#f92672">);</span>
+
+    <span style="color:#f92672">}</span>
+<span style="color:#f92672">}</span>
+
+</code></pre></div><p>实现插入数据：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="color:#f92672">package</span> com.iNuo.Demo.Demo02<span style="color:#f92672">;</span>
+
+<span style="color:#f92672">import</span> java.sql.Connection<span style="color:#f92672">;</span>
+<span style="color:#f92672">import</span> java.sql.PreparedStatement<span style="color:#f92672">;</span>
+<span style="color:#f92672">import</span> java.sql.SQLException<span style="color:#f92672">;</span>
+
+<span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">B_DruidJDBC</span> <span style="color:#f92672">{</span>
+    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">main</span><span style="color:#f92672">(</span>String<span style="color:#f92672">[]</span> args<span style="color:#f92672">)</span> <span style="color:#66d9ef">throws</span> SQLException <span style="color:#f92672">{</span>
+
+        <span style="color:#75715e">// 创建连接对象
+</span><span style="color:#75715e"></span>        Connection conn<span style="color:#f92672">=</span>B_DruidUtil<span style="color:#f92672">.</span><span style="color:#a6e22e">getConnection</span><span style="color:#f92672">();</span>
+        <span style="color:#75715e">// 创建sql语句
+</span><span style="color:#75715e"></span>        PreparedStatement pst<span style="color:#f92672">=</span>conn<span style="color:#f92672">.</span><span style="color:#a6e22e">prepareStatement</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;insert into account(name,money) values(?,?)&#34;</span><span style="color:#f92672">);</span>
+        pst<span style="color:#f92672">.</span><span style="color:#a6e22e">setString</span><span style="color:#f92672">(</span>1<span style="color:#f92672">,</span><span style="color:#e6db74">&#34;李七&#34;</span><span style="color:#f92672">);</span>
+        pst<span style="color:#f92672">.</span><span style="color:#a6e22e">setDouble</span><span style="color:#f92672">(</span>2<span style="color:#f92672">,</span>1000<span style="color:#f92672">);</span>
+        <span style="color:#75715e">// 执行sql语句
+</span><span style="color:#75715e"></span>        <span style="color:#66d9ef">int</span> count<span style="color:#f92672">=</span>pst<span style="color:#f92672">.</span><span style="color:#a6e22e">executeUpdate</span><span style="color:#f92672">();</span>
+        System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;受影响行数：&#34;</span><span style="color:#f92672">+</span>count<span style="color:#f92672">);</span>
+        <span style="color:#75715e">// 关闭资源
+</span><span style="color:#75715e"></span>        B_DruidUtil<span style="color:#f92672">.</span><span style="color:#a6e22e">close</span><span style="color:#f92672">(</span>pst<span style="color:#f92672">,</span>conn<span style="color:#f92672">);</span>
+    <span style="color:#f92672">}</span>
+<span style="color:#f92672">}</span>
+
+</code></pre></div><h4 id="22-spring-jdbc">2.2 Spring JDBC</h4>
+<p>Spring框架对JDBC的简单封装！提供了一个JDBCTemplate对象简化JDBC的开发。</p>
+<h5 id="步骤">步骤：</h5>
+<ol>
+<li>
+<p>导入jar包：spring-beans-5.0.0.RELEASE.jar、spring-core-5.0.0.RELEASE.jar、spring-jdbc-5.0.0.RELEASE.jar、spring-tx-5.0.0.RELEASE.jar、commons-logging-1.2.jar</p>
+</li>
+<li>
+<p>创建JdbcTemplate对象，依赖于数据源DataSource</p>
+</li>
+</ol>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java">JdbcTemplate template <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> JdbcTemplate<span style="color:#f92672">(</span>ds<span style="color:#f92672">);</span>
+</code></pre></div><ol start="3">
+<li>调用JdbcTemplate的方法来完成CRUD的操作</li>
+</ol>
+<h5 id="增删改操作">增删改操作</h5>
+<ul>
+<li>update()：执行DML增、删、改语句</li>
+</ul>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="color:#f92672">package</span> com.iNuo.Demo.Demo02<span style="color:#f92672">;</span>
+
+<span style="color:#f92672">import</span> org.springframework.jdbc.core.JdbcTemplate<span style="color:#f92672">;</span>
+
+<span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">C_jdbcTemplate</span> <span style="color:#f92672">{</span>
+    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">main</span><span style="color:#f92672">(</span>String<span style="color:#f92672">[]</span> args<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+
+        <span style="color:#75715e">//创建一个jdbcTemplate对象
+</span><span style="color:#75715e"></span>        JdbcTemplate jt<span style="color:#f92672">=</span><span style="color:#66d9ef">new</span> JdbcTemplate<span style="color:#f92672">(</span>B_DruidUtil<span style="color:#f92672">.</span><span style="color:#a6e22e">getDataSource</span><span style="color:#f92672">());</span>
+
+        <span style="color:#75715e">//执行sql语句 增
+</span><span style="color:#75715e"></span>        String sql<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;insert into account(name,money) values(?,?)&#34;</span><span style="color:#f92672">;</span>
+        <span style="color:#66d9ef">int</span> count<span style="color:#f92672">=</span>jt<span style="color:#f92672">.</span><span style="color:#a6e22e">update</span><span style="color:#f92672">(</span>sql<span style="color:#f92672">,</span><span style="color:#e6db74">&#34;刘巴&#34;</span><span style="color:#f92672">,</span>1800<span style="color:#f92672">);</span>
+        System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;增受影响行数：&#34;</span><span style="color:#f92672">+</span>count<span style="color:#f92672">);</span>
+
+
+        <span style="color:#75715e">//执行sql语句 改
+</span><span style="color:#75715e"></span>        String sql1<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;update account set money=2000 where name=?&#34;</span><span style="color:#f92672">;</span>
+        <span style="color:#66d9ef">int</span> count1<span style="color:#f92672">=</span>jt<span style="color:#f92672">.</span><span style="color:#a6e22e">update</span><span style="color:#f92672">(</span>sql1<span style="color:#f92672">,</span><span style="color:#e6db74">&#34;刘巴&#34;</span><span style="color:#f92672">);</span>
+        System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;改受影响行数：&#34;</span><span style="color:#f92672">+</span>count1<span style="color:#f92672">);</span>
+
+
+        <span style="color:#75715e">//执行sql语句 删
+</span><span style="color:#75715e"></span>        String sql2<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;delete from account where name=?&#34;</span><span style="color:#f92672">;</span>
+        <span style="color:#66d9ef">int</span> count2<span style="color:#f92672">=</span>jt<span style="color:#f92672">.</span><span style="color:#a6e22e">update</span><span style="color:#f92672">(</span>sql2<span style="color:#f92672">,</span><span style="color:#e6db74">&#34;刘巴&#34;</span><span style="color:#f92672">);</span>
+        System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;删受影响行数：&#34;</span><span style="color:#f92672">+</span>count2<span style="color:#f92672">);</span>
+    <span style="color:#f92672">}</span>
+<span style="color:#f92672">}</span>
+
+</code></pre></div><h5 id="查询操作">查询操作</h5>
+<ul>
+<li>
+<p>queryForMap()：查询结果将结果集封装为map集合，将列名作为key，将值作为value 将这条记录封装为一个map集合。注意：这个方法查询的结果集长度只能是1</p>
+</li>
+<li>
+<p>queryForList()：查询结果将结果集封装为list集合。注意：将每一条记录封装为一个Map集合，再将Map集合装载到List集合中</p>
+</li>
+<li>
+<p>query()：查询结果，将结果封装为JavaBean对象！query的参数：RowMapper，一般我们使用BeanPropertyRowMapper实现类。可以完成数据到JavaBean的自动封装！new BeanPropertyRowMapper&lt;类型&gt;(类型.class)</p>
+</li>
+<li>
+<p>queryForObject：查询结果，将结果封装为对象！一般用于聚合函数的查询</p>
+</li>
+</ul>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="color:#f92672">package</span> com.iNuo.Demo.Demo02<span style="color:#f92672">;</span>
+
+<span style="color:#f92672">import</span> org.junit.Test<span style="color:#f92672">;</span>
+<span style="color:#f92672">import</span> org.springframework.jdbc.core.BeanPropertyRowMapper<span style="color:#f92672">;</span>
+<span style="color:#f92672">import</span> org.springframework.jdbc.core.JdbcTemplate<span style="color:#f92672">;</span>
+
+<span style="color:#f92672">import</span> java.util.List<span style="color:#f92672">;</span>
+<span style="color:#f92672">import</span> java.util.Map<span style="color:#f92672">;</span>
+
+<span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">C_jdbcTemplate1</span> <span style="color:#f92672">{</span>
+
+    <span style="color:#75715e">//创建一个jdbcTemplate对象
+</span><span style="color:#75715e"></span>    JdbcTemplate jt<span style="color:#f92672">=</span><span style="color:#66d9ef">new</span> JdbcTemplate<span style="color:#f92672">(</span>B_DruidUtil<span style="color:#f92672">.</span><span style="color:#a6e22e">getDataSource</span><span style="color:#f92672">());</span>
+
+    <span style="color:#a6e22e">@Test</span>
+    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">Search</span><span style="color:#f92672">(){</span> <span style="color:#75715e">//查询结果为一条记录时，即一个对象
+</span><span style="color:#75715e"></span>
+        Map<span style="color:#f92672">&lt;</span>String<span style="color:#f92672">,</span>Object<span style="color:#f92672">&gt;</span> map<span style="color:#f92672">=</span>jt<span style="color:#f92672">.</span><span style="color:#a6e22e">queryForMap</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;select * from account where id=?&#34;</span><span style="color:#f92672">,</span>1<span style="color:#f92672">);</span>
+        System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span>map<span style="color:#f92672">);</span>
+    <span style="color:#f92672">}</span>
+
+    <span style="color:#a6e22e">@Test</span>
+    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">Search1</span><span style="color:#f92672">(){</span> <span style="color:#75715e">//查询结果为多条记录时，即多个对象
+</span><span style="color:#75715e"></span>
+        List<span style="color:#f92672">&lt;</span>C_Account<span style="color:#f92672">&gt;</span> lst<span style="color:#f92672">=</span>jt<span style="color:#f92672">.</span><span style="color:#a6e22e">query</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;select * from account&#34;</span><span style="color:#f92672">,</span><span style="color:#66d9ef">new</span> BeanPropertyRowMapper<span style="color:#f92672">&lt;</span>C_Account<span style="color:#f92672">&gt;(</span>C_Account<span style="color:#f92672">.</span><span style="color:#a6e22e">class</span><span style="color:#f92672">));</span>
+        <span style="color:#66d9ef">for</span> <span style="color:#f92672">(</span>C_Account c_account <span style="color:#f92672">:</span> lst<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+            System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span>c_account<span style="color:#f92672">);</span>
+        <span style="color:#f92672">}</span>
+    <span style="color:#f92672">}</span>
+
+
+    <span style="color:#a6e22e">@Test</span>
+    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">Search2</span><span style="color:#f92672">(){</span> <span style="color:#75715e">//查询结果为一个数字时
+</span><span style="color:#75715e"></span>
+        <span style="color:#66d9ef">int</span> count<span style="color:#f92672">=</span>jt<span style="color:#f92672">.</span><span style="color:#a6e22e">queryForObject</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;select count(*) from account&#34;</span><span style="color:#f92672">,</span>Integer<span style="color:#f92672">.</span><span style="color:#a6e22e">class</span><span style="color:#f92672">);</span>
+        System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span>count<span style="color:#f92672">);</span>
+    <span style="color:#f92672">}</span>
+<span style="color:#f92672">}</span>
+
+</code></pre></div><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="color:#f92672">package</span> com.iNuo.Demo.Demo02<span style="color:#f92672">;</span>
+
+<span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">C_Account</span> <span style="color:#f92672">{</span>
+
+    <span style="color:#66d9ef">private</span> Integer id<span style="color:#f92672">;</span>
+    <span style="color:#66d9ef">private</span> String name<span style="color:#f92672">;</span>
+    <span style="color:#66d9ef">private</span> Double money<span style="color:#f92672">;</span>
+
+    <span style="color:#a6e22e">@Override</span>
+    <span style="color:#66d9ef">public</span> String <span style="color:#a6e22e">toString</span><span style="color:#f92672">()</span> <span style="color:#f92672">{</span>
+        <span style="color:#66d9ef">return</span> <span style="color:#e6db74">&#34;C_Account{&#34;</span> <span style="color:#f92672">+</span>
+                <span style="color:#e6db74">&#34;id=&#34;</span> <span style="color:#f92672">+</span> id <span style="color:#f92672">+</span>
+                <span style="color:#e6db74">&#34;, name=&#39;&#34;</span> <span style="color:#f92672">+</span> name <span style="color:#f92672">+</span> <span style="color:#e6db74">&#39;\&#39;&#39;</span> <span style="color:#f92672">+</span>
+                <span style="color:#e6db74">&#34;, money=&#34;</span> <span style="color:#f92672">+</span> money <span style="color:#f92672">+</span>
+                <span style="color:#e6db74">&#39;}&#39;</span><span style="color:#f92672">;</span>
+    <span style="color:#f92672">}</span>
+
+    <span style="color:#66d9ef">public</span> Integer <span style="color:#a6e22e">getId</span><span style="color:#f92672">()</span> <span style="color:#f92672">{</span>
+        <span style="color:#66d9ef">return</span> id<span style="color:#f92672">;</span>
+    <span style="color:#f92672">}</span>
+
+    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">setId</span><span style="color:#f92672">(</span>Integer id<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+        <span style="color:#66d9ef">this</span><span style="color:#f92672">.</span><span style="color:#a6e22e">id</span> <span style="color:#f92672">=</span> id<span style="color:#f92672">;</span>
+    <span style="color:#f92672">}</span>
+
+    <span style="color:#66d9ef">public</span> String <span style="color:#a6e22e">getName</span><span style="color:#f92672">()</span> <span style="color:#f92672">{</span>
+        <span style="color:#66d9ef">return</span> name<span style="color:#f92672">;</span>
+    <span style="color:#f92672">}</span>
+
+    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">setName</span><span style="color:#f92672">(</span>String name<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+        <span style="color:#66d9ef">this</span><span style="color:#f92672">.</span><span style="color:#a6e22e">name</span> <span style="color:#f92672">=</span> name<span style="color:#f92672">;</span>
+    <span style="color:#f92672">}</span>
+
+    <span style="color:#66d9ef">public</span> Double <span style="color:#a6e22e">getMoney</span><span style="color:#f92672">()</span> <span style="color:#f92672">{</span>
+        <span style="color:#66d9ef">return</span> money<span style="color:#f92672">;</span>
+    <span style="color:#f92672">}</span>
+
+    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">setMoney</span><span style="color:#f92672">(</span>Double money<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+        <span style="color:#66d9ef">this</span><span style="color:#f92672">.</span><span style="color:#a6e22e">money</span> <span style="color:#f92672">=</span> money<span style="color:#f92672">;</span>
+    <span style="color:#f92672">}</span>
+<span style="color:#f92672">}</span>
+
+</code></pre></div><h5 id="练习">练习：</h5>
+<p>需求：</p>
+<ol>
+<li>
+<p>修改1号数据的 salary 为 10000</p>
+</li>
+<li>
+<p>添加一条记录</p>
+</li>
+<li>
+<p>删除刚才添加的记录</p>
+</li>
+<li>
+<p>查询id为1的记录，将其封装为Map集合</p>
+</li>
+<li>
+<p>查询所有记录，将其封装为List</p>
+</li>
+<li>
+<p>查询所有记录，将其封装为Emp对象的List集合</p>
+</li>
+<li>
+<p>查询总记录数</p>
+</li>
+</ol>
+<p>代码：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="color:#f92672">package</span> com.iNuo.Demo.Demo02<span style="color:#f92672">;</span>
+
+
+<span style="color:#f92672">import</span> org.junit.Test<span style="color:#f92672">;</span>
+<span style="color:#f92672">import</span> org.springframework.jdbc.core.BeanPropertyRowMapper<span style="color:#f92672">;</span>
+<span style="color:#f92672">import</span> org.springframework.jdbc.core.JdbcTemplate<span style="color:#f92672">;</span>
+<span style="color:#f92672">import</span> java.util.List<span style="color:#f92672">;</span>
+<span style="color:#f92672">import</span> java.util.Map<span style="color:#f92672">;</span>
+
+
+<span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">C_Test</span> <span style="color:#f92672">{</span>
+
+    <span style="color:#75715e">//Junit单元测试，可以让方法独立执行
+</span><span style="color:#75715e"></span>
+    <span style="color:#75715e">//获取JDBCTemplate对象
+</span><span style="color:#75715e"></span>    <span style="color:#66d9ef">private</span> JdbcTemplate template <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> JdbcTemplate<span style="color:#f92672">(</span>B_DruidUtil<span style="color:#f92672">.</span><span style="color:#a6e22e">getDataSource</span><span style="color:#f92672">());</span>
+
+
+    <span style="color:#75715e">// 1.修改1号数据的 money 为 10000
+</span><span style="color:#75715e"></span>    <span style="color:#a6e22e">@Test</span>
+    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">test1</span><span style="color:#f92672">()</span> <span style="color:#f92672">{</span>
+
+        <span style="color:#75715e">//定义sql
+</span><span style="color:#75715e"></span>        String sql <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;update account set money = 10000 where id = 1&#34;</span><span style="color:#f92672">;</span>
+
+        <span style="color:#75715e">//3. 执行sql
+</span><span style="color:#75715e"></span>        <span style="color:#66d9ef">int</span> count <span style="color:#f92672">=</span> template<span style="color:#f92672">.</span><span style="color:#a6e22e">update</span><span style="color:#f92672">(</span>sql<span style="color:#f92672">);</span>
+        System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span>count<span style="color:#f92672">);</span>
+
+    <span style="color:#f92672">}</span>
+
+
+     <span style="color:#75715e">//2.添加一条记录
+</span><span style="color:#75715e"></span>    <span style="color:#a6e22e">@Test</span>
+    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">test2</span><span style="color:#f92672">()</span> <span style="color:#f92672">{</span>
+
+        String sql <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;insert into account(name,money) values(?,?)&#34;</span><span style="color:#f92672">;</span>
+        <span style="color:#66d9ef">int</span> count <span style="color:#f92672">=</span> template<span style="color:#f92672">.</span><span style="color:#a6e22e">update</span><span style="color:#f92672">(</span>sql<span style="color:#f92672">,</span> <span style="color:#e6db74">&#34;郭靖&#34;</span><span style="color:#f92672">,</span> 10<span style="color:#f92672">);</span>
+        System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span>count<span style="color:#f92672">);</span>
+
+    <span style="color:#f92672">}</span>
+
+
+
+    <span style="color:#75715e">//3.删除一条记录
+</span><span style="color:#75715e"></span>    <span style="color:#a6e22e">@Test</span>
+    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">test3</span><span style="color:#f92672">()</span> <span style="color:#f92672">{</span>
+
+        String sql <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;delete from account where id = ?&#34;</span><span style="color:#f92672">;</span>
+        <span style="color:#66d9ef">int</span> count <span style="color:#f92672">=</span> template<span style="color:#f92672">.</span><span style="color:#a6e22e">update</span><span style="color:#f92672">(</span>sql<span style="color:#f92672">,</span> 3<span style="color:#f92672">);</span>
+        System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span>count<span style="color:#f92672">);</span>
+
+    <span style="color:#f92672">}</span>
+
+
+
+    <span style="color:#75715e">//4.查询id为1的记录，将其封装为Map集合 //注意：这个方法查询的结果集长度只能是1
+</span><span style="color:#75715e"></span>    <span style="color:#a6e22e">@Test</span>
+    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">test4</span><span style="color:#f92672">()</span> <span style="color:#f92672">{</span>
+
+        String sql <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;select * from account where id = ? or id = ?&#34;</span><span style="color:#f92672">;</span>
+        Map<span style="color:#f92672">&lt;</span>String<span style="color:#f92672">,</span> Object<span style="color:#f92672">&gt;</span> map <span style="color:#f92672">=</span> template<span style="color:#f92672">.</span><span style="color:#a6e22e">queryForMap</span><span style="color:#f92672">(</span>sql<span style="color:#f92672">,</span> 1<span style="color:#f92672">,</span> 2<span style="color:#f92672">);</span>
+        System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span>map<span style="color:#f92672">);</span>
+
+    <span style="color:#f92672">}</span>
+
+
+
+    <span style="color:#75715e">//5.查询所有记录，将其封装为List
+</span><span style="color:#75715e"></span>    <span style="color:#a6e22e">@Test</span>
+    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">test5</span><span style="color:#f92672">()</span> <span style="color:#f92672">{</span>
+
+        String sql <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;select * from account&#34;</span><span style="color:#f92672">;</span>
+        List<span style="color:#f92672">&lt;</span>Map<span style="color:#f92672">&lt;</span>String<span style="color:#f92672">,</span> Object<span style="color:#f92672">&gt;&gt;</span> list <span style="color:#f92672">=</span> template<span style="color:#f92672">.</span><span style="color:#a6e22e">queryForList</span><span style="color:#f92672">(</span>sql<span style="color:#f92672">);</span>
+
+        <span style="color:#66d9ef">for</span> <span style="color:#f92672">(</span>Map<span style="color:#f92672">&lt;</span>String<span style="color:#f92672">,</span> Object<span style="color:#f92672">&gt;</span> stringObjectMap <span style="color:#f92672">:</span> list<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+            System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span>stringObjectMap<span style="color:#f92672">);</span>
+        <span style="color:#f92672">}</span>
+    <span style="color:#f92672">}</span>
+
+
+
+     <span style="color:#75715e">//6.查询所有记录，将其封装为account对象的List集合
+</span><span style="color:#75715e"></span>    <span style="color:#a6e22e">@Test</span>
+    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">test6_2</span><span style="color:#f92672">()</span> <span style="color:#f92672">{</span>
+
+        String sql <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;select  from emp&#34;</span><span style="color:#f92672">;</span>
+        List<span style="color:#f92672">&lt;</span>C_Account<span style="color:#f92672">&gt;</span> list <span style="color:#f92672">=</span> template<span style="color:#f92672">.</span><span style="color:#a6e22e">query</span><span style="color:#f92672">(</span>sql<span style="color:#f92672">,</span> <span style="color:#66d9ef">new</span> BeanPropertyRowMapper<span style="color:#f92672">&lt;</span>C_Account<span style="color:#f92672">&gt;(</span>C_Account<span style="color:#f92672">.</span><span style="color:#a6e22e">class</span><span style="color:#f92672">));</span>
+
+        <span style="color:#66d9ef">for</span> <span style="color:#f92672">(</span>C_Account emp <span style="color:#f92672">:</span> list<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+            System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span>emp<span style="color:#f92672">);</span>
+        <span style="color:#f92672">}</span>
+
+    <span style="color:#f92672">}</span>
+
+
+
+     <span style="color:#75715e">//7.查询总记录数
+</span><span style="color:#75715e"></span>    <span style="color:#a6e22e">@Test</span>
+    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">test7</span><span style="color:#f92672">()</span> <span style="color:#f92672">{</span>
+
+        String sql <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;select count(id) from account&#34;</span><span style="color:#f92672">;</span>
+        Long total <span style="color:#f92672">=</span> template<span style="color:#f92672">.</span><span style="color:#a6e22e">queryForObject</span><span style="color:#f92672">(</span>sql<span style="color:#f92672">,</span> Long<span style="color:#f92672">.</span><span style="color:#a6e22e">class</span><span style="color:#f92672">);</span>
+        System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span>total<span style="color:#f92672">);</span>
+
+    <span style="color:#f92672">}</span>
+
+
+<span style="color:#f92672">}</span>
+</code></pre></div></div>
+  
+</article></main>
+<footer class="footer">
+  <span>&copy; 2021 <a href="https://xshi000.github.io/">及时当勉励，岁月不待人！@iNuo</a></span>
+  <span>&middot;</span>
+  <span>Powered by <a href="https://gohugo.io/" rel="noopener" target="_blank">Hugo️️</a>️</span>
+  <span>&middot;</span>
+  <span>Theme️ <a href="https://github.com/nanxiaobei/hugo-paper" rel="noopener" target="_blank">Paper</a></span>
+</footer>
+<script src="https://xshi000.github.io/highlight.min.js"></script>
+<script>
+  hljs.initHighlightingOnLoad();
+</script>
+</body>
+</html>
+
