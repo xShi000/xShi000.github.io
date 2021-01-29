@@ -1,0 +1,1572 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    
+    <title>极简Java十：HTML5和CSS3 - 及时当勉励，岁月不待人！@iNuo</title>
+    
+    <meta name="description" content="第一章  本章内容  html   为什么要学习HTML？ 制作精美的电商、门户等静态网页
+什么是HTML   HTML：超文本标记语言（Hyper Text Markup Language）
+  HTML不是一种编程语言，而是一种标记语言，描述网页的语言
+  HTML使用标签描述网页中图片、文本、音乐、视频、超链接等
+  HTML基本标签    名称 标签 示例     标题标签 &lt;h1&gt;~&lt;h6&gt; &lt;h1&gt;静夜思&lt;/h1&gt;   段落和换行标签 &lt;p&gt;…&lt;/p&gt;&lt;br/&gt; &lt;p&gt;床前明月光疑是地上霜&lt;/p&gt;   水平线标签 &lt;hr/&gt; &lt;hr/&gt;   斜体 &lt;em&gt;…&lt;/em&gt; 举头望明月   字体加粗 &lt;strong&gt;…&lt;/strong&gt; 低头思故乡    &lt;!DOCTYPE html&gt; &lt;html lang=&#34;zh-cn&#34;&gt; &lt;head&gt; &lt;meta charset=&#34;UTF-8&#34;&gt; &lt;title&gt;静夜思&lt;/title&gt; &lt;/head&gt; &lt;body&gt; &lt;h1&gt;静夜思&lt;/h1&gt; &lt;hr/&gt; &lt;p&gt; 床前明月光&lt;br/&gt; 疑是地上霜&lt;br/&gt; &lt;em&gt;举头望明月&lt;/em&gt;&lt;br/&gt; &lt;strong&gt;低头思故乡&lt;/strong&gt; &lt;/p&gt; &lt;/body&gt; &lt;/html&gt; 图像标签: 常见图片格式：jpg、gif、bmp、png">
+    <meta name="author" content="">
+    
+    <link href="https://xshi000.github.io/an-old-hope.min.css" rel="stylesheet">
+    <link href="https://xshi000.github.io/style.css" rel="stylesheet">
+    <link href="https://xshi000.github.io/custom.css" rel="stylesheet">
+    
+    <link rel="apple-touch-icon" href="https://xshi000.github.io/apple-touch-icon.png">
+    <link rel="icon" href="https://xshi000.github.io/favicon.ico">
+    <meta name="generator" content="Hugo 0.65.3" />
+    
+    
+    
+    <script>
+      function setTheme() {
+        const time = new Date();
+
+        const prev = localStorage.getItem('date');
+        const date = String(time.getMonth() + 1) + '.' + String(time.getDate());
+
+        const now = time.getTime();
+        let sunrise;
+        let sunset;
+
+        function setBodyClass() {
+          if (now > sunrise && now < sunset) return;
+          document.body.classList.add('dark');
+        }
+
+        if (date !== prev) {
+          fetch('https://api.ipgeolocation.io/astronomy?apiKey=5ed37d85103e4defa5df4c5298ed5215')
+            .then(res => res.json())
+            .then(data => {
+              sunrise = data.sunrise.split(':').map(Number);
+              sunset = data.sunset.split(':').map(Number);
+            })
+            .catch(() => {
+              sunrise = [7, 0];
+              sunset = [19, 0];
+            })
+            .finally(() => {
+              sunrise = time.setHours(sunrise[0], sunrise[1], 0);
+              sunset = time.setHours(sunset[0], sunset[1], 0);
+              setBodyClass();
+              localStorage.setItem('sunrise', sunrise);
+              localStorage.setItem('sunset', sunset);
+            });
+          localStorage.setItem('date', date);
+        } else {
+          sunrise = Number(localStorage.getItem('sunrise'));
+          sunset = Number(localStorage.getItem('sunset'));
+          setBodyClass();
+        }
+      }
+    </script>
+  </head>
+  <body class="single">
+    <script>
+      setTheme();
+    </script>
+    <header class="header">
+      <nav class="nav">
+        <p class="logo"><a href="https://xshi000.github.io/">及时当勉励，岁月不待人！@iNuo</a></p>
+      </nav>
+    </header>
+    <main class="main">
+
+
+<article class="post-single">
+  <header class="post-header">
+    <h1 class="post-title">极简Java十：HTML5和CSS3</h1>
+    <div class="post-meta">January 29, 2021</div>
+  </header>
+  <div class="post-content"><h3 id="第一章">第一章</h3>
+<hr>
+<h5 id="本章内容">本章内容</h5>
+<ul>
+<li>html</li>
+</ul>
+<hr>
+<h5 id="为什么要学习html">为什么要学习HTML？</h5>
+<p>制作精美的电商、门户等静态网页</p>
+<p><img src="/img/clip_image002-1608881634904.jpg" alt="img"></p>
+<h5 id="什么是html">什么是HTML</h5>
+<ul>
+<li>
+<p>HTML：超文本标记语言（Hyper Text Markup Language）</p>
+</li>
+<li>
+<p>HTML不是一种编程语言，而是一种标记语言，描述网页的语言</p>
+</li>
+<li>
+<p>HTML使用标签描述网页中图片、文本、音乐、视频、超链接等</p>
+</li>
+</ul>
+<h5 id="html基本标签">HTML基本标签</h5>
+<table>
+<thead>
+<tr>
+<th>名称</th>
+<th>标签</th>
+<th>示例</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>标题标签</td>
+<td>&lt;h1&gt;~&lt;h6&gt;</td>
+<td>&lt;h1&gt;静夜思&lt;/h1&gt;</td>
+</tr>
+<tr>
+<td>段落和换行标签</td>
+<td>&lt;p&gt;…&lt;/p&gt;<!-- raw HTML omitted -->&lt;br/&gt;</td>
+<td>&lt;p&gt;床前明月光<!-- raw HTML omitted -->疑是地上霜&lt;/p&gt;</td>
+</tr>
+<tr>
+<td>水平线标签</td>
+<td>&lt;hr/&gt;</td>
+<td>&lt;hr/&gt;</td>
+</tr>
+<tr>
+<td>斜体</td>
+<td>&lt;em&gt;…&lt;/em&gt;</td>
+<td><!-- raw HTML omitted -->举头望明月<!-- raw HTML omitted --></td>
+</tr>
+<tr>
+<td>字体加粗</td>
+<td>&lt;strong&gt;…&lt;/strong&gt;</td>
+<td><!-- raw HTML omitted -->低头思故乡<!-- raw HTML omitted --></td>
+</tr>
+</tbody>
+</table>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html"><span style="color:#75715e">&lt;!DOCTYPE html&gt;</span>
+&lt;<span style="color:#f92672">html</span> <span style="color:#a6e22e">lang</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;zh-cn&#34;</span>&gt;
+&lt;<span style="color:#f92672">head</span>&gt;
+    &lt;<span style="color:#f92672">meta</span> <span style="color:#a6e22e">charset</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;UTF-8&#34;</span>&gt;
+    &lt;<span style="color:#f92672">title</span>&gt;静夜思&lt;/<span style="color:#f92672">title</span>&gt;
+&lt;/<span style="color:#f92672">head</span>&gt;
+&lt;<span style="color:#f92672">body</span>&gt;
+&lt;<span style="color:#f92672">h1</span>&gt;静夜思&lt;/<span style="color:#f92672">h1</span>&gt;
+&lt;<span style="color:#f92672">hr</span>/&gt;
+&lt;<span style="color:#f92672">p</span>&gt;
+    床前明月光&lt;<span style="color:#f92672">br</span>/&gt;
+    疑是地上霜&lt;<span style="color:#f92672">br</span>/&gt;
+    &lt;<span style="color:#f92672">em</span>&gt;举头望明月&lt;/<span style="color:#f92672">em</span>&gt;&lt;<span style="color:#f92672">br</span>/&gt;
+    &lt;<span style="color:#f92672">strong</span>&gt;低头思故乡&lt;/<span style="color:#f92672">strong</span>&gt;
+&lt;/<span style="color:#f92672">p</span>&gt;
+&lt;/<span style="color:#f92672">body</span>&gt;
+&lt;/<span style="color:#f92672">html</span>&gt;
+</code></pre></div><h5 id="图像标签">图像标签:</h5>
+<p>常见图片格式：jpg、gif、bmp、png</p>
+<p><img src="img/clip_image003-1608881634905.png" alt="img"></p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html"><span style="color:#75715e">&lt;!--图片地址正确 alt不显示--&gt;</span>
+&lt;<span style="color:#f92672">img</span> <span style="color:#a6e22e">src</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;../img/img-1.jpg&#34;</span> <span style="color:#a6e22e">alt</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;&#34;</span>/&gt;
+&lt;<span style="color:#f92672">br</span>/&gt;
+
+<span style="color:#75715e">&lt;!--图片地址不正确 alt显示--&gt;</span>
+&lt;<span style="color:#f92672">img</span> <span style="color:#a6e22e">src</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;../img/img1.jpg&#34;</span> <span style="color:#a6e22e">alt</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;图片显示出错，路径问题！！&#34;</span>/&gt;
+</code></pre></div><p><strong>超链接：</strong></p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#f92672">a</span> <span style="color:#a6e22e">href</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;链接地址&#34;</span> <span style="color:#a6e22e">target</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;目标窗口位置&#34;</span>&gt;文本或图像&lt;/<span style="color:#f92672">a</span>&gt;
+</code></pre></div><p>目标窗口位置：_self 自身窗口 _blank新建窗口</p>
+<p>超链接的应用</p>
+<p>​	1、页面间链接：A页到B页，网上常见链接</p>
+<p>​	2、锚链接：跳至自身固定位置，需锚标记</p>
+<p>​	3、功能性链接：电子邮件、QQ、MSN等链接</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html"><span style="color:#75715e">&lt;!--链接--&gt;</span>
+<span style="color:#75715e">&lt;!--页面链接--&gt;</span>
+&lt;<span style="color:#f92672">a</span> <span style="color:#a6e22e">href</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;A_Target.html&#34;</span> <span style="color:#a6e22e">target</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;_self&#34;</span>&gt;跳转至新页面（本页面打开）&lt;/<span style="color:#f92672">a</span>&gt;
+&lt;<span style="color:#f92672">br</span>/&gt;
+&lt;<span style="color:#f92672">a</span> <span style="color:#a6e22e">href</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;A_Target.html&#34;</span> <span style="color:#a6e22e">target</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;_blank&#34;</span>&gt;跳转至新页面（新页面打开）&lt;/<span style="color:#f92672">a</span>&gt;
+&lt;<span style="color:#f92672">br</span>/&gt;
+
+<span style="color:#75715e">&lt;!--锚链接--&gt;</span>
+&lt;<span style="color:#f92672">a</span> <span style="color:#a6e22e">name</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;top&#34;</span>&gt;&lt;/<span style="color:#f92672">a</span>&gt;
+&lt;<span style="color:#f92672">a</span> <span style="color:#a6e22e">href</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;#top&#34;</span>&gt;回到顶部&lt;/<span style="color:#f92672">a</span>&gt;
+&lt;<span style="color:#f92672">br</span>/&gt;
+
+<span style="color:#75715e">&lt;!--功能性链接--&gt;</span>
+[&lt;<span style="color:#f92672">a</span> <span style="color:#a6e22e">href</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;mailto:1131239464@qq.com&#34;</span>&gt;联系iNuo&lt;/<span style="color:#f92672">a</span>&gt;]
+</code></pre></div><h5 id="列表">列表:</h5>
+<p>Ul li    快捷键：ul&gt;li*3   Tab</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#f92672">ul</span>&gt;
+&lt;<span style="color:#f92672">li</span>&gt;北京&lt;/<span style="color:#f92672">li</span>&gt;
+&lt;<span style="color:#f92672">li</span>&gt;上海&lt;/<span style="color:#f92672">li</span>&gt;
+&lt;/<span style="color:#f92672">ul</span>&gt;
+</code></pre></div><h5 id="注释和特殊符号">注释和特殊符号：</h5>
+<p>注释快捷键: Ctrl+/</p>
+<pre><code>&lt;!--&gt;
+</code></pre><table>
+<thead>
+<tr>
+<th><strong>特殊符号</strong></th>
+<th><strong>字符实体</strong></th>
+<th><strong>示例</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>空格</td>
+<td>&amp;nbsp;</td>
+<td><!-- raw HTML omitted -->百度<!-- raw HTML omitted --> | <!-- raw HTML omitted -->新浪<!-- raw HTML omitted --></td>
+</tr>
+<tr>
+<td>大于号(&gt;)</td>
+<td>&amp;gt;</td>
+<td>如果时间&gt;晚上6点，就坐车回家</td>
+</tr>
+<tr>
+<td>小于号(&lt;)</td>
+<td>&amp;lt;</td>
+<td>如果时间&lt;早上7点，就走路去上学</td>
+</tr>
+<tr>
+<td>引号(&quot;)</td>
+<td>&amp;quot;</td>
+<td>W3C规范中，HTML的属性值必须用成对的&quot;引起来</td>
+</tr>
+<tr>
+<td>版权符号@</td>
+<td>&amp;copy;</td>
+<td>©</td>
+</tr>
+</tbody>
+</table>
+<h5 id="w3c标准">W3C标准：</h5>
+<ul>
+<li>
+<p>标签名称、属性名称必须小写</p>
+</li>
+<li>
+<p>标签必须严格嵌套，并且必须闭合，即使空元素标签也必须闭合</p>
+</li>
+<li>
+<p>属性值必须用引号引起来</p>
+</li>
+</ul>
+<h5 id="网页上播放视频和音频的方法">网页上播放视频和音频的方法：</h5>
+<p>视频元素 Video</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html"><span style="color:#75715e">&lt;!--兼容各种浏览器--&gt;</span>
+&lt;<span style="color:#f92672">video</span> <span style="color:#a6e22e">width</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;320&#34;</span> <span style="color:#a6e22e">height</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;240&#34;</span> <span style="color:#a6e22e">controls</span>&gt;
+    &lt;<span style="color:#f92672">source</span> <span style="color:#a6e22e">src</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;../video/story.mov&#34;</span> <span style="color:#a6e22e">type</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;video/mov&#34;</span>/&gt;
+    &lt;<span style="color:#f92672">source</span> <span style="color:#a6e22e">src</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;../video/iNuo.mp4&#34;</span> <span style="color:#a6e22e">type</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;video/mp4&#34;</span>/&gt;
+    你的浏览器不支持video元素
+&lt;/<span style="color:#f92672">video</span>&gt;
+</code></pre></div><p>音频元素 audio</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#f92672">audio</span> <span style="color:#a6e22e">controls</span>&gt;
+    &lt;<span style="color:#f92672">source</span> <span style="color:#a6e22e">src</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;../video/mm.mp3&#34;</span> <span style="color:#a6e22e">type</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;audio/mp3&#34;</span>&gt;&lt;/<span style="color:#f92672">source</span>&gt;
+    &lt;<span style="color:#f92672">source</span> <span style="color:#a6e22e">src</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;../video/mn.mp3&#34;</span> <span style="color:#a6e22e">type</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;audio/mp3&#34;</span>/&gt;
+    你的浏览器不支持audio元素
+&lt;/<span style="color:#f92672">audio</span>&gt;
+</code></pre></div><h5 id="页面结构分析">页面结构分析：</h5>
+<p>页面布局分析</p>
+<p><img src="/img/clip_image004-1608881634905.png" alt="img"></p>
+<h5 id="html5的结构元素">HTML5的结构元素：</h5>
+<table>
+<thead>
+<tr>
+<th><strong>元素名</strong></th>
+<th><strong>描   述</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>header</td>
+<td>标题头部区域的内容（用于页面或页面中的一块区域）</td>
+</tr>
+<tr>
+<td>footer</td>
+<td>标记脚部区域的内容（用于整个页面或页面的一块区域）</td>
+</tr>
+<tr>
+<td>section</td>
+<td>Web页面中的一块独立区域</td>
+</tr>
+<tr>
+<td>article</td>
+<td>独立的文章内容</td>
+</tr>
+<tr>
+<td>aside</td>
+<td>相关内容或应用（常用于侧边栏）</td>
+</tr>
+<tr>
+<td>nav</td>
+<td>导航类辅助内容</td>
+</tr>
+</tbody>
+</table>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#f92672">header</span>&gt;&lt;<span style="color:#f92672">h2</span>&gt;网页头部&lt;/<span style="color:#f92672">h2</span>&gt; &lt;/<span style="color:#f92672">header</span>&gt;
+
+    &lt;<span style="color:#f92672">section</span>&gt;&lt;<span style="color:#f92672">h2</span>&gt;网页主体部分&lt;/<span style="color:#f92672">h2</span>&gt;&lt;/<span style="color:#f92672">section</span>&gt;
+
+    &lt;<span style="color:#f92672">footer</span>&gt;&lt;<span style="color:#f92672">h2</span>&gt;网页底部&lt;/<span style="color:#f92672">h2</span>&gt;&lt;/<span style="color:#f92672">footer</span>&gt;
+</code></pre></div><p>布局案例：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html"><span style="color:#75715e">&lt;!DOCTYPE html&gt;</span>
+
+&lt;<span style="color:#f92672">html</span>&gt;
+
+&lt;<span style="color:#f92672">head</span> <span style="color:#a6e22e">lang</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;en&#34;</span>&gt;
+
+    &lt;<span style="color:#f92672">meta</span> <span style="color:#a6e22e">charset</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;UTF-8&#34;</span>&gt;
+
+  &lt;<span style="color:#f92672">title</span>&gt;网易邮箱页面布局&lt;/<span style="color:#f92672">title</span>&gt;
+
+  <span style="color:#75715e">&lt;!--此段代码只是让大家能更好的看到每块元素的位置，后面在CSS中会具体讲解--&gt;</span>
+
+    &lt;<span style="color:#f92672">style</span>&gt;
+
+    <span style="color:#f92672">header</span><span style="color:#f92672">,</span><span style="color:#f92672">section</span><span style="color:#f92672">,</span><span style="color:#f92672">footer</span>{
+
+      <span style="color:#66d9ef">height</span>: <span style="color:#ae81ff">200</span><span style="color:#66d9ef">px</span>;
+
+      <span style="color:#66d9ef">border</span>: <span style="color:#ae81ff">1</span><span style="color:#66d9ef">px</span> <span style="color:#66d9ef">solid</span> <span style="color:#66d9ef">red</span>;
+
+    }
+
+  &lt;/<span style="color:#f92672">style</span>&gt;
+
+&lt;/<span style="color:#f92672">head</span>&gt;
+
+&lt;<span style="color:#f92672">body</span>&gt;
+
+  &lt;<span style="color:#f92672">header</span>&gt;
+
+    &lt;<span style="color:#f92672">h2</span>&gt;网页头部&lt;/<span style="color:#f92672">h2</span>&gt;
+
+  &lt;/<span style="color:#f92672">header</span>&gt;
+
+  &lt;<span style="color:#f92672">section</span>&gt;
+
+    &lt;<span style="color:#f92672">h2</span>&gt;网页主体部分&lt;/<span style="color:#f92672">h2</span>&gt;
+
+  &lt;/<span style="color:#f92672">section</span>&gt;
+
+  &lt;<span style="color:#f92672">footer</span>&gt;
+
+    &lt;<span style="color:#f92672">h2</span>&gt;网页底部&lt;/<span style="color:#f92672">h2</span>&gt;
+
+  &lt;/<span style="color:#f92672">footer</span>&gt;
+
+&lt;/<span style="color:#f92672">body</span>&gt;
+
+&lt;/<span style="color:#f92672">html</span>&gt;
+</code></pre></div><h5 id="表格的基本结构">表格的基本结构:</h5>
+<p><img src="/img/clip_image006-1608881634905.jpg" alt="img"></p>
+<p>表格的基本语法:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html"> &lt;<span style="color:#f92672">table</span>&gt;
+ &lt;<span style="color:#f92672">tr</span>&gt;
+     &lt;<span style="color:#f92672">td</span>&gt;单元格1&lt;/<span style="color:#f92672">td</span>&gt;
+     &lt;<span style="color:#f92672">td</span>&gt;单元格2&lt;/<span style="color:#f92672">td</span>&gt;
+    ……
+  &lt;/<span style="color:#f92672">tr</span>&gt;
+    ……
+&lt;/<span style="color:#f92672">table</span>&gt;
+</code></pre></div><p>表格的跨行和跨列:</p>
+<p><img src="/img/clip_image007-1608881634905.png" alt="img"></p>
+<p><img src="/img/clip_image008-1608881634905.png" alt="img"></p>
+<p>表格快捷键：table&gt;tr*5&gt;td*3  Tab</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html"><span style="color:#75715e">&lt;!--表格--&gt;</span>
+&lt;<span style="color:#f92672">table</span> <span style="color:#a6e22e">border</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;1&#34;</span>&gt;
+&lt;<span style="color:#f92672">tr</span>&gt;
+    &lt;<span style="color:#f92672">td</span> <span style="color:#a6e22e">colspan</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;3&#34;</span>&gt;三年级五班学员的语文成绩和数学成线&lt;/<span style="color:#f92672">td</span>&gt;
+&lt;/<span style="color:#f92672">tr</span>&gt;
+
+&lt;<span style="color:#f92672">tr</span>&gt;
+    &lt;<span style="color:#f92672">td</span> <span style="color:#a6e22e">rowspan</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;2&#34;</span>&gt;白杨&lt;/<span style="color:#f92672">td</span>&gt;
+    &lt;<span style="color:#f92672">td</span>&gt;语文&lt;/<span style="color:#f92672">td</span>&gt;
+    &lt;<span style="color:#f92672">td</span>&gt;98&lt;/<span style="color:#f92672">td</span>&gt;
+&lt;/<span style="color:#f92672">tr</span>&gt;
+
+&lt;<span style="color:#f92672">tr</span>&gt;
+    &lt;<span style="color:#f92672">td</span>&gt;数学&lt;/<span style="color:#f92672">td</span>&gt;
+    &lt;<span style="color:#f92672">td</span>&gt;96&lt;/<span style="color:#f92672">td</span>&gt;
+&lt;/<span style="color:#f92672">tr</span>&gt;
+
+&lt;<span style="color:#f92672">tr</span>&gt;
+    &lt;<span style="color:#f92672">td</span> <span style="color:#a6e22e">rowspan</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;2&#34;</span>&gt;杨晨&lt;/<span style="color:#f92672">td</span>&gt;
+    &lt;<span style="color:#f92672">td</span>&gt;语文&lt;/<span style="color:#f92672">td</span>&gt;
+    &lt;<span style="color:#f92672">td</span>&gt;92&lt;/<span style="color:#f92672">td</span>&gt;
+&lt;/<span style="color:#f92672">tr</span>&gt;
+
+&lt;<span style="color:#f92672">tr</span>&gt;
+    &lt;<span style="color:#f92672">td</span>&gt;数学&lt;/<span style="color:#f92672">td</span>&gt;
+    &lt;<span style="color:#f92672">td</span>&gt;100&lt;/<span style="color:#f92672">td</span>&gt;
+&lt;/<span style="color:#f92672">tr</span>&gt;
+
+&lt;/<span style="color:#f92672">table</span>&gt;
+</code></pre></div><h5 id="表单">表单：</h5>
+<p>表单在网页中的应用有哪些？</p>
+<p>注册、登录</p>
+<p>个人信息记录</p>
+<p>……</p>
+<p><img src="/img/clip_image010-1608881634905.jpg" alt="img"></p>
+<p>表单的基本结构:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#f92672">form</span>  <span style="color:#a6e22e">method</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;post&#34;</span> <span style="color:#a6e22e">action</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;result.html&#34;</span>&gt;
+   &lt;<span style="color:#f92672">p</span>&gt;  名字：&lt;<span style="color:#f92672">input</span> <span style="color:#a6e22e">name</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;name&#34;</span> <span style="color:#a6e22e">type</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;text&#34;</span> &gt;  &lt;/<span style="color:#f92672">p</span>&gt;
+   &lt;<span style="color:#f92672">p</span>&gt;  密码：&lt;<span style="color:#f92672">input</span> <span style="color:#a6e22e">name</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;pass&#34;</span> <span style="color:#a6e22e">type</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;password&#34;</span> &gt;  &lt;/<span style="color:#f92672">p</span>&gt;
+   &lt;<span style="color:#f92672">p</span>&gt;
+      &lt;<span style="color:#f92672">input</span> <span style="color:#a6e22e">type</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;submit&#34;</span> <span style="color:#a6e22e">name</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;Button&#34;</span> <span style="color:#a6e22e">value</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;提交&#34;</span>&gt;
+      &lt;<span style="color:#f92672">input</span> <span style="color:#a6e22e">type</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;reset&#34;</span> <span style="color:#a6e22e">name</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;Reset&#34;</span> <span style="color:#a6e22e">value</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;重填&#34;</span>&gt; 
+   &lt;/<span style="color:#f92672">p</span>&gt;
+&lt;/<span style="color:#f92672">form</span>&gt;
+</code></pre></div><p>Method: 发送表单数据的方式常用值：get | post；post方式提交的数据安全性要明显高于get方式提交的数据。因此在实际开发中通常采用post方式提交表单数据。</p>
+<p>Action: 向何处发送表单数据</p>
+<p>表单的元素:</p>
+<table>
+<thead>
+<tr>
+<th>属性</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>type</td>
+<td>元素类型：text、password、checkbox、radio、submit、<!-- raw HTML omitted -->reset、file、image 和 button，默认为 text</td>
+</tr>
+<tr>
+<td>size</td>
+<td>元素的宽度，当 type 为 text 或 password时</td>
+</tr>
+<tr>
+<td>maxlength</td>
+<td>type为text 或 password 时，输入的最大字符数</td>
+</tr>
+<tr>
+<td>checked</td>
+<td>type为radio或checkbox时，指定按钮是否是被选中</td>
+</tr>
+</tbody>
+</table>
+<h5 id="列表框">列表框:</h5>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#f92672">select</span> <span style="color:#a6e22e">name</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;名称&#34;</span> <span style="color:#a6e22e">size</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;行数&#34;</span>&gt;
+    
+&lt;<span style="color:#f92672">option</span> <span style="color:#a6e22e">value</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;值&#34;</span> <span style="color:#a6e22e">selected</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;selected&#34;</span>&gt;
+   …
+&lt;/<span style="color:#f92672">option</span> &gt;
+
+&lt;<span style="color:#f92672">option</span> <span style="color:#a6e22e">value</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;值&#34;</span>&gt;…&lt;/<span style="color:#f92672">option</span>&gt;
+
+&lt;/<span style="color:#f92672">select</span>&gt;
+</code></pre></div><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#f92672">select</span> <span style="color:#a6e22e">name</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;city&#34;</span>&gt;
+            &lt;<span style="color:#f92672">option</span> <span style="color:#a6e22e">value</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;wh&#34;</span>&gt;武汉&lt;/<span style="color:#f92672">option</span>&gt;
+            &lt;<span style="color:#f92672">option</span> <span style="color:#a6e22e">value</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;jz&#34;</span> <span style="color:#a6e22e">selected</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;selected&#34;</span>&gt;锦州&lt;/<span style="color:#f92672">option</span>&gt;
+&lt;/<span style="color:#f92672">select</span>&gt;
+</code></pre></div><h5 id="多行文本域">多行文本域:</h5>
+<p><img src="/img/clip_image011-1608881634906.png" alt="img"></p>
+<p>隐藏域: type=&quot;hidden&rdquo;</p>
+<p>只读: readonly=&quot;readonly&rdquo;</p>
+<p>禁用: disabled=&quot;disabled&rdquo;</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html"><span style="color:#75715e">&lt;!--        多行文本域--&gt;</span>
+&lt;<span style="color:#f92672">textarea</span> <span style="color:#a6e22e">name</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;showText&#34;</span> <span style="color:#a6e22e">rows</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;5&#34;</span> <span style="color:#a6e22e">cols</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;20&#34;</span>&gt;&lt;/<span style="color:#f92672">textarea</span>&gt;
+
+<span style="color:#75715e">&lt;!--        隐藏文本域--&gt;</span>
+&lt;<span style="color:#f92672">input</span> <span style="color:#a6e22e">type</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;hidden&#34;</span> <span style="color:#a6e22e">name</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;id&#34;</span> <span style="color:#a6e22e">value</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;a&#34;</span>&gt;
+</code></pre></div><h5 id="表单的高级应用">表单的高级应用:</h5>
+<p><img src="/img/clip_image012-1608881634906.png" alt="img"></p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#f92672">form</span> <span style="color:#a6e22e">action</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;result.html&#34;</span> <span style="color:#a6e22e">method</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;post&#34;</span>&gt;
+&lt;<span style="color:#f92672">table</span>&gt;
+    &lt;<span style="color:#f92672">tr</span>&gt;
+        &lt;<span style="color:#f92672">td</span>&gt;用户名:&lt;/<span style="color:#f92672">td</span>&gt;
+        &lt;<span style="color:#f92672">td</span>&gt;&lt;<span style="color:#f92672">input</span> <span style="color:#a6e22e">type</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;text&#34;</span> <span style="color:#a6e22e">name</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;userName&#34;</span>&gt;&lt;/<span style="color:#f92672">td</span>&gt;
+    &lt;/<span style="color:#f92672">tr</span>&gt;
+    &lt;<span style="color:#f92672">tr</span>&gt;
+        &lt;<span style="color:#f92672">td</span>&gt;密码框:&lt;/<span style="color:#f92672">td</span>&gt;
+        &lt;<span style="color:#f92672">td</span>&gt;&lt;<span style="color:#f92672">input</span> <span style="color:#a6e22e">type</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;password&#34;</span> <span style="color:#a6e22e">name</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;pwd&#34;</span>&gt;&lt;/<span style="color:#f92672">td</span>&gt;
+    &lt;/<span style="color:#f92672">tr</span>&gt;
+    &lt;<span style="color:#f92672">tr</span>&gt;
+        &lt;<span style="color:#f92672">td</span>&gt;性别:&lt;/<span style="color:#f92672">td</span>&gt;
+        &lt;<span style="color:#f92672">td</span>&gt;
+            &lt;<span style="color:#f92672">input</span> <span style="color:#a6e22e">name</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;sex&#34;</span> <span style="color:#a6e22e">type</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;radio&#34;</span> <span style="color:#a6e22e">checked</span>  <span style="color:#a6e22e">value</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;男&#34;</span>&gt;男
+            &lt;<span style="color:#f92672">input</span> <span style="color:#a6e22e">name</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;sex&#34;</span> <span style="color:#a6e22e">type</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;radio&#34;</span>  <span style="color:#a6e22e">value</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;女&#34;</span>&gt;女
+        &lt;/<span style="color:#f92672">td</span>&gt;
+    &lt;/<span style="color:#f92672">tr</span>&gt;
+    &lt;<span style="color:#f92672">tr</span>&gt;
+        &lt;<span style="color:#f92672">td</span>&gt;爱好&lt;/<span style="color:#f92672">td</span>&gt;
+        &lt;<span style="color:#f92672">td</span>&gt;
+            &lt;<span style="color:#f92672">input</span> <span style="color:#a6e22e">type</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;checkbox&#34;</span> <span style="color:#a6e22e">name</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;hobby&#34;</span> <span style="color:#a6e22e">value</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;吃&#34;</span> <span style="color:#a6e22e">checked</span>&gt;吃&amp;nbsp;
+            &lt;<span style="color:#f92672">input</span> <span style="color:#a6e22e">type</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;checkbox&#34;</span> <span style="color:#a6e22e">name</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;hobby&#34;</span> <span style="color:#a6e22e">value</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;玩&#34;</span> &gt;玩
+            &lt;<span style="color:#f92672">input</span> <span style="color:#a6e22e">type</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;checkbox&#34;</span> <span style="color:#a6e22e">name</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;hobby&#34;</span> <span style="color:#a6e22e">value</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;睡觉&#34;</span> &gt;睡觉&amp;nbsp;
+            &lt;<span style="color:#f92672">input</span> <span style="color:#a6e22e">type</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;checkbox&#34;</span> <span style="color:#a6e22e">name</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;hobby&#34;</span> <span style="color:#a6e22e">value</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;赛车&#34;</span> &gt;赛车
+        &lt;/<span style="color:#f92672">td</span>&gt;
+    &lt;/<span style="color:#f92672">tr</span>&gt;
+    &lt;<span style="color:#f92672">tr</span>&gt;
+        &lt;<span style="color:#f92672">td</span>&gt;简历上传&lt;/<span style="color:#f92672">td</span>&gt;
+        &lt;<span style="color:#f92672">td</span>&gt;&lt;<span style="color:#f92672">input</span> <span style="color:#a6e22e">type</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;file&#34;</span> <span style="color:#a6e22e">name</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;jianli&#34;</span>&gt;&lt;/<span style="color:#f92672">td</span>&gt;
+    &lt;/<span style="color:#f92672">tr</span>&gt;
+    &lt;<span style="color:#f92672">tr</span>&gt;
+        &lt;<span style="color:#f92672">td</span>&gt;城市&lt;/<span style="color:#f92672">td</span>&gt;
+        &lt;<span style="color:#f92672">td</span>&gt;
+            &lt;<span style="color:#f92672">select</span> <span style="color:#a6e22e">name</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;city&#34;</span>&gt;
+            &lt;<span style="color:#f92672">option</span> <span style="color:#a6e22e">value</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;北京&#34;</span>&gt;北京&lt;/<span style="color:#f92672">option</span>&gt;
+            &lt;<span style="color:#f92672">option</span> <span style="color:#a6e22e">value</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;上海&#34;</span>&gt;上海&lt;/<span style="color:#f92672">option</span>&gt;
+        	&lt;/<span style="color:#f92672">select</span>&gt;
+        &lt;/<span style="color:#f92672">td</span>&gt;
+    &lt;/<span style="color:#f92672">tr</span>&gt;
+    &lt;<span style="color:#f92672">tr</span>&gt;
+        &lt;<span style="color:#f92672">td</span>&gt;个人简介&lt;/<span style="color:#f92672">td</span>&gt;
+        &lt;<span style="color:#f92672">td</span>&gt;&lt;<span style="color:#f92672">textarea</span> <span style="color:#a6e22e">name</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;intro&#34;</span> <span style="color:#a6e22e">cols</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;30&#34;</span> <span style="color:#a6e22e">rows</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;10&#34;</span>&gt;&lt;/<span style="color:#f92672">textarea</span>&gt;&lt;/<span style="color:#f92672">td</span>&gt;
+    &lt;/<span style="color:#f92672">tr</span>&gt;
+    &lt;<span style="color:#f92672">tr</span>&gt;
+        &lt;<span style="color:#f92672">td</span> <span style="color:#a6e22e">colspan</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;2&#34;</span>&gt;
+            &lt;<span style="color:#f92672">input</span> <span style="color:#a6e22e">type</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;submit&#34;</span> <span style="color:#a6e22e">value</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;提交&#34;</span> <span style="color:#a6e22e">disabled</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;disabled&#34;</span>&gt;
+        	&lt;<span style="color:#f92672">input</span> <span style="color:#a6e22e">type</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;reset&#34;</span> <span style="color:#a6e22e">value</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;重置&#34;</span>&gt;
+            &lt;<span style="color:#f92672">input</span> <span style="color:#a6e22e">type</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;button&#34;</span> <span style="color:#a6e22e">value</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;普通按钮&#34;</span>&gt;
+            &lt;<span style="color:#f92672">input</span> <span style="color:#a6e22e">type</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;image&#34;</span> <span style="color:#a6e22e">src</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;../img/btnLogin.jpg&#34;</span>&gt;
+        &lt;/<span style="color:#f92672">td</span>&gt;
+    &lt;/<span style="color:#f92672">tr</span>&gt;
+   &lt;/<span style="color:#f92672">table</span>&gt;
+&lt;/<span style="color:#f92672">form</span>&gt;
+</code></pre></div><h5 id="作业使用表格和表单完成">作业：使用表格和表单完成</h5>
+<p><img src="/img/clip_image014-1608881634906.jpg" alt="img"></p>
+<hr>
+<h3 id="第二章">第二章</h3>
+<hr>
+<h5 id="本章内容-1">本章内容</h5>
+<ul>
+<li>Css概念</li>
+<li>选择器</li>
+<li>文本元素</li>
+<li>标签分类</li>
+<li>Css特性</li>
+<li>链接伪类</li>
+</ul>
+<hr>
+<h4 id="21-css概念">2.1 Css概念</h4>
+<p>CSS 指层叠样式表 (Cascading Style Sheets)(级联样式表)</p>
+<p>Css是用来美化html标签的，相当于页面化妆。</p>
+<p>样式表书写位置:</p>
+<p><img src="/img/clip_image001-1608882741563.png" alt="img"></p>
+<p>举例： Div是一个内容块</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#f92672">head</span>&gt;
+	&lt;<span style="color:#f92672">style</span> <span style="color:#a6e22e">type</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;text/css&#34;</span>&gt;
+        <span style="color:#f92672">Div</span>{
+            <span style="color:#66d9ef">color</span>:<span style="color:#66d9ef">red</span>
+        }
+    &lt;/<span style="color:#f92672">style</span>&gt;
+&lt;/<span style="color:#f92672">head</span>&gt;
+
+
+&lt;<span style="color:#f92672">body</span>&gt;
+&lt;<span style="color:#f92672">div</span>&gt;
+    我爱北京!
+&lt;/<span style="color:#f92672">div</span>&gt;
+&lt;/<span style="color:#f92672">body</span>&gt;
+</code></pre></div><h5 id="选择器">选择器</h5>
+<p>{属性:值； 属性:值;}</p>
+<table>
+<thead>
+<tr>
+<th>属性</th>
+<th>解释</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Width:20px;</td>
+<td>宽</td>
+</tr>
+<tr>
+<td>Height:20px;</td>
+<td>高</td>
+</tr>
+<tr>
+<td>Background-color:red;</td>
+<td>背景颜色</td>
+</tr>
+<tr>
+<td>font-size:24px;</td>
+<td>文字大小</td>
+</tr>
+<tr>
+<td>text-align:left | center| right</td>
+<td>内容的水平对齐方式</td>
+</tr>
+<tr>
+<td>text-indent:2em;</td>
+<td>首行缩进</td>
+</tr>
+<tr>
+<td>Color:red;</td>
+<td>文字颜色</td>
+</tr>
+</tbody>
+</table>
+<h4 id="22-选择器">2.2 选择器</h4>
+<h5 id="写法">写法</h5>
+<p>选择器是一个选择谁（标签）的过程。</p>
+<h5 id="基础选择器">基础选择器</h5>
+<p>标签选择器</p>
+<pre><code>标签{属性：值;}
+</code></pre><p>特点：标签选择器定义之后，会将页面所有的元素都执行这个标签样式。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#f92672">head</span>&gt;
+	&lt;<span style="color:#f92672">style</span> <span style="color:#a6e22e">type</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;text/css&#34;</span>&gt;
+        <span style="color:#f92672">div</span>{
+            <span style="color:#66d9ef">font-size</span>: <span style="color:#ae81ff">20</span><span style="color:#66d9ef">px</span>;
+            <span style="color:#66d9ef">color</span>:<span style="color:#ae81ff">#000000</span>;
+            <span style="color:#66d9ef">width</span>:<span style="color:#ae81ff">100</span><span style="color:#66d9ef">px</span>;
+            <span style="color:#66d9ef">height</span>:<span style="color:#ae81ff">100</span><span style="color:#66d9ef">px</span>;
+            <span style="color:#66d9ef">background-color</span>: <span style="color:#66d9ef">red</span>;
+        }
+    &lt;/<span style="color:#f92672">style</span>&gt;
+&lt;/<span style="color:#f92672">head</span>&gt;
+&lt;<span style="color:#f92672">body</span>&gt;
+&lt;<span style="color:#f92672">div</span>&gt;我爱北京&lt;/<span style="color:#f92672">div</span>&gt;
+&lt;<span style="color:#f92672">div</span>&gt;你好&lt;/<span style="color:#f92672">div</span>&gt;
+&lt;/<span style="color:#f92672">body</span>&gt;
+</code></pre></div><p>颜色的显示方式</p>
+<ul>
+<li>
+<p>直接写颜色的名称：red\blue\green&hellip;</p>
+</li>
+<li>
+<p>十六进制显示颜色：0-9 a-f   #000000; 前2为代表红色，中间2位代表绿色，后边2位代表蓝色。</p>
+</li>
+</ul>
+<h5 id="类选择器重点">类选择器（重点）</h5>
+<p>写法</p>
+<pre><code>.自定义类名{属性:值; 属性:值；}
+</code></pre><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#f92672">head</span>&gt; 
+	&lt;<span style="color:#f92672">style</span> <span style="color:#a6e22e">type</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;text/css&#34;</span>&gt;
+        .<span style="color:#a6e22e">box</span>{
+            <span style="color:#66d9ef">font-size</span>:<span style="color:#ae81ff">40</span><span style="color:#66d9ef">px</span>;
+            <span style="color:#66d9ef">color</span>:<span style="color:#66d9ef">red</span>;
+            <span style="color:#66d9ef">width</span>:<span style="color:#ae81ff">200</span><span style="color:#66d9ef">px</span>;
+            <span style="color:#66d9ef">height</span>:<span style="color:#ae81ff">100</span><span style="color:#66d9ef">px</span>;
+            <span style="color:#66d9ef">background-color</span>: <span style="color:#ae81ff">#000033</span>;
+        }
+        .<span style="color:#a6e22e">miss</span>{
+            <span style="color:#66d9ef">text-indent</span>:<span style="color:#ae81ff">2</span><span style="color:#66d9ef">em</span>;
+        }
+    &lt;/<span style="color:#f92672">style</span>&gt;
+&lt;/<span style="color:#f92672">head</span>&gt;
+
+&lt;<span style="color:#f92672">body</span>&gt;
+&lt;<span style="color:#f92672">div</span> <span style="color:#a6e22e">class</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;box miss&#34;</span>&gt;我爱北京&lt;/<span style="color:#f92672">div</span>&gt;
+&lt;<span style="color:#f92672">div</span> <span style="color:#a6e22e">class</span><span style="color:#f92672">=</span><span style="color:#e6db74">”box”</span>&gt;天安门&lt;/<span style="color:#f92672">div</span>&gt;
+&lt;/<span style="color:#f92672">body</span>&gt;
+</code></pre></div><p>特点： 谁调用，谁生效。</p>
+<ul>
+<li>
+<p>一个标签可以调用多个类选择器。</p>
+</li>
+<li>
+<p>多个标签可以调用同一个类选择器。</p>
+</li>
+</ul>
+<p>类选择器命名规则</p>
+<ul>
+<li>
+<p>不能用纯数字或者数字开头来定义类名</p>
+</li>
+<li>
+<p>不能使用特殊符号或者特殊符号开头（_）来定义类名</p>
+</li>
+<li>
+<p>不建议使用汉字来定义类名</p>
+</li>
+<li>
+<p>不推荐使用属性或者属性的值来定义类名</p>
+</li>
+</ul>
+<p><img src="/img/clip_image003.jpg" alt="img"></p>
+<h5 id="id选择器">ID选择器</h5>
+<p>写法</p>
+<pre><code>#自定义名称{属性:值;}
+</code></pre><p>特点： 一个ID选择器在一个页面只能调用一次。如果使用2次或者2次以上，不符合w3c规范，JS调用会出问题。</p>
+<ul>
+<li>
+<p>一个标签只能调用一个ID选择器。</p>
+</li>
+<li>
+<p>一个标签可以同时调用类选择器和ID选择器。</p>
+</li>
+</ul>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#f92672">head</span>&gt;
+    &lt;<span style="color:#f92672">style</span> <span style="color:#a6e22e">type</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;text/css&#34;</span>&gt;        
+        #box{
+           <span style="color:#66d9ef">color</span>:<span style="color:#66d9ef">blue</span>;
+           <span style="color:#66d9ef">background-color</span>:<span style="color:#66d9ef">red</span>;
+        }
+        .<span style="color:#a6e22e">miss</span>{
+             <span style="color:#66d9ef">width</span>: <span style="color:#ae81ff">400</span><span style="color:#66d9ef">px</span>;
+        }
+    &lt;/<span style="color:#f92672">style</span>&gt;
+&lt;/<span style="color:#f92672">head</span>&gt;
+
+&lt;<span style="color:#f92672">body</span>&gt;
+&lt;<span style="color:#f92672">div</span> <span style="color:#a6e22e">id</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;box&#34;</span> <span style="color:#a6e22e">class</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;miss&#34;</span>&gt;我爱北京天安门&lt;/<span style="color:#f92672">div</span>&gt;
+&lt;/<span style="color:#f92672">body</span>&gt;
+</code></pre></div><h5 id="通配符选择器">通配符选择器</h5>
+<pre><code>*{属性:值;}
+</code></pre><p>特点：给所有的标签都使用相同的样式。不推荐使用，增加浏览器和服务器负担！！</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#f92672">head</span>&gt;
+	&lt;<span style="color:#f92672">style</span> <span style="color:#a6e22e">type</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;text/css&#34;</span>&gt;        
+        <span style="color:#f92672">*</span>{
+           <span style="color:#66d9ef">color</span>:<span style="color:#66d9ef">blue</span>;
+           <span style="color:#66d9ef">background-color</span>:<span style="color:#66d9ef">red</span>;
+            <span style="color:#66d9ef">width</span>: <span style="color:#ae81ff">400</span><span style="color:#66d9ef">px</span>;
+        }
+    &lt;/<span style="color:#f92672">style</span>&gt;
+&lt;/<span style="color:#f92672">head</span>&gt;
+
+&lt;<span style="color:#f92672">body</span>&gt;
+&lt;<span style="color:#f92672">div</span> <span style="color:#a6e22e">id</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;box&#34;</span> &gt;我爱北京天安门&lt;/<span style="color:#f92672">div</span>&gt;
+&lt;<span style="color:#f92672">div</span> <span style="color:#a6e22e">class</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;miss&#34;</span>&gt;我爱北京天安门&lt;/<span style="color:#f92672">div</span>&gt;
+&lt;<span style="color:#f92672">p</span>&gt;我爱北京天安门&lt;/<span style="color:#f92672">p</span>&gt;
+&lt;/<span style="color:#f92672">body</span>&gt;
+</code></pre></div><h5 id="复合选择器">复合选择器</h5>
+<p>概念：两个或者两个以上的基础选择器通过不同的方式连接在一起。</p>
+<p>并集选择器</p>
+<pre><code>选择器+，+选择器+，选择器{属性:值;}
+</code></pre><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#f92672">head</span>&gt;
+    &lt;<span style="color:#f92672">style</span> <span style="color:#a6e22e">type</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;text/css&#34;</span>&gt;         
+        #box<span style="color:#f92672">,</span>.<span style="color:#a6e22e">miss</span><span style="color:#f92672">,</span><span style="color:#f92672">p</span>{             
+        	<span style="color:#66d9ef">color</span>:<span style="color:#66d9ef">red</span>;         
+    	}     
+    &lt;/<span style="color:#f92672">style</span>&gt; 
+&lt;/<span style="color:#f92672">head</span>&gt; 
+
+&lt;<span style="color:#f92672">body</span>&gt; 
+&lt;<span style="color:#f92672">div</span> <span style="color:#a6e22e">id</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;box&#34;</span>&gt;我爱北京&lt;/<span style="color:#f92672">div</span>&gt; 
+&lt;<span style="color:#f92672">div</span> <span style="color:#a6e22e">class</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;miss&#34;</span>&gt;天安门&lt;/<span style="color:#f92672">div</span>&gt; 
+&lt;<span style="color:#f92672">p</span>&gt;你好&lt;/<span style="color:#f92672">p</span>&gt;
+&lt;/<span style="color:#f92672">body</span>&gt;
+</code></pre></div><p>交集选择器</p>
+<pre><code>标签+类（ID）选择器{属性：值；}
+</code></pre><p>特点：即要满足使用了某个标签，还要满足使用了类（id）选择器。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#f92672">head</span>&gt;
+    &lt;<span style="color:#f92672">style</span> <span style="color:#a6e22e">type</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;text/css&#34;</span>&gt;         
+        #box.<span style="color:#a6e22e">miss</span>{             
+        	<span style="color:#66d9ef">color</span>:<span style="color:#66d9ef">red</span>;         
+        }     
+    &lt;/<span style="color:#f92672">style</span>&gt; 
+&lt;/<span style="color:#f92672">head</span>&gt; 
+
+&lt;<span style="color:#f92672">body</span>&gt; 
+&lt;<span style="color:#f92672">div</span> <span style="color:#a6e22e">id</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;box&#34;</span> <span style="color:#a6e22e">class</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;miss&#34;</span>&gt;我爱北京&lt;/<span style="color:#f92672">div</span>&gt; 
+&lt;<span style="color:#f92672">div</span> <span style="color:#a6e22e">class</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;miss&#34;</span>&gt;你好&lt;/<span style="color:#f92672">div</span>&gt;
+&lt;/<span style="color:#f92672">body</span>&gt; 
+</code></pre></div><h5 id="后代选择器重点">后代选择器（重点）</h5>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">选择器+空格+选择器{属性：值;}
+</code></pre></div><p>后代选择器首先要满足包含（嵌套）关系。父集元素在前边，子集元素在后边。</p>
+<p>特点：无限制隔代。只要能代表标签，标签、类选择器、ID选择器自由组合。</p>
+<p>div p：选择&lt;div&gt;元素内的所有&lt;p&gt;元素</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#f92672">head</span>&gt;
+	&lt;<span style="color:#f92672">style</span> <span style="color:#a6e22e">type</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;text/css&#34;</span>&gt;
+        <span style="color:#f92672">div</span> <span style="color:#f92672">p</span>{
+            <span style="color:#66d9ef">color</span>:<span style="color:#66d9ef">red</span>;
+        }
+    &lt;/<span style="color:#f92672">style</span>&gt;
+&lt;/<span style="color:#f92672">head</span>&gt;
+
+&lt;<span style="color:#f92672">body</span>&gt;
+    &lt;<span style="color:#f92672">div</span>&gt;
+        &lt;<span style="color:#f92672">p</span>&gt;我爱&lt;/<span style="color:#f92672">p</span>&gt;
+        &lt;<span style="color:#f92672">p</span>&gt;北京&lt;/<span style="color:#f92672">p</span>&gt;
+        &lt;<span style="color:#f92672">p</span>&gt;天安门&lt;/<span style="color:#f92672">p</span>&gt;
+        &lt;<span style="color:#f92672">ul</span>&gt;
+            &lt;<span style="color:#f92672">li</span>&gt;&lt;<span style="color:#f92672">p</span>&gt;我爱&lt;/<span style="color:#f92672">p</span>&gt;&lt;/<span style="color:#f92672">li</span>&gt;
+            &lt;<span style="color:#f92672">li</span>&gt;中国&lt;/<span style="color:#f92672">li</span>&gt;
+        &lt;/<span style="color:#f92672">ul</span>&gt;
+    &lt;/<span style="color:#f92672">div</span>&gt;
+&lt;<span style="color:#f92672">p</span>&gt;你好&lt;/<span style="color:#f92672">p</span>&gt;
+&lt;/<span style="color:#f92672">body</span>&gt;
+</code></pre></div><p>子代选择器</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">选择器&gt;选择器{属性:值;}
+</code></pre></div><p>div&gt;p：选择所有父级是 &lt;div&gt; 元素的 &lt;p&gt; 元素</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#f92672">head</span>&gt;
+	&lt;<span style="color:#f92672">style</span> <span style="color:#a6e22e">type</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;text/css&#34;</span>&gt;
+        <span style="color:#f92672">div</span><span style="color:#f92672">&gt;</span><span style="color:#f92672">p</span>{
+            <span style="color:#66d9ef">color</span>:<span style="color:#66d9ef">red</span>;
+        }
+    &lt;/<span style="color:#f92672">style</span>&gt;
+&lt;/<span style="color:#f92672">head</span>&gt;
+
+&lt;<span style="color:#f92672">body</span>&gt;
+    &lt;<span style="color:#f92672">div</span>&gt;
+        &lt;<span style="color:#f92672">p</span>&gt;我爱&lt;/<span style="color:#f92672">p</span>&gt;
+        &lt;<span style="color:#f92672">p</span>&gt;北京&lt;/<span style="color:#f92672">p</span>&gt;
+        &lt;<span style="color:#f92672">p</span>&gt;天安门&lt;/<span style="color:#f92672">p</span>&gt;
+        &lt;<span style="color:#f92672">ul</span>&gt;
+            &lt;<span style="color:#f92672">li</span>&gt;&lt;<span style="color:#f92672">p</span>&gt;我爱&lt;/<span style="color:#f92672">p</span>&gt;&lt;/<span style="color:#f92672">li</span>&gt;
+            &lt;<span style="color:#f92672">li</span>&gt;中国&lt;/<span style="color:#f92672">li</span>&gt;
+        &lt;/<span style="color:#f92672">ul</span>&gt;
+    &lt;/<span style="color:#f92672">div</span>&gt;
+&lt;<span style="color:#f92672">p</span>&gt;你好&lt;/<span style="color:#f92672">p</span>&gt;
+&lt;/<span style="color:#f92672">body</span>&gt;
+</code></pre></div><h4 id="23-文本元素">2.3 文本元素</h4>
+<h5 id="属性">属性</h5>
+<ul>
+<li>
+<p>font-size:16px; 文字大小</p>
+</li>
+<li>
+<p>Font-weight: 700  ;  值从100-900，文字粗细，不推荐使用font-weight:bold;</p>
+</li>
+<li>
+<p>Font-family:微软雅黑; 文本的字体</p>
+</li>
+<li>
+<p>Font-style: normal | italic;   normal 默认值 italic 斜体</p>
+</li>
+<li>
+<p>line-height: 行高</p>
+</li>
+</ul>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#f92672">style</span> <span style="color:#a6e22e">type</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;text/css&#34;</span>&gt;         
+    <span style="color:#f92672">div</span>{             
+        <span style="color:#66d9ef">font-size</span>:<span style="color:#ae81ff">16</span><span style="color:#66d9ef">px</span>;             
+        <span style="color:#66d9ef">font-weight</span>: <span style="color:#ae81ff">700</span>;             
+        <span style="color:#66d9ef">font-style</span>: <span style="color:#66d9ef">italic</span>;             
+        <span style="color:#66d9ef">font-family</span>: <span style="color:#960050;background-color:#1e0010">微软雅黑</span>;             
+        <span style="color:#66d9ef">line-height</span>: <span style="color:#ae81ff">30</span><span style="color:#66d9ef">px</span>;             
+        <span style="color:#66d9ef">background-color</span>: <span style="color:#66d9ef">red</span>;         
+    }     
+&lt;/<span style="color:#f92672">style</span>&gt; 
+&lt;/<span style="color:#f92672">head</span>&gt; 
+
+&lt;<span style="color:#f92672">body</span>&gt;     
+&lt;<span style="color:#f92672">div</span>&gt;我爱北京&lt;/<span style="color:#f92672">div</span>&gt; 
+&lt;/<span style="color:#f92672">body</span>&gt;
+</code></pre></div><h5 id="文本属性连写">文本属性连写</h5>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-css" data-lang="css"><span style="color:#f92672">font</span><span style="color:#f92672">:</span> <span style="color:#f92672">font-style</span> <span style="color:#f92672">font-weight</span> <span style="color:#f92672">font-size</span><span style="color:#f92672">/</span><span style="color:#f92672">line-height</span> <span style="color:#f92672">font-family</span><span style="color:#f92672">;</span>
+</code></pre></div><p>注意：font:后边写属性的值。一定按照书写顺序。文本属性连写文字大小和字体为必写项。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-css" data-lang="css"><span style="color:#f92672">Font</span>:<span style="color:#a6e22e">italic</span> <span style="color:#f92672">700</span> <span style="color:#f92672">16px</span><span style="color:#f92672">/</span><span style="color:#f92672">40px</span> <span style="color:#f92672">微软雅黑</span><span style="color:#f92672">;</span>
+
+<span style="color:#f92672">div</span>{
+       <span style="color:#66d9ef">font</span>:<span style="color:#66d9ef">italic</span> <span style="color:#ae81ff">700</span> <span style="color:#ae81ff">16</span><span style="color:#66d9ef">px</span><span style="color:#f92672">/</span><span style="color:#ae81ff">30</span><span style="color:#66d9ef">px</span> <span style="color:#960050;background-color:#1e0010">微软雅黑</span>;
+     }
+</code></pre></div><h5 id="样式表书写位置">样式表书写位置</h5>
+<ul>
+<li>内嵌式写法</li>
+</ul>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#f92672">head</span>&gt;
+    &lt;<span style="color:#f92672">style</span> <span style="color:#a6e22e">type</span><span style="color:#f92672">=</span><span style="color:#e6db74">”text/css”</span>&gt;
+    	<span style="color:#f92672">样式表写法</span>
+    &lt;/<span style="color:#f92672">style</span>&gt;
+&lt;/<span style="color:#f92672">head</span>&gt;
+</code></pre></div><ul>
+<li>外链式写法</li>
+</ul>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html"><span style="color:#75715e">&lt;!--写在head里--&gt;</span>
+&lt;<span style="color:#f92672">link</span> <span style="color:#a6e22e">rel</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;stylesheet&#34;</span> <span style="color:#a6e22e">href</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;1.css&#34;</span>&gt;
+</code></pre></div><ul>
+<li>行内样式表</li>
+</ul>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#f92672">h1</span> <span style="color:#a6e22e">style</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;font-size:30px;color:red;&#34;</span>&gt;我爱北京&lt;/<span style="color:#f92672">h1</span>&gt;
+</code></pre></div><p>三种写法特点:</p>
+<p>​	内嵌式写法，样式只作用于当前文件，没有真正实现结构表现分离。</p>
+<p>​	外链式写法，作用范围是当前站点，谁调用谁生效，范围广，真正实现结构表现分离。</p>
+<p>​	行内样式表，作用范围仅限于当前标签，范围小，结构表现混在一起。 （不推荐使用）</p>
+<h4 id="24-标签分类显示方式">2.4 标签分类(显示方式)</h4>
+<h5 id="块元素">块元素</h5>
+<p>典型代表：Div，h1-h6，p，ul，li</p>
+<p>特点:</p>
+<ul>
+<li>
+<p>独占一行</p>
+</li>
+<li>
+<p>可以设置宽高</p>
+</li>
+</ul>
+<h5 id="行内元素">行内元素</h5>
+<p>典型代表：span，a，strong，em</p>
+<p>特点：</p>
+<ul>
+<li>
+<p>在一行上显示</p>
+</li>
+<li>
+<p>不能直接设置宽高</p>
+</li>
+<li>
+<p>元素的宽和高就是内容撑开的宽高。</p>
+</li>
+</ul>
+<h5 id="行内块元素内联元素">行内块元素(内联元素)</h5>
+<p>典型代表：img</p>
+<p>特点：</p>
+<ul>
+<li>
+<p>在一行上显示</p>
+</li>
+<li>
+<p>可以设置宽高</p>
+</li>
+</ul>
+<h5 id="元素转换">元素转换</h5>
+<p>块元素转行内元素</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">display:inline;
+</code></pre></div><p><img src="/img/clip_image004-1608882741564.png" alt="img"></p>
+<p>行内元素转块元素</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">display:block;
+</code></pre></div><p><img src="/img/clip_image005-1608882741564.png" alt="img"></p>
+<p>块和行内元素转行内块元素</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">display:inline-block;
+</code></pre></div><p><img src="/img/clip_image006-1608882741564.png" alt="img"></p>
+<h4 id="25-css特性">2.5 css特性</h4>
+<h5 id="层叠性">层叠性</h5>
+<p>当多个样式作用于同一个（同一类）标签时，样式发生了冲突，总是执行后边的代码(后边代码层叠前边的代码)。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#f92672">style</span> <span style="color:#a6e22e">type</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;text/css&#34;</span>&gt;    
+    <span style="color:#f92672">div</span>{         
+    	<span style="color:#66d9ef">background</span>:<span style="color:#66d9ef">blue</span>;       
+    } 
+&lt;/<span style="color:#f92672">style</span>&gt; 
+&lt;<span style="color:#f92672">link</span> <span style="color:#a6e22e">rel</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;stylesheet&#34;</span> <span style="color:#a6e22e">href</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;1.css&#34;</span>&gt; 
+&lt;/<span style="color:#f92672">head</span>&gt; 
+
+&lt;<span style="color:#f92672">body</span>&gt; 
+&lt;<span style="color:#f92672">div</span> &gt;aaaa&lt;/<span style="color:#f92672">div</span>&gt; 
+</code></pre></div><h5 id="继承性">继承性</h5>
+<p>继承性发生的前提是包含（嵌套关系）</p>
+<ul>
+<li>
+<p>文字颜色可以继承</p>
+</li>
+<li>
+<p>文字大小可以继承</p>
+</li>
+<li>
+<p>字体可以继承</p>
+</li>
+<li>
+<p>字体粗细可以继承</p>
+</li>
+<li>
+<p>文字风格可以继承</p>
+</li>
+<li>
+<p>行高可以继承</p>
+<p>总结：文字的所有属性都可以继承。</p>
+</li>
+</ul>
+<p>特殊情况：</p>
+<p>h系列不能继承文字大小。</p>
+<p>a标签不能继承文字颜色。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#f92672">style</span> <span style="color:#a6e22e">type</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;text/css&#34;</span>&gt;
+        <span style="color:#f92672">span</span>{
+            <span style="color:#66d9ef">color</span> :<span style="color:#66d9ef">red</span>;
+        }
+    &lt;/<span style="color:#f92672">style</span>&gt;
+
+&lt;/<span style="color:#f92672">head</span>&gt;
+&lt;<span style="color:#f92672">body</span>&gt;
+&lt;<span style="color:#f92672">div</span> &gt;
+    &lt;<span style="color:#f92672">span</span>&gt;
+        &lt;<span style="color:#f92672">p</span>&gt;bbbb&lt;/<span style="color:#f92672">p</span>&gt;
+        aaaa
+        &lt;<span style="color:#f92672">a</span> <span style="color:#a6e22e">href</span><span style="color:#f92672">=</span><span style="color:#e6db74">”#”</span>&gt;ddd&lt;/<span style="color:#f92672">a</span>&gt;
+        &lt;<span style="color:#f92672">h6</span>&gt;lala&lt;/<span style="color:#f92672">h6</span>&gt;
+    &lt;/<span style="color:#f92672">span</span>&gt;
+    ccc
+&lt;/<span style="color:#f92672">div</span>&gt;
+</code></pre></div><h5 id="优先级">优先级</h5>
+<p>默认样式&lt;标签选择器&lt;类选择器&lt;id选择器&lt;行内样式</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#f92672">style</span> <span style="color:#a6e22e">type</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;text/css&#34;</span>&gt;
+       <span style="color:#f92672">div</span>{
+           <span style="color:#66d9ef">color</span>:<span style="color:#66d9ef">blue</span>;
+       }
+        .<span style="color:#a6e22e">myCity</span>{
+            <span style="color:#66d9ef">color</span>:<span style="color:#66d9ef">black</span>;
+        }
+        #city{
+            <span style="color:#66d9ef">color</span>: <span style="color:#66d9ef">antiquewhite</span>;
+        }
+    &lt;/<span style="color:#f92672">style</span>&gt;
+&lt;/<span style="color:#f92672">head</span>&gt;
+&lt;<span style="color:#f92672">body</span>&gt;
+&lt;<span style="color:#f92672">div</span> <span style="color:#a6e22e">class</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;myCity&#34;</span> <span style="color:#a6e22e">id</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;city&#34;</span> <span style="color:#a6e22e">style</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;color:red;&#34;</span>&gt;我爱北京&lt;/<span style="color:#f92672">div</span>&gt;
+
+&lt;/<span style="color:#f92672">body</span>&gt;
+</code></pre></div><h4 id="26-链接伪类">2.6 链接伪类</h4>
+<p>定义的时候必须按照以下顺序：其中，a:link{属性:值;} a{属性:值}效果是一样的！</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-css" data-lang="css"><span style="color:#f92672">a</span>:<span style="color:#a6e22e">link</span>{<span style="color:#960050;background-color:#1e0010">属性:值</span>;}     <span style="color:#f92672">//</span> <span style="color:#f92672">链接默认状态</span>  
+
+<span style="color:#f92672">a</span>:<span style="color:#a6e22e">visited</span>{<span style="color:#960050;background-color:#1e0010">属性:值</span>;}  <span style="color:#f92672">//</span> <span style="color:#f92672">链接访问之后的状态</span> 
+
+<span style="color:#f92672">a</span>:<span style="color:#a6e22e">hover</span>{<span style="color:#960050;background-color:#1e0010">属性:值</span>;}    <span style="color:#f92672">//</span> <span style="color:#f92672">鼠标放到链接上显示的状态</span>  <span style="color:#f92672">a</span>:<span style="color:#a6e22e">active</span>{<span style="color:#960050;background-color:#1e0010">属性:值</span>;}   <span style="color:#f92672">链接激活的状态</span>
+
+<span style="color:#f92672">a</span>:<span style="color:#a6e22e">focus</span>{<span style="color:#960050;background-color:#1e0010">属性:值；</span>}   <span style="color:#f92672">//</span> <span style="color:#f92672">获取焦点</span>
+</code></pre></div><p><img src="/img/clip_image008-1608882741564.jpg" alt="img"></p>
+<h5 id="作业">作业：</h5>
+<p><img src="/img/clip_image009.png" alt="img"></p>
+<hr>
+<h3 id="第三章">第三章</h3>
+<hr>
+<h5 id="本章内容-2">本章内容</h5>
+<ul>
+<li>Css基础</li>
+</ul>
+<hr>
+<h5 id="文本修饰">文本修饰</h5>
+<p>text-decoration: none |  underline  |   line-through</p>
+<h5 id="背景属性">背景属性</h5>
+<ul>
+<li>
+<p>background-color   背景颜色</p>
+</li>
+<li>
+<p>background-image  背景图片</p>
+</li>
+<li>
+<p>Background-repeat  repeat(默认) | no-repeat |  repeat-x  | repeat-y   背景平铺</p>
+</li>
+<li>
+<p>Background-position left | right | center  | top | bottom 背景定位</p>
+</li>
+</ul>
+<p><img src="/img/clip_image001-1608884292801.png" alt="img"></p>
+<p>方位值只写一个的时候，另外一个值默认居中。</p>
+<p><img src="/img/clip_image002-1608884292803.png" alt="img"></p>
+<p>写2个方位值的时候，顺序没有要求。</p>
+<p><img src="/img/clip_image003-1608884292803.png" alt="img"></p>
+<p>写2个具体值的时候，第一个值代表水平方向，第二个值代表垂直方向。</p>
+<h5 id="背景属性连写">背景属性连写</h5>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">background:url(&#34;../img/login.gif&#34;) no-repeat 30px 50px red;
+</code></pre></div><p>连写的时候没有顺序要求，url为必写项。</p>
+<h5 id="行高">行高</h5>
+<p>浏览器默认文字大小</p>
+<ul>
+<li>
+<p>浏览器默认文字大小：16px</p>
+</li>
+<li>
+<p>行高：是基线与基线之间的距离</p>
+</li>
+<li>
+<p>行高=文字高度+上下边距</p>
+</li>
+</ul>
+<p><img src="/img/clip_image005-1608884292804.jpg" alt="img"></p>
+<p>一行文字行高和父元素高度一致的时候，垂直居中显示。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#f92672">style</span> <span style="color:#a6e22e">type</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;text/css&#34;</span>&gt;         
+    <span style="color:#f92672">div</span>{             
+        <span style="color:#66d9ef">line-height</span>: <span style="color:#ae81ff">80</span><span style="color:#66d9ef">px</span>;             
+        <span style="color:#66d9ef">height</span>: <span style="color:#ae81ff">80</span><span style="color:#66d9ef">px</span>;             
+        <span style="color:#66d9ef">background-color</span>:<span style="color:#66d9ef">red</span>;        
+    }     
+&lt;/<span style="color:#f92672">style</span>&gt; 
+&lt;/<span style="color:#f92672">head</span>&gt; 
+
+&lt;<span style="color:#f92672">body</span>&gt; 
+&lt;<span style="color:#f92672">div</span>&gt;我爱北京&lt;/<span style="color:#f92672">div</span>&gt; 
+&lt;/<span style="color:#f92672">body</span>&gt;
+</code></pre></div><h5 id="盒子模型">盒子模型</h5>
+<p>Border边框，margin外边距，padding内边距</p>
+<p><img src="/img/clip_image007-1608884292804.jpg" alt="img"></p>
+<p><img src="/img/clip_image009-1608884292804.jpg" alt="img"></p>
+<p><img src="/img/clip_image010-1608884292804.png" alt="img"></p>
+<h5 id="边框-border">边框 border</h5>
+<p>Border-top-style: solid  实线 / dotted 点线 / dashed 虚线</p>
+<p>Border-top-color  边框颜色</p>
+<p>Border-top-width  边框粗细</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-css" data-lang="css"><span style="color:#f92672">div</span>{
+   <span style="color:#66d9ef">border-top-style</span>: <span style="color:#66d9ef">dotted</span>;
+   <span style="color:#66d9ef">border-top-width</span>: <span style="color:#ae81ff">3</span><span style="color:#66d9ef">px</span>;
+   <span style="color:#66d9ef">border-top-color</span>: <span style="color:#66d9ef">red</span>;
+   <span style="color:#66d9ef">border-bottom-style</span>:<span style="color:#66d9ef">solid</span>;
+   <span style="color:#66d9ef">border-bottom-width</span>:<span style="color:#ae81ff">2</span><span style="color:#66d9ef">px</span>;
+   <span style="color:#66d9ef">border-bottom-color</span>:<span style="color:#66d9ef">blue</span>;
+   <span style="color:#66d9ef">border</span>:<span style="color:#ae81ff">1</span><span style="color:#66d9ef">px</span> <span style="color:#66d9ef">red</span> <span style="color:#66d9ef">solid</span>;
+   <span style="color:#66d9ef">border-top</span>:<span style="color:#ae81ff">2</span><span style="color:#66d9ef">px</span> <span style="color:#66d9ef">blue</span> <span style="color:#66d9ef">dotted</span>;
+ }
+</code></pre></div><p>边框属性的连写</p>
+<p>特点：没有顺序要求，线型为必写项。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-css" data-lang="css"><span style="color:#f92672">border-top</span>:<span style="color:#a6e22e">2px</span> <span style="color:#f92672">blue</span> <span style="color:#f92672">dotted</span><span style="color:#f92672">;</span>
+</code></pre></div><p>四个边框值相同的写法</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-css" data-lang="css"><span style="color:#f92672">border</span>:<span style="color:#a6e22e">1px</span> <span style="color:#f92672">red</span> <span style="color:#f92672">solid</span><span style="color:#f92672">;</span>
+</code></pre></div><p>特点：没有顺序要求，线型为必写项。</p>
+<h5 id="圆角边框">圆角边框</h5>
+<p>border-radius属性;</p>
+<p>该属性可以用来设计圆角效果：</p>
+<p>Border-radius:20px 四个角都是20px</p>
+<p>Border-radius:20p 40px  top-left和bottom-right 20px  top-right和bottom-left 40px</p>
+<p>Border-radius:20px 40px 50px top-left:20px top-right和bottom-left:40px  bottom-right:50px</p>
+<p>Border-radius:10px 20px 30px 40px  top-left  top-right  bottom-right  bottom-left</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-css" data-lang="css"><span style="color:#f92672">div</span>{
+   <span style="color:#66d9ef">border-radius</span>: <span style="color:#ae81ff">40</span><span style="color:#66d9ef">px</span>;
+   <span style="color:#66d9ef">background-color</span>:<span style="color:#66d9ef">red</span>;
+   <span style="color:#66d9ef">width</span>:<span style="color:#ae81ff">100</span><span style="color:#66d9ef">px</span>;
+   <span style="color:#66d9ef">height</span>:<span style="color:#ae81ff">100</span><span style="color:#66d9ef">px</span>;
+ }
+</code></pre></div><p>画园形：</p>
+<ol>
+<li>
+<p>宽度和高度相同</p>
+</li>
+<li>
+<p>圆角半径值为:50%</p>
+</li>
+</ol>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-css" data-lang="css"><span style="color:#f92672">div</span>{
+   <span style="color:#66d9ef">border-radius</span>: <span style="color:#ae81ff">50</span><span style="color:#66d9ef">%</span>;
+   <span style="color:#66d9ef">background-color</span>:<span style="color:#66d9ef">red</span>;
+   <span style="color:#66d9ef">width</span>:<span style="color:#ae81ff">100</span><span style="color:#66d9ef">px</span>;
+   <span style="color:#66d9ef">height</span>:<span style="color:#ae81ff">100</span><span style="color:#66d9ef">px</span>;
+ }
+</code></pre></div><h5 id="边框合并">边框合并</h5>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-css" data-lang="css"><span style="color:#f92672">border-collapse</span>:<span style="color:#a6e22e">collapse</span><span style="color:#f92672">;</span>
+</code></pre></div><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-css" data-lang="css"><span style="color:#f92672">table</span>{
+   <span style="color:#66d9ef">border</span>:<span style="color:#ae81ff">1</span><span style="color:#66d9ef">px</span> <span style="color:#66d9ef">red</span> <span style="color:#66d9ef">solid</span>;
+   <span style="color:#66d9ef">border-collapse</span>: <span style="color:#66d9ef">collapse</span>;
+ }
+ <span style="color:#f92672">td</span>{
+   <span style="color:#66d9ef">border</span>:<span style="color:#ae81ff">1</span><span style="color:#66d9ef">px</span> <span style="color:#66d9ef">red</span> <span style="color:#66d9ef">solid</span>;
+ }
+</code></pre></div><h5 id="内边距">内边距</h5>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-css" data-lang="css"><span style="color:#f92672">Padding-left</span>  <span style="color:#f92672">|</span>  <span style="color:#f92672">right</span>  <span style="color:#f92672">|</span> <span style="color:#f92672">top</span> <span style="color:#f92672">|</span> <span style="color:#f92672">bottom</span>
+</code></pre></div><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#f92672">style</span> <span style="color:#a6e22e">type</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;text/css&#34;</span>&gt;         
+    <span style="color:#f92672">p</span>{             
+        <span style="color:#66d9ef">width</span>:<span style="color:#ae81ff">100</span><span style="color:#66d9ef">px</span>;             
+        <span style="color:#66d9ef">height</span>:<span style="color:#ae81ff">100</span><span style="color:#66d9ef">px</span>;             
+        <span style="color:#66d9ef">background-color</span>:<span style="color:#66d9ef">red</span>;             
+        <span style="color:#66d9ef">border</span>:<span style="color:#ae81ff">1</span><span style="color:#66d9ef">px</span> <span style="color:#66d9ef">blue</span> <span style="color:#66d9ef">solid</span>;             
+        <span style="color:#75715e">/*padding-right:30px;*/</span>             
+        <span style="color:#75715e">/*padding:20px 10px 20px;*/</span>             
+        <span style="color:#75715e">/*padding :10px 10px 15px 30px;*/</span>             
+        <span style="color:#66d9ef">padding-left</span>:<span style="color:#ae81ff">20</span><span style="color:#66d9ef">px</span>;         
+    }     
+&lt;/<span style="color:#f92672">style</span>&gt; 
+&lt;/<span style="color:#f92672">head</span>&gt; 
+&lt;<span style="color:#f92672">body</span>&gt;     
+&lt;<span style="color:#f92672">p</span>&gt;我爱北京&lt;/<span style="color:#f92672">p</span>&gt; 
+&lt;/<span style="color:#f92672">body</span>&gt;
+</code></pre></div><p>padding连写</p>
+<ul>
+<li>
+<p>Padding: 20px;  上右下左内边距都是20px</p>
+</li>
+<li>
+<p>Padding: 20px 30px;  上下20px  左右30px</p>
+</li>
+<li>
+<p>Padding: 20px 30px 40px;  上内边距为20px 左右内边距为30px  下内边距为40</p>
+</li>
+<li>
+<p>Padding: 20px 30px  40px 50px;  上20px 右30px 下40px 左 50px</p>
+</li>
+</ul>
+<p>内边距撑大盒子的问题</p>
+<ul>
+<li>
+<p>影响盒子宽度的因素</p>
+</li>
+<li>
+<p>内边距影响盒子的宽度</p>
+</li>
+<li>
+<p>边框影响盒子的宽度</p>
+</li>
+<li>
+<p>盒子的宽度=定义的宽度+边框宽度+左右内边距</p>
+</li>
+</ul>
+<p>如果不想盒子被撑开可以设置盒子的box-sizing: border-box</p>
+<h5 id="外边距">外边距</h5>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">margin-left  | right | top | bottom
+</code></pre></div><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#f92672">style</span> <span style="color:#a6e22e">type</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;text/css&#34;</span>&gt;         
+    <span style="color:#f92672">div</span>{             
+        <span style="color:#66d9ef">width</span>:<span style="color:#ae81ff">100</span><span style="color:#66d9ef">px</span>;             
+        <span style="color:#66d9ef">height</span>: <span style="color:#ae81ff">100</span><span style="color:#66d9ef">px</span>;             
+        <span style="color:#66d9ef">background-color</span>:<span style="color:#66d9ef">red</span>;         
+    }         
+    #div1{             
+        <span style="color:#75715e">/*margin:30px 20px 50px 60px;*/</span>             
+        <span style="color:#75715e">/*margin-bottom: 50px;*/</span>                     
+    }         
+    #div2{             
+    	<span style="color:#75715e">/*margin-top:80px;*/</span>         
+    }     
+&lt;/<span style="color:#f92672">style</span>&gt; 
+
+&lt;/<span style="color:#f92672">head</span>&gt; 
+&lt;<span style="color:#f92672">body</span>&gt; 
+&lt;<span style="color:#f92672">div</span> <span style="color:#a6e22e">id</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;div1&#34;</span>&gt;我爱&lt;/<span style="color:#f92672">div</span>&gt; 
+&lt;<span style="color:#f92672">div</span> <span style="color:#a6e22e">id</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;div2&#34;</span>&gt;中国&lt;/<span style="color:#f92672">div</span>&gt; 
+&lt;/<span style="color:#f92672">body</span>&gt;
+</code></pre></div><p>外边距连写</p>
+<ul>
+<li>
+<p>Margin: 20px;  上下左右外边距20PX</p>
+</li>
+<li>
+<p>Margin: 20px 30px;  上下20px 左右30px</p>
+</li>
+<li>
+<p>Margin: 20px 30px 40px;   上20px 左右30px  下 40px</p>
+</li>
+<li>
+<p>Margin: 20px 30px  40px 50px; 上20px  右30px  下40px 左50px</p>
+</li>
+</ul>
+<p>垂直方向外边距合并</p>
+<p>两个盒子垂直一个设置上外边距，一个设置下外边距，取的设置较大的值。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-css" data-lang="css"><span style="color:#f92672">居中显示</span><span style="color:#f92672">:</span> <span style="color:#f92672">margin</span>:<span style="color:#a6e22e">30px</span> <span style="color:#f92672">auto</span><span style="color:#f92672">;</span>
+</code></pre></div><p>每个元素都有默认的内外边距。可以使用*{margin:0;padding:0}将内外边距清零</p>
+<h5 id="案例课程导航">案例：课程导航</h5>
+<p><img src="/img/clip_image011-1608884292804.png" alt="img"></p>
+<h5 id="案例聚美优品商品分类">案例：聚美优品商品分类</h5>
+<p><img src="/img/clip_image012-1608884292805.png" alt="img"></p>
+<h5 id="案例仿京东快报">案例：仿京东快报</h5>
+<p><img src="/img/clip_image013-1608884292805.png" alt="img"></p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">  &lt;<span style="color:#f92672">style</span> <span style="color:#a6e22e">type</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;text/css&#34;</span>&gt;
+        <span style="color:#f92672">*</span>{<span style="color:#66d9ef">padding</span>:<span style="color:#ae81ff">0</span>;<span style="color:#66d9ef">margin</span>:<span style="color:#ae81ff">0</span>}
+        <span style="color:#f92672">body</span>{
+            <span style="color:#66d9ef">margin</span>:<span style="color:#ae81ff">30</span><span style="color:#66d9ef">px</span>;
+        }
+        #container{
+            <span style="color:#66d9ef">border</span>:<span style="color:#ae81ff">1</span><span style="color:#66d9ef">px</span> <span style="color:#66d9ef">gray</span> <span style="color:#66d9ef">solid</span>;
+            <span style="color:#66d9ef">width</span>:<span style="color:#ae81ff">220</span><span style="color:#66d9ef">px</span>;
+        }
+        <span style="color:#f92672">h2</span>{
+            <span style="color:#66d9ef">font-size</span>:<span style="color:#ae81ff">16</span><span style="color:#66d9ef">px</span>;
+            <span style="color:#66d9ef">color</span>:<span style="color:#66d9ef">gray</span>;
+            <span style="color:#66d9ef">font-weight</span>: <span style="color:#66d9ef">normal</span>;
+            <span style="color:#66d9ef">padding-left</span>:<span style="color:#ae81ff">10</span><span style="color:#66d9ef">px</span>;
+            <span style="color:#66d9ef">border-bottom</span>:<span style="color:#ae81ff">1</span><span style="color:#66d9ef">px</span> <span style="color:#66d9ef">gray</span> <span style="color:#66d9ef">dotted</span>;
+            <span style="color:#66d9ef">height</span>:<span style="color:#ae81ff">40</span><span style="color:#66d9ef">px</span>;
+            <span style="color:#66d9ef">line-height</span>: <span style="color:#ae81ff">40</span><span style="color:#66d9ef">px</span>;
+
+        }
+
+        <span style="color:#f92672">ul</span>{
+            <span style="color:#66d9ef">list-style</span>: <span style="color:#66d9ef">none</span>;
+        }
+        <span style="color:#f92672">ul</span> <span style="color:#f92672">&gt;</span><span style="color:#f92672">li</span>{
+            <span style="color:#66d9ef">line-height</span>: <span style="color:#ae81ff">35</span><span style="color:#66d9ef">px</span>;
+        }
+        <span style="color:#f92672">ul</span> <span style="color:#f92672">li</span> <span style="color:#f92672">span</span>{
+            <span style="color:#66d9ef">font-weight</span>: <span style="color:#66d9ef">bold</span>;
+            <span style="color:#66d9ef">font-size</span>:<span style="color:#ae81ff">14</span><span style="color:#66d9ef">px</span>;
+        }
+        <span style="color:#f92672">ul</span> <span style="color:#f92672">li</span> <span style="color:#f92672">a</span>{
+            <span style="color:#66d9ef">text-decoration</span>: <span style="color:#66d9ef">none</span>;
+            <span style="color:#66d9ef">font-size</span>:<span style="color:#ae81ff">12</span><span style="color:#66d9ef">px</span>;
+            <span style="color:#66d9ef">color</span>:<span style="color:#66d9ef">gray</span>;
+        }
+        <span style="color:#f92672">ul</span> <span style="color:#f92672">li</span> <span style="color:#f92672">a</span>:<span style="color:#a6e22e">hover</span>{
+            <span style="color:#66d9ef">color</span>:<span style="color:#66d9ef">orangered</span>;
+        }
+
+
+    &lt;/<span style="color:#f92672">style</span>&gt;
+&lt;/<span style="color:#f92672">head</span>&gt;
+&lt;<span style="color:#f92672">body</span>&gt;
+    &lt;<span style="color:#f92672">div</span> <span style="color:#a6e22e">id</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;container&#34;</span>&gt;
+        &lt;<span style="color:#f92672">h2</span>&gt;京东快报&lt;/<span style="color:#f92672">h2</span>&gt;
+        &lt;<span style="color:#f92672">ul</span>&gt;
+            &lt;<span style="color:#f92672">li</span>&gt;&lt;<span style="color:#f92672">span</span>&gt;【特惠】&lt;/<span style="color:#f92672">span</span>&gt;&lt;<span style="color:#f92672">a</span> <span style="color:#a6e22e">href</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;#&#34;</span>&gt;海飞丝去屑&lt;/<span style="color:#f92672">a</span>&gt;&lt;/<span style="color:#f92672">li</span>&gt;
+            &lt;<span style="color:#f92672">li</span>&gt;&lt;<span style="color:#f92672">span</span>&gt;【公告】&lt;/<span style="color:#f92672">span</span>&gt;&lt;<span style="color:#f92672">a</span> <span style="color:#a6e22e">href</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;#&#34;</span>&gt;京东公益支持&lt;/<span style="color:#f92672">a</span>&gt;&lt;/<span style="color:#f92672">li</span>&gt;
+            &lt;<span style="color:#f92672">li</span>&gt;&lt;<span style="color:#f92672">span</span>&gt;【特惠】&lt;/<span style="color:#f92672">span</span>&gt;&lt;<span style="color:#f92672">a</span> <span style="color:#a6e22e">href</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;#&#34;</span>&gt;4666元抢&lt;/<span style="color:#f92672">a</span>&gt;&lt;/<span style="color:#f92672">li</span>&gt;
+            &lt;<span style="color:#f92672">li</span>&gt;&lt;<span style="color:#f92672">span</span>&gt;【公告】&lt;/<span style="color:#f92672">span</span>&gt;&lt;<span style="color:#f92672">a</span> <span style="color:#a6e22e">href</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;#&#34;</span>&gt;小米电视携带&lt;/<span style="color:#f92672">a</span>&gt;&lt;/<span style="color:#f92672">li</span>&gt;
+        &lt;/<span style="color:#f92672">ul</span>&gt;
+    &lt;/<span style="color:#f92672">div</span>&gt;
+&lt;/<span style="color:#f92672">body</span>&gt;
+</code></pre></div><h5 id="作业-1">作业：</h5>
+<p>素材</p>
+<p><img src="/img/clip_image014-1608884292805.png" alt="img"></p>
+<p>制作京东导航</p>
+<p><img src="/img/clip_image016-1608884292805.jpg" alt="img"></p>
+<hr>
+<h3 id="第四章">第四章</h3>
+<hr>
+<h5 id="本章内容-3">本章内容</h5>
+<ul>
+<li>浮动定位</li>
+</ul>
+<hr>
+<h5 id="文档流标准流">文档流（标准流）</h5>
+<p>元素自上而下，自左而右，块元素独占一行，行内元素在一行上显示，碰到父集元素的边框换行。</p>
+<h5 id="浮动布局">浮动布局</h5>
+<p>为什么要有浮动？多个div需要排成一行！float: left  |  right</p>
+<p><img src="/img/clip_image002-1608885089784.jpg" alt="img"></p>
+<p>特点：</p>
+<ul>
+<li>元素浮动之后不占据原来的位置（脱标）</li>
+<li>漂浮于原有元素的上一个层面</li>
+<li>根据浮动的方向定位于父元素的左上角或右上角。</li>
+<li>多个浮动元素会按照流式布局依次排列下去</li>
+<li>元素浮动之后转换为行内块元素。</li>
+</ul>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-css" data-lang="css"> <span style="color:#f92672">&lt;</span><span style="color:#f92672">style</span> <span style="color:#f92672">type</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;text/css&#34;</span><span style="color:#f92672">&gt;</span>
+        <span style="color:#f92672">div</span>{
+            <span style="color:#66d9ef">width</span>: <span style="color:#ae81ff">200</span><span style="color:#66d9ef">px</span>;
+        }
+        #div1{
+            <span style="color:#66d9ef">height</span>: <span style="color:#ae81ff">100</span><span style="color:#66d9ef">px</span>;
+            <span style="color:#66d9ef">background-color</span>: <span style="color:#66d9ef">red</span>;
+            <span style="color:#66d9ef">float</span>:<span style="color:#66d9ef">left</span>;
+        }
+        #div2{
+            <span style="color:#66d9ef">height</span>: <span style="color:#ae81ff">200</span><span style="color:#66d9ef">px</span>;
+            <span style="color:#66d9ef">background-color</span>: <span style="color:#ae81ff">#000033</span>;
+            <span style="color:#66d9ef">float</span>:<span style="color:#66d9ef">left</span>;
+        }#div3{
+            <span style="color:#66d9ef">height</span>: <span style="color:#ae81ff">300</span><span style="color:#66d9ef">px</span>;
+            <span style="color:#66d9ef">background-color</span>: <span style="color:#66d9ef">green</span>;
+            <span style="color:#75715e">/*float:left;*/</span>
+        }
+    <span style="color:#f92672">&lt;/</span><span style="color:#f92672">style</span><span style="color:#f92672">&gt;</span>
+<span style="color:#f92672">&lt;/</span><span style="color:#f92672">head</span><span style="color:#f92672">&gt;</span>
+<span style="color:#f92672">&lt;</span><span style="color:#f92672">body</span><span style="color:#f92672">&gt;</span>
+<span style="color:#f92672">&lt;</span><span style="color:#f92672">div</span> <span style="color:#f92672">id</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;div1&#34;</span><span style="color:#f92672">&gt;&lt;/</span><span style="color:#f92672">div</span><span style="color:#f92672">&gt;</span>
+<span style="color:#f92672">&lt;</span><span style="color:#f92672">div</span> <span style="color:#f92672">id</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;div2&#34;</span><span style="color:#f92672">&gt;&lt;/</span><span style="color:#f92672">div</span><span style="color:#f92672">&gt;</span>
+<span style="color:#f92672">&lt;</span><span style="color:#f92672">div</span> <span style="color:#f92672">id</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;div3&#34;</span><span style="color:#f92672">&gt;&lt;/</span><span style="color:#f92672">div</span><span style="color:#f92672">&gt;</span>
+<span style="color:#f92672">&lt;/</span><span style="color:#f92672">body</span><span style="color:#f92672">&gt;</span>
+</code></pre></div><h5 id="清除浮动">清除浮动</h5>
+<ul>
+<li>
+<p>清除浮动不是不用浮动，清除浮动产生的影响。</p>
+</li>
+<li>
+<p>清除浮动的方法</p>
+</li>
+</ul>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">clear: left | right | both
+</code></pre></div><p>工作里用的最多的是clear:both;</p>
+<p>清除浮动的应用：当嵌套的元素父元素没有设置宽高的时候，子元素浮动会导致边框塌陷。</p>
+<p><img src="/img/clip_image004-1608885089786.jpg" alt="img"></p>
+<p>解决办法：</p>
+<ol>
+<li>额外标签法，在最后一个浮动元素后添加标签,。</li>
+</ol>
+<p><img src="/img/clip_image005-1608885089790.png" alt="img"></p>
+<ol start="2">
+<li>给父集元素使用：overflow:hidden;</li>
+</ol>
+<p><img src="/img/clip_image007-1608885089791.jpg" alt="img"></p>
+<ol start="3">
+<li>伪元素清除浮动 （推荐使用）</li>
+</ol>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-css" data-lang="css">  .<span style="color:#a6e22e">clear</span>:<span style="color:#a6e22e">after</span>{
+       <span style="color:#66d9ef">content</span>:<span style="color:#e6db74">&#39;&#39;</span>;
+       <span style="color:#66d9ef">display</span>:<span style="color:#66d9ef">block</span>;
+       <span style="color:#66d9ef">clear</span>:<span style="color:#66d9ef">both</span>;
+     }
+</code></pre></div><p>​</p>
+<h5 id="浮动案例">浮动案例</h5>
+<p><img src="/img/clip_image009-1608885089791.jpg" alt="img"></p>
+<h5 id="定位">定位</h5>
+<p>定位方向: left | right | top | bottom</p>
+<h5 id="静态定位">静态定位</h5>
+<p>默认值，就是文档流。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-css" data-lang="css"><span style="color:#f92672">position</span><span style="color:#960050;background-color:#1e0010">：</span><span style="color:#f92672">static</span><span style="color:#f92672">;</span> 
+</code></pre></div><h5 id="相对定位">相对定位</h5>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-css" data-lang="css"><span style="color:#f92672">Position</span><span style="color:#f92672">:</span> <span style="color:#f92672">relative</span><span style="color:#f92672">;</span>
+</code></pre></div><p>特点：</p>
+<ul>
+<li>
+<p>使用相对定位，位置从自身出发。</p>
+</li>
+<li>
+<p>还占据原来的位置。</p>
+</li>
+</ul>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#f92672">html</span>&gt;
+  &lt;<span style="color:#f92672">head</span>&gt;
+      &lt;<span style="color:#f92672">meta</span> <span style="color:#a6e22e">charset</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;UTF-8&#34;</span>&gt;
+      &lt;<span style="color:#f92672">title</span>&gt;&lt;/<span style="color:#f92672">title</span>&gt;
+      &lt;<span style="color:#f92672">style</span> <span style="color:#a6e22e">type</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;text/css&#34;</span>&gt;
+          <span style="color:#f92672">div</span>{
+            <span style="color:#66d9ef">width</span>: <span style="color:#ae81ff">200</span><span style="color:#66d9ef">px</span>;
+            <span style="color:#66d9ef">height</span>: <span style="color:#ae81ff">200</span><span style="color:#66d9ef">px</span>;
+          }
+          #div1{
+            <span style="color:#66d9ef">background</span>: <span style="color:#66d9ef">red</span>;
+          }
+
+          #div2{
+            <span style="color:#66d9ef">background</span>: <span style="color:#66d9ef">blue</span>;
+            <span style="color:#66d9ef">position</span>: <span style="color:#66d9ef">relative</span>;
+            <span style="color:#66d9ef">top</span>:<span style="color:#ae81ff">100</span><span style="color:#66d9ef">px</span>;
+            <span style="color:#66d9ef">left</span>:<span style="color:#ae81ff">100</span><span style="color:#66d9ef">px</span>;
+          }
+          #div3{
+            <span style="color:#66d9ef">background-color</span>: <span style="color:#66d9ef">black</span>;
+          }
+    &lt;/<span style="color:#f92672">style</span>&gt;
+  &lt;/<span style="color:#f92672">head</span>&gt;
+
+  &lt;<span style="color:#f92672">body</span>&gt;
+      &lt;<span style="color:#f92672">div</span> <span style="color:#a6e22e">id</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;div1&#34;</span>&gt;&lt;/<span style="color:#f92672">div</span>&gt;
+      &lt;<span style="color:#f92672">div</span> <span style="color:#a6e22e">id</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;div2&#34;</span>&gt;&lt;/<span style="color:#f92672">div</span>&gt;
+      &lt;<span style="color:#f92672">div</span> <span style="color:#a6e22e">id</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;div3&#34;</span>&gt;&lt;/<span style="color:#f92672">div</span>&gt;
+  &lt;/<span style="color:#f92672">body</span>&gt;
+&lt;/<span style="color:#f92672">html</span>&gt;
+</code></pre></div><h5 id="绝对定位">绝对定位</h5>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-css" data-lang="css"><span style="color:#f92672">Position</span>:<span style="color:#a6e22e">absolute</span><span style="color:#f92672">;</span>
+</code></pre></div><p>特点：</p>
+<ul>
+<li>
+<p>元素使用绝对定位之后不占据原来的位置（脱标）</p>
+</li>
+<li>
+<p>元素使用绝对定位是从最近的已经定位的上一级盒子出发如果没有已经定位的上一级盒子则从浏览器出发。</p>
+</li>
+<li>
+<p>使用绝对定位之后，转换为行内块。</p>
+</li>
+</ul>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html"><span style="color:#75715e">&lt;!DOCTYPE html&gt;</span>
+&lt;<span style="color:#f92672">html</span> <span style="color:#a6e22e">lang</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;en&#34;</span>&gt;
+&lt;<span style="color:#f92672">head</span>&gt;
+    &lt;<span style="color:#f92672">meta</span> <span style="color:#a6e22e">charset</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;UTF-8&#34;</span>&gt;
+    &lt;<span style="color:#f92672">title</span>&gt;绝对定位&lt;/<span style="color:#f92672">title</span>&gt;
+    &lt;<span style="color:#f92672">style</span> <span style="color:#a6e22e">type</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;text/css&#34;</span>&gt;
+        #div1{
+            <span style="color:#66d9ef">width</span>: <span style="color:#ae81ff">400</span><span style="color:#66d9ef">px</span>;
+            <span style="color:#66d9ef">height</span>: <span style="color:#ae81ff">400</span><span style="color:#66d9ef">px</span>;
+            <span style="color:#66d9ef">background</span>: <span style="color:#66d9ef">black</span>;
+            <span style="color:#66d9ef">margin</span>: <span style="color:#ae81ff">30</span><span style="color:#66d9ef">px</span>;
+            <span style="color:#66d9ef">position</span>: <span style="color:#66d9ef">relative</span>;
+        }
+        #div2{
+            <span style="color:#66d9ef">width</span>: <span style="color:#ae81ff">200</span><span style="color:#66d9ef">px</span>;
+            <span style="color:#66d9ef">height</span>: <span style="color:#ae81ff">200</span><span style="color:#66d9ef">px</span>;
+            <span style="color:#66d9ef">background</span>: <span style="color:#66d9ef">blue</span>;
+            <span style="color:#66d9ef">position</span>: <span style="color:#66d9ef">absolute</span>;
+            <span style="color:#66d9ef">top</span>:<span style="color:#ae81ff">100</span><span style="color:#66d9ef">px</span>;
+            <span style="color:#66d9ef">left</span>:<span style="color:#ae81ff">100</span><span style="color:#66d9ef">px</span>;
+        }
+
+    &lt;/<span style="color:#f92672">style</span>&gt;
+&lt;/<span style="color:#f92672">head</span>&gt;
+
+&lt;<span style="color:#f92672">body</span>&gt;
+&lt;<span style="color:#f92672">div</span> <span style="color:#a6e22e">id</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;div1&#34;</span>&gt;
+    &lt;<span style="color:#f92672">div</span> <span style="color:#a6e22e">id</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;div2&#34;</span>&gt;&lt;/<span style="color:#f92672">div</span>&gt;
+&lt;/<span style="color:#f92672">div</span>&gt;
+&lt;/<span style="color:#f92672">body</span>&gt;
+&lt;/<span style="color:#f92672">html</span>&gt;
+</code></pre></div><p>父相子绝（父元素相对定位，子元素绝对定位）一种常用的布局方式，让子元素可以相对父元素的位置去进行定位。为什么父盒子不使用绝对定位，因为父盒子使用绝对定位会脱离文档流，可能会和其它元素重叠。</p>
+<h5 id="固定定位">固定定位</h5>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-css" data-lang="css"><span style="color:#f92672">Position</span>:<span style="color:#a6e22e">fixed</span><span style="color:#f92672">;</span>
+</code></pre></div><p>特点：</p>
+<ul>
+<li>
+<p>固定定位之后，不占据原来的位置（脱标）</p>
+</li>
+<li>
+<p>元素使用固定定位之后，位置从浏览器出发。</p>
+</li>
+<li>
+<p>元素使用固定定位之后，会转化为行内块</p>
+</li>
+</ul>
+<p><img src="/img/clip_image012-1608885089791.jpg" alt="img"></p>
+<p>案例1：</p>
+<p><img src="/img/clip_image013-1608885089791.png" alt="img"></p>
+<p>案例2：</p>
+<p><img src="/img/clip_image014-1608885089791.png" alt="img"></p>
+<h5 id="定位的盒子居中显示">定位的盒子居中显示</h5>
+<ul>
+<li>
+<p>margin:0 auto; 只能让标准流的盒子居中对齐。</p>
+</li>
+<li>
+<p>定位的盒子居中：先左右走父元素盒子的一半50%，再向左走子盒子的一半(margin-left:负值。)</p>
+</li>
+</ul>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#f92672">style</span>&gt;         
+    #div1{             
+        <span style="color:#66d9ef">width</span>:<span style="color:#ae81ff">1000</span><span style="color:#66d9ef">px</span>;             
+        <span style="color:#66d9ef">height</span>:<span style="color:#ae81ff">500</span><span style="color:#66d9ef">px</span>;             
+        <span style="color:#66d9ef">border</span>:<span style="color:#ae81ff">1</span><span style="color:#66d9ef">px</span> <span style="color:#66d9ef">solid</span> <span style="color:#66d9ef">red</span>;             
+        <span style="color:#66d9ef">position</span>:<span style="color:#66d9ef">relative</span>;         
+    }         
+    #div2{             
+        <span style="color:#66d9ef">position</span>: <span style="color:#66d9ef">absolute</span>;             
+        <span style="color:#66d9ef">left</span>:<span style="color:#ae81ff">50</span><span style="color:#66d9ef">%</span>;              
+        <span style="color:#66d9ef">width</span>:<span style="color:#ae81ff">600</span><span style="color:#66d9ef">px</span>;             
+        <span style="color:#66d9ef">height</span>:<span style="color:#ae81ff">500</span><span style="color:#66d9ef">px</span>;             
+        <span style="color:#66d9ef">background-color</span>:<span style="color:#66d9ef">blue</span>;             
+        <span style="color:#66d9ef">margin-left</span>:<span style="color:#ae81ff">-300</span><span style="color:#66d9ef">px</span>;         
+    }     
+&lt;/<span style="color:#f92672">style</span>&gt; 
+&lt;/<span style="color:#f92672">head</span>&gt; 
+&lt;<span style="color:#f92672">body</span>&gt; 
+&lt;<span style="color:#f92672">div</span>  <span style="color:#a6e22e">id</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;div1&#34;</span>&gt;     
+	&lt;<span style="color:#f92672">div</span> <span style="color:#a6e22e">id</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;div2&#34;</span>&gt;&lt;/<span style="color:#f92672">div</span>&gt; 
+&lt;/<span style="color:#f92672">div</span>&gt; 
+&lt;/<span style="color:#f92672">body</span>&gt;
+</code></pre></div><h5 id="z-index属性">z-index属性</h5>
+<p>调整元素定位时重叠层的上下位置</p>
+<p>z-index属性值：整数，默认值为0</p>
+<p>设置了positon属性时，z-index属性可以设置各元素之间的重叠高低关系</p>
+<p>z-index值大的层位于其值小的层上方</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#f92672">head</span>&gt;
+   &lt;<span style="color:#f92672">meta</span> <span style="color:#a6e22e">charset</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;UTF-8&#34;</span>&gt;
+   &lt;<span style="color:#f92672">title</span>&gt;Title&lt;/<span style="color:#f92672">title</span>&gt;
+   &lt;<span style="color:#f92672">style</span>&gt;
+     <span style="color:#f92672">div</span>{
+       <span style="color:#66d9ef">width</span>:<span style="color:#ae81ff">300</span><span style="color:#66d9ef">px</span>;
+       <span style="color:#66d9ef">height</span>:<span style="color:#ae81ff">300</span><span style="color:#66d9ef">px</span>;
+       <span style="color:#66d9ef">position</span>:<span style="color:#66d9ef">absolute</span>;
+     }
+     #div1{
+       <span style="color:#66d9ef">background-color</span>:<span style="color:#66d9ef">red</span>;
+       <span style="color:#66d9ef">z-index</span>:<span style="color:#ae81ff">4</span>;
+     }
+     #div2{
+       <span style="color:#66d9ef">background-color</span>: <span style="color:#66d9ef">blue</span>;
+       <span style="color:#66d9ef">z-index</span>: <span style="color:#ae81ff">1</span>;
+     }
+     #div3{
+       <span style="color:#66d9ef">background-color</span>:<span style="color:#66d9ef">green</span>;
+     }
+   &lt;/<span style="color:#f92672">style</span>&gt;
+ &lt;/<span style="color:#f92672">head</span>&gt;
+ &lt;<span style="color:#f92672">body</span>&gt;
+ &lt;<span style="color:#f92672">div</span> <span style="color:#a6e22e">id</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;div1&#34;</span>&gt;&lt;/<span style="color:#f92672">div</span>&gt;
+ &lt;<span style="color:#f92672">div</span> <span style="color:#a6e22e">id</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;div2&#34;</span>&gt;&lt;/<span style="color:#f92672">div</span>&gt;
+ &lt;<span style="color:#f92672">div</span> <span style="color:#a6e22e">id</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;div3&#34;</span>&gt;&lt;/<span style="color:#f92672">div</span>&gt;
+</code></pre></div><h5 id="标签包含规范">标签包含规范</h5>
+<ul>
+<li>
+<p>div可以包含所有的标签。</p>
+</li>
+<li>
+<p>p标签不能包含div h1等标签。</p>
+</li>
+<li>
+<p>h1可以包含p，div等标签。</p>
+</li>
+<li>
+<p>行内元素尽量包含行内元素，行内元素不要包含块元素。</p>
+</li>
+</ul>
+<h5 id="规避脱标流">规避脱标流</h5>
+<ul>
+<li>
+<p>尽量使用标准流。</p>
+</li>
+<li>
+<p>标准流解决不了的使用浮动。</p>
+</li>
+<li>
+<p>浮动解决不了的使用定位。</p>
+</li>
+</ul>
+</div>
+  
+</article></main>
+<footer class="footer">
+  <span>&copy; 2021 <a href="https://xshi000.github.io/">及时当勉励，岁月不待人！@iNuo</a></span>
+  <span>&middot;</span>
+  <span>Powered by <a href="https://gohugo.io/" rel="noopener" target="_blank">Hugo️️</a>️</span>
+  <span>&middot;</span>
+  <span>Theme️ <a href="https://github.com/nanxiaobei/hugo-paper" rel="noopener" target="_blank">Paper</a></span>
+</footer>
+<script src="https://xshi000.github.io/highlight.min.js"></script>
+<script>
+  hljs.initHighlightingOnLoad();
+</script>
+</body>
+</html>
+

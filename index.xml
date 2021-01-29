@@ -6,10 +6,23 @@
     <description>Recent content on 及时当勉励，岁月不待人！@iNuo</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-cn</language>
-    <lastBuildDate>Wed, 27 Jan 2021 21:52:55 +0800</lastBuildDate>
+    <lastBuildDate>Fri, 29 Jan 2021 10:41:15 +0800</lastBuildDate>
     
 	<atom:link href="https://xshi000.github.io/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>极简Java十：HTML5和CSS3</title>
+      <link>https://xshi000.github.io/java_10/</link>
+      <pubDate>Fri, 29 Jan 2021 10:41:15 +0800</pubDate>
+      
+      <guid>https://xshi000.github.io/java_10/</guid>
+      <description>第一章  本章内容  html   为什么要学习HTML？ 制作精美的电商、门户等静态网页
+什么是HTML   HTML：超文本标记语言（Hyper Text Markup Language）
+  HTML不是一种编程语言，而是一种标记语言，描述网页的语言
+  HTML使用标签描述网页中图片、文本、音乐、视频、超链接等
+  HTML基本标签    名称 标签 示例     标题标签 &amp;lt;h1&amp;gt;~&amp;lt;h6&amp;gt; &amp;lt;h1&amp;gt;静夜思&amp;lt;/h1&amp;gt;   段落和换行标签 &amp;lt;p&amp;gt;…&amp;lt;/p&amp;gt;&amp;lt;br/&amp;gt; &amp;lt;p&amp;gt;床前明月光疑是地上霜&amp;lt;/p&amp;gt;   水平线标签 &amp;lt;hr/&amp;gt; &amp;lt;hr/&amp;gt;   斜体 &amp;lt;em&amp;gt;…&amp;lt;/em&amp;gt; 举头望明月   字体加粗 &amp;lt;strong&amp;gt;…&amp;lt;/strong&amp;gt; 低头思故乡    &amp;lt;!DOCTYPE html&amp;gt; &amp;lt;html lang=&amp;#34;zh-cn&amp;#34;&amp;gt; &amp;lt;head&amp;gt; &amp;lt;meta charset=&amp;#34;UTF-8&amp;#34;&amp;gt; &amp;lt;title&amp;gt;静夜思&amp;lt;/title&amp;gt; &amp;lt;/head&amp;gt; &amp;lt;body&amp;gt; &amp;lt;h1&amp;gt;静夜思&amp;lt;/h1&amp;gt; &amp;lt;hr/&amp;gt; &amp;lt;p&amp;gt; 床前明月光&amp;lt;br/&amp;gt; 疑是地上霜&amp;lt;br/&amp;gt; &amp;lt;em&amp;gt;举头望明月&amp;lt;/em&amp;gt;&amp;lt;br/&amp;gt; &amp;lt;strong&amp;gt;低头思故乡&amp;lt;/strong&amp;gt; &amp;lt;/p&amp;gt; &amp;lt;/body&amp;gt; &amp;lt;/html&amp;gt; 图像标签: 常见图片格式：jpg、gif、bmp、png</description>
+    </item>
     
     <item>
       <title>极简Java九：JDBC与连接池</title>
