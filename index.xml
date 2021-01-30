@@ -6,10 +6,25 @@
     <description>Recent content on 及时当勉励，岁月不待人！@iNuo</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-cn</language>
-    <lastBuildDate>Fri, 29 Jan 2021 10:41:15 +0800</lastBuildDate>
+    <lastBuildDate>Sat, 30 Jan 2021 12:26:39 +0800</lastBuildDate>
     
 	<atom:link href="https://xshi000.github.io/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>极简Java十一：JavaScript与jQuery</title>
+      <link>https://xshi000.github.io/java_11/</link>
+      <pubDate>Sat, 30 Jan 2021 12:26:39 +0800</pubDate>
+      
+      <guid>https://xshi000.github.io/java_11/</guid>
+      <description>第一章  本章内容  Js介绍 JavaScript核心语法   1.1 Js介绍 什么是JavaScript 客户端的脚本语言，它是一门解释性语言，边执行边解释
+功能：向HTML页面中添加交互行为
+为什么要学JavaScript： 表单验证－减轻服务器端压力
+页面动态效果
+JavaScript的基本结构 &amp;lt;!DOCTYPE html&amp;gt; &amp;lt;html lang=&amp;#34;en&amp;#34;&amp;gt; &amp;lt;head&amp;gt; &amp;lt;meta charset=&amp;#34;UTF-8&amp;#34;&amp;gt; &amp;lt;title&amp;gt;JavaScript的基本结构&amp;lt;/title&amp;gt; &amp;lt;script type=&amp;#34;text/javascript&amp;#34;&amp;gt; document.write(&amp;#34;hello,JavaScript&amp;#34;); &amp;lt;/script&amp;gt; &amp;lt;/head&amp;gt; &amp;lt;body&amp;gt; &amp;lt;script type=&amp;#34;text/javascript&amp;#34;&amp;gt; alert(&amp;#34;初学JavaScript!&amp;#34;); &amp;lt;/script&amp;gt; &amp;lt;/body&amp;gt; &amp;lt;/html&amp;gt; &amp;lt;script&amp;gt;…&amp;lt;/script&amp;gt;可以包含在文档中的任何地方，只要保证这些代码在被使用前已读取并加载到内存即可
+JavaScript的执行原理 JavaScript的书写位置  写在行内  &amp;lt;input type=&amp;#34;button&amp;#34; value=&amp;#34;按钮&amp;#34; onclick=&amp;#34;alert(&amp;#39;Hello World&amp;#39;)&amp;#34; /&amp;gt;  写在script标签中  &amp;lt;head&amp;gt; &amp;lt;script&amp;gt; alert(&amp;#39;Hello World!&amp;#39;); &amp;lt;/script&amp;gt; &amp;lt;/head&amp;gt;  写在外部js文件中，在页面引入  &amp;lt;script src=&amp;#34;main.js&amp;#34;&amp;gt;&amp;lt;/script&amp;gt; 1.2 JavaScript核心语法： 变量 var声明变量
+var age; age = 18; 同时声明多个变量并赋值</description>
+    </item>
     
     <item>
       <title>极简Java十：HTML5和CSS3</title>
