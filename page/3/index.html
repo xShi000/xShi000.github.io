@@ -79,6 +79,29 @@
 
 <article class="post-entry">
   <header class="entry-header">
+    <h2>ADO.NET</h2>
+  </header>
+  <section class="entry-content">
+   <p>ADO.NET是数据库访问的方法和技术
+ADO.NET由两部分组成：DataSet（数据集）和.NET Framework数据提供程序
+  DataSet数据集——能临时保存各种类型数据库中的数据；
+  .Net framework数据提供程序——它由几个组件组成，分别负责连接、操作和访问数据库，其中负责访问数据的组件是只读只进式的，也就是只读不修改、只能往前读不能后退
+  ADO.NET主要通过以下对象操作数据库：
+  Connection对象，负责连接数据库。
+  Command对象，对数据库进行增删改的操作。
+  Datareader对象，读取数据（只读只进）。
+  DataAdapter对象，从数据库获取对象后填充给DataSet临时数据库。
+  使用connection对象的步骤
+示例1
+private void button1_Click(object sender, EventArgs e) { //1.创建链接对象 SqlConnection con = new SqlConnection(); //2.给对象添加属性 con.ConnectionString = &#34;data source=.; initial catalog=TestDB; integrated security=true&#34;; try //将可能出现异常的代码，放在try里 { //3.打开数据库连接 con.Open(); MessageBox.Show(&#34;打开数据库连接成功&#34;); } catch (Exception ex)//如果出现异常，则允许catch里的代码 { MessageBox.Show(ex.Message);//以消息框形式，输出异常消息 } finally //不管程序错误与否，都会执行的代码 { con.Close(); MessageBox.Show(&#34;关闭数据库连接成功&#34;); } } 使用Command对象...</p>
+  </section>
+  <footer class="entry-footer">
+    <time>September 29, 2020</time>
+  </footer>
+  <a class="entry-link" href="https://xshi000.github.io/ado/"></a>
+</article>
+<article class="post-entry">
+  <header class="entry-header">
     <h2>Excel-图表模板大法</h2>
   </header>
   <section class="entry-content">
