@@ -79,6 +79,21 @@
 
 <article class="post-entry">
   <header class="entry-header">
+    <h2>极简Java五：IO流</h2>
+  </header>
+  <section class="entry-content">
+   <p>第一章  本章内容  递归 File类 FileInputStream FileOutputStream   1.1 递归 递归的概述 递归，指在当前方法内调用自己的这种现象！
+public class DemoStack { public static void main(String[] args) { method(); } public static void method(){ System.out.println(&#34;递归的演示&#34;); //在当前方法内调用自己  method(); } }   递归一定要有条件限定，保证递归能够停止下来，否则会发生栈内存溢出。
+  在递归中虽然有限定条件，但是递归次数不能太多。否则也会发生栈内存溢出。
+  public class DemoDigui { public static void main(String[] args) { test(1); } public static void test(int i){ System.out.println(i); if(i==10000){ return; } test(&#43;&#43;i); } } 递归的代码演示，计算1-n之间的和，使用递归完成...</p>
+  </section>
+  <footer class="entry-footer">
+    <time>January 22, 2021</time>
+  </footer>
+  <a class="entry-link" href="https://xshi000.github.io/java_5/"></a>
+</article>
+<article class="post-entry">
+  <header class="entry-header">
     <h2>极简Java四：集合框架</h2>
   </header>
   <section class="entry-content">
@@ -272,21 +287,6 @@ Main，加载图片pygame.image.load（）赋予my_plane
     <time>September 29, 2020</time>
   </footer>
   <a class="entry-link" href="https://xshi000.github.io/cshape/"></a>
-</article>
-<article class="post-entry">
-  <header class="entry-header">
-    <h2>T-SQL</h2>
-  </header>
-  <section class="entry-content">
-   <p>新建数据库
-create database TestDB; 使用数据库
-use TestDB; //跳转到指定数据库 新建表
-create table Student( Id int primary key identity(1831301,1), --编号 整数 主键 标识列（种子，增量 ） Names nvarchar(30) not null, --姓名 字符 非空 Gender char(2) not null, --性别 字符 非空 Age int not null, --年龄 整数 非空 Adress nvarchar(50) default(&#39;湖北武汉&#39;),--地址 字符 默认值（湖北武汉）	Score float check(Score&gt;=0 and Score&lt;=100) not null --分数 小数 check约束（0~100之间) 非空 ); //查 --查询数据库表Student里的所有信息 select * from Student; //改 update Student set Major=4 where Major=2; //删 delete from Student where Number=1831304; //增 insert into Student (Names,Gender,Age,Adress,Score) values (&#39;李荣浩&#39;,&#39;男&#39;,18,default,88); 删除表...</p>
-  </section>
-  <footer class="entry-footer">
-    <time>September 29, 2020</time>
-  </footer>
-  <a class="entry-link" href="https://xshi000.github.io/sql/"></a>
 </article>
 <footer class="page-footer">
   <nav class="pagination">

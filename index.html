@@ -79,6 +79,28 @@
 
 <article class="first-entry">
   <header class="entry-header">
+    <h2>极简Java十五：MyBatis框架</h2>
+  </header>
+  <section class="entry-content">
+   <p>第一章  本章内容  Mybatis介绍 Mybatis框架 Mybatis入门案例   什么是框架？   是一个应用程序的半成品
+  提供可重用的公共结构
+  按一定规则组织的一组组件
+  例：写简历，使用模板不用考虑布局、排版等，提高效率，可专心在简历内容上，结构统一，便于人事阅读，新手也可以作出专业的简历。
+使用框架的好处   不用再考虑公共问题
+  专心在业务实现上
+  结构统一，易于学习、维护
+  新手也可写出好程序
+  主流框架：  SSH：Spring &#43; Strucs2 &#43; Hibernate SSM：Spring &#43; SpringMVC &#43; Mybatis  1.1 Mybatis介绍 MyBatis是一个优秀的持久层框架，它对jdbc的操作数据库的过程进行封装，使开发者只需要关注 SQL 本身，而不需要花费精力去处理例如注册驱动、创建connection、创建statement、手动设置参数、结果集检索等jdbc繁杂的过程代码。
+Jdbc的问题： Sql语句在代码中硬编码，造成代码不易维护，实际应用sql变化的可能较大，sql变动需要改变java代码。
+public static void main(String[] args) { Connection connection = null; PreparedStatement preparedStatement = null; ResultSet resultSet = null; try { //加载数据库驱动  Class....</p>
+  </section>
+  <footer class="entry-footer">
+    <time>February 6, 2021</time>
+  </footer>
+  <a class="entry-link" href="https://xshi000.github.io/java_15/"></a>
+</article>
+<article class="post-entry">
+  <header class="entry-header">
     <h2>极简Java十四：Maven入门</h2>
   </header>
   <section class="entry-content">
@@ -278,21 +300,6 @@ Class类 获取Class对象的三种方式
     <time>January 23, 2021</time>
   </footer>
   <a class="entry-link" href="https://xshi000.github.io/java_6/"></a>
-</article>
-<article class="post-entry">
-  <header class="entry-header">
-    <h2>极简Java五：IO流</h2>
-  </header>
-  <section class="entry-content">
-   <p>第一章  本章内容  递归 File类 FileInputStream FileOutputStream   1.1 递归 递归的概述 递归，指在当前方法内调用自己的这种现象！
-public class DemoStack { public static void main(String[] args) { method(); } public static void method(){ System.out.println(&#34;递归的演示&#34;); //在当前方法内调用自己  method(); } }   递归一定要有条件限定，保证递归能够停止下来，否则会发生栈内存溢出。
-  在递归中虽然有限定条件，但是递归次数不能太多。否则也会发生栈内存溢出。
-  public class DemoDigui { public static void main(String[] args) { test(1); } public static void test(int i){ System.out.println(i); if(i==10000){ return; } test(&#43;&#43;i); } } 递归的代码演示，计算1-n之间的和，使用递归完成...</p>
-  </section>
-  <footer class="entry-footer">
-    <time>January 22, 2021</time>
-  </footer>
-  <a class="entry-link" href="https://xshi000.github.io/java_5/"></a>
 </article>
 <footer class="page-footer">
   <nav class="pagination">
