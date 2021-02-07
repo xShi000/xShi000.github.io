@@ -79,6 +79,23 @@
 
 <article class="post-entry">
   <header class="entry-header">
+    <h2>极简Java六：反射注解</h2>
+  </header>
+  <section class="entry-content">
+   <p>第一章  本章内容  反射   1.1 反射 JAVA反射机制是在运行状态中，对于任意一个类，都能够知道这个类的所有属性和方法；对于任意一个对象，都能够调用它的任意一个方法和属性；这种动态获取的信息以及动态调用对象的方法的功能称为java语言的反射机制。
+要想解剖一个类,必须先要获取到该类的字节码文件对象。而解剖使用的就是Class类中的方法！所以先要获取到每一个字节码文件对应的Class类型的对象。
+Class类 获取Class对象的三种方式
+ 方式一: 通过Object类中的getObject()方法  Person p = new Person(); Class c = p.getClass();  方式二: 通过 类名.class 获取到字节码文件对象（任意数据类型都具备一个class静态属性,看上去要比第一种方式简单）。  Class c2 = Person.class;  方式三: 通过Class类中的方法（将类名作为字符串传递给Class类中的静态方法forName即可）。  Class c3 = Class.forName(&#34;Person&#34;); 注意：第三种和前两种的区别
+ 前两种你必须明确Person类型； 第三种是指定这种类型的字符串就行，这种扩展更强！我不需要知道你的类，我只提供字符串，按照配置文件加载就可以了  代码演示：
+/* \ 获取.class字节码文件对象的方式 \ 1：通过Object类中的getObject()方法 \ 2: 通过 类名.class 获取到字节码文件对象 \ 3: 反射中的方法, \public static Class&lt;?&gt; forName(String className) throws ClassNotFoundException \返回与带有给定字符串名的类或接口相关联的 Class 对象 */ public class ReflectDemoReflect { public static void main(String[] args) throws ClassNotFoundException { // 1： 通过Object类中的getObject()方法  // Person p1 = new Person();  // Class c1 = p1....</p>
+  </section>
+  <footer class="entry-footer">
+    <time>January 23, 2021</time>
+  </footer>
+  <a class="entry-link" href="https://xshi000.github.io/java_6/"></a>
+</article>
+<article class="post-entry">
+  <header class="entry-header">
     <h2>极简Java五：IO流</h2>
   </header>
   <section class="entry-content">
@@ -272,21 +289,6 @@ Main，加载图片pygame.image.load（）赋予my_plane
     <time>September 29, 2020</time>
   </footer>
   <a class="entry-link" href="https://xshi000.github.io/pygame/"></a>
-</article>
-<article class="post-entry">
-  <header class="entry-header">
-    <h2>C#项目：学员信息管理系统</h2>
-  </header>
-  <section class="entry-content">
-   <p>0.项目总体概述 功能模块
-   学员管理系统               系统 学员管理 成绩管理 考勤管理 帮助         秘密修改 退出系统 添加学员 信息打印 学员管理 成绩分析 快速查询 考勤打卡 考勤查询 在线帮助 联系我们    项目数据库
-学员表 &amp; 成绩表 &amp; 班级表 管理员表 项目框架设计（典型两层设计）
-   UI 应用程序层（界面）     Models 实体层(数据封装与传递)   DAL 数据访问层   数据库     1....</p>
-  </section>
-  <footer class="entry-footer">
-    <time>September 29, 2020</time>
-  </footer>
-  <a class="entry-link" href="https://xshi000.github.io/cshape/"></a>
 </article>
 <footer class="page-footer">
   <nav class="pagination">

@@ -79,6 +79,29 @@
 
 <article class="first-entry">
   <header class="entry-header">
+    <h2>极简Java十六：Spring框架</h2>
+  </header>
+  <section class="entry-content">
+   <p>第一章  本章内容  Spring的概述 Spring入门案例 Spring容器 bean 标签 spring 的依赖注入   1.1 Spring的概述 什么是Spring？ Spring是一个开源框架，Spring是于2003 年兴起的一个轻量级的Java 开发框架， Spring的核心是：
+ 控制反转（IoC)） 面向切面（AOP）  为什么学习Spring？  方便解耦，简化开发  Spring就是一个大工厂，可以将所有对象创建和依赖关系维护，交给Spring管理
+ AOP编程的支持  Spring提供面向切面编程，可以方便的实现对程序进行权限拦截、运行监控等功能
+ 声明式事务的支持  只需要通过配置就可以完成对事务的管理，而无需手动编程
+ 方便程序的测试  Spring对Junit4支持，可以通过注解方便的测试Spring程序
+ 方便集成各种优秀框架  Spring不排斥各种优秀的开源框架，其内部提供了对各种优秀框架（如：Struts、Hibernate、MyBatis、Quartz等）的直接支持
+ 降低JavaEE API的使用难度  Spring 对JavaEE开发中非常难用的一些API（JDBC、JavaMail、远程调用等），都提供了封装，使这些API应用难度大大降低
+什么是耦合？ 模块间的耦合度是指模块之间的依赖关系，包括控制关系、调用关系、数据传递关系。模块间联系越多，其耦合性越强，同时表明其独立性越差( 降低耦合性，可以提高其独立性)
+当数据库的访问方式发生变化时，传统方式耦合性过高，而spring可借助其工厂类实现控制控制反转，降低耦合！
+工厂模式解耦 在实际开发中我们可以把三层的对象都使用配置文件配置起来，当启动服务器应用加载的时候， 让一个类中的方法通过读取配置文件，把这些对象创建出来并存起来。在接下来的使用的时候，直接拿过来用就好了。那么，这个读取配置文件， 创建和获取三层对象的类就是工厂。
+工厂类：
+/* 创建一个Bean对象的工厂BeanFactory，用它来创建我们的service和dao对象！ 需求： 第一个：需要一个配置文件来配置我们的service和dao 配置的内容：唯一标识=全限定类名（key=value) 第二个：通过读取配置文件中配置的内容，反射创建对象 我的配置文件可以是xml也可以是properties */ public class BeanFactory { //定义一个Properties对象  private static Properties props; //定义一个Map,用于存放我们要创建的对象。我们把它称之为容器  private static Map&lt;String,Object&gt; beans; //使用静态代码块为Properties对象赋值  static { try { //实例化对象  props = new Properties(); //获取properties文件的流对象  InputStream in = BeanFactory....</p>
+  </section>
+  <footer class="entry-footer">
+    <time>February 7, 2021</time>
+  </footer>
+  <a class="entry-link" href="https://xshi000.github.io/java_16/"></a>
+</article>
+<article class="post-entry">
+  <header class="entry-header">
     <h2>极简Java十五：MyBatis框架</h2>
   </header>
   <section class="entry-content">
@@ -283,23 +306,6 @@ public class A_Thread { void show() { for (int i=1;i&lt;=10000 ;i&#43;&#43; ) { 
     <time>January 24, 2021</time>
   </footer>
   <a class="entry-link" href="https://xshi000.github.io/java_7/"></a>
-</article>
-<article class="post-entry">
-  <header class="entry-header">
-    <h2>极简Java六：反射注解</h2>
-  </header>
-  <section class="entry-content">
-   <p>第一章  本章内容  反射   1.1 反射 JAVA反射机制是在运行状态中，对于任意一个类，都能够知道这个类的所有属性和方法；对于任意一个对象，都能够调用它的任意一个方法和属性；这种动态获取的信息以及动态调用对象的方法的功能称为java语言的反射机制。
-要想解剖一个类,必须先要获取到该类的字节码文件对象。而解剖使用的就是Class类中的方法！所以先要获取到每一个字节码文件对应的Class类型的对象。
-Class类 获取Class对象的三种方式
- 方式一: 通过Object类中的getObject()方法  Person p = new Person(); Class c = p.getClass();  方式二: 通过 类名.class 获取到字节码文件对象（任意数据类型都具备一个class静态属性,看上去要比第一种方式简单）。  Class c2 = Person.class;  方式三: 通过Class类中的方法（将类名作为字符串传递给Class类中的静态方法forName即可）。  Class c3 = Class.forName(&#34;Person&#34;); 注意：第三种和前两种的区别
- 前两种你必须明确Person类型； 第三种是指定这种类型的字符串就行，这种扩展更强！我不需要知道你的类，我只提供字符串，按照配置文件加载就可以了  代码演示：
-/* \ 获取.class字节码文件对象的方式 \ 1：通过Object类中的getObject()方法 \ 2: 通过 类名.class 获取到字节码文件对象 \ 3: 反射中的方法, \public static Class&lt;?&gt; forName(String className) throws ClassNotFoundException \返回与带有给定字符串名的类或接口相关联的 Class 对象 */ public class ReflectDemoReflect { public static void main(String[] args) throws ClassNotFoundException { // 1： 通过Object类中的getObject()方法  // Person p1 = new Person();  // Class c1 = p1....</p>
-  </section>
-  <footer class="entry-footer">
-    <time>January 23, 2021</time>
-  </footer>
-  <a class="entry-link" href="https://xshi000.github.io/java_6/"></a>
 </article>
 <footer class="page-footer">
   <nav class="pagination">

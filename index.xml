@@ -6,10 +6,30 @@
     <description>Recent content on 及时当勉励，岁月不待人！@iNuo</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-cn</language>
-    <lastBuildDate>Sat, 06 Feb 2021 22:46:12 +0800</lastBuildDate>
+    <lastBuildDate>Sun, 07 Feb 2021 21:52:42 +0800</lastBuildDate>
     
 	<atom:link href="https://xshi000.github.io/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>极简Java十六：Spring框架</title>
+      <link>https://xshi000.github.io/java_16/</link>
+      <pubDate>Sun, 07 Feb 2021 21:52:42 +0800</pubDate>
+      
+      <guid>https://xshi000.github.io/java_16/</guid>
+      <description>第一章  本章内容  Spring的概述 Spring入门案例 Spring容器 bean 标签 spring 的依赖注入   1.1 Spring的概述 什么是Spring？ Spring是一个开源框架，Spring是于2003 年兴起的一个轻量级的Java 开发框架， Spring的核心是：
+ 控制反转（IoC)） 面向切面（AOP）  为什么学习Spring？  方便解耦，简化开发  Spring就是一个大工厂，可以将所有对象创建和依赖关系维护，交给Spring管理
+ AOP编程的支持  Spring提供面向切面编程，可以方便的实现对程序进行权限拦截、运行监控等功能
+ 声明式事务的支持  只需要通过配置就可以完成对事务的管理，而无需手动编程
+ 方便程序的测试  Spring对Junit4支持，可以通过注解方便的测试Spring程序
+ 方便集成各种优秀框架  Spring不排斥各种优秀的开源框架，其内部提供了对各种优秀框架（如：Struts、Hibernate、MyBatis、Quartz等）的直接支持
+ 降低JavaEE API的使用难度  Spring 对JavaEE开发中非常难用的一些API（JDBC、JavaMail、远程调用等），都提供了封装，使这些API应用难度大大降低
+什么是耦合？ 模块间的耦合度是指模块之间的依赖关系，包括控制关系、调用关系、数据传递关系。模块间联系越多，其耦合性越强，同时表明其独立性越差( 降低耦合性，可以提高其独立性)
+当数据库的访问方式发生变化时，传统方式耦合性过高，而spring可借助其工厂类实现控制控制反转，降低耦合！
+工厂模式解耦 在实际开发中我们可以把三层的对象都使用配置文件配置起来，当启动服务器应用加载的时候， 让一个类中的方法通过读取配置文件，把这些对象创建出来并存起来。在接下来的使用的时候，直接拿过来用就好了。那么，这个读取配置文件， 创建和获取三层对象的类就是工厂。
+工厂类：
+/* 创建一个Bean对象的工厂BeanFactory，用它来创建我们的service和dao对象！ 需求： 第一个：需要一个配置文件来配置我们的service和dao 配置的内容：唯一标识=全限定类名（key=value) 第二个：通过读取配置文件中配置的内容，反射创建对象 我的配置文件可以是xml也可以是properties */ public class BeanFactory { //定义一个Properties对象  private static Properties props; //定义一个Map,用于存放我们要创建的对象。我们把它称之为容器  private static Map&amp;lt;String,Object&amp;gt; beans; //使用静态代码块为Properties对象赋值  static { try { //实例化对象  props = new Properties(); //获取properties文件的流对象  InputStream in = BeanFactory.</description>
+    </item>
     
     <item>
       <title>极简Java十五：MyBatis框架</title>
