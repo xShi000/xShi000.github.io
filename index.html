@@ -79,6 +79,31 @@
 
 <article class="first-entry">
   <header class="entry-header">
+    <h2>极简Java十七：SpringMvc框架</h2>
+  </header>
+  <section class="entry-content">
+   <p>第一章  本章内容  三层架构和MVC模型 SpringMVC的入门案例 请求参数的绑定 常用的注解   1.1 三层架构和MVC模型 三层架构   咱们开发服务器端程序，一般都基于两种形式，一种C/S架构程序，一种B/S架构程序
+  使用Java语言基本上都是开发B/S架构的程序，B/S架构又分成了三层架构
+  三层架构
+表现层：WEB层，用来和客户端进行数据交互的。表现层一般会采用MVC的设计模型
+业务层：SERVICE层，处理公司具体的业务逻辑的
+持久层：DAO层，用来操作数据库的
+  MVC模型 MVC全名是Model View Controller 模型视图控制器，每个部分各司其职。
+  Model：数据模型，JavaBean的类，用来进行数据封装。
+  View：指JSP、HTML用来展示数据给用户
+  Controller：用来接收用户的请求，整个流程的控制器。用来进行数据校验等。
+  1.2 SpringMVC的入门案例 SpringMVC概述   是一种基于Java实现的MVC设计模型的请求驱动类型的轻量级WEB框架。
+  Spring MVC属于SpringFrameWork的后续产品，已经融合在Spring Web Flow里面，Spring 框架提供了构建 Web 应用程序的全功能 MVC 模块。
+  使用 Spring 可插入的 MVC 架构，从而在使用Spring进行WEB开发时，可以选择使用Spring的SpringMVC框架或集成其他MVC开发框架，如Struts1(现在一般不用)，Struts2等。
+  SpringMVC在三层架构中的位置是 表现层框架...</p>
+  </section>
+  <footer class="entry-footer">
+    <time>February 8, 2021</time>
+  </footer>
+  <a class="entry-link" href="https://xshi000.github.io/java_17/"></a>
+</article>
+<article class="post-entry">
+  <header class="entry-header">
     <h2>极简Java十六：Spring框架</h2>
   </header>
   <section class="entry-content">
@@ -280,32 +305,6 @@ var age; age = 18; 同时声明多个变量并赋值...</p>
     <time>January 26, 2021</time>
   </footer>
   <a class="entry-link" href="https://xshi000.github.io/java_8/"></a>
-</article>
-<article class="post-entry">
-  <header class="entry-header">
-    <h2>极简Java七：多线程与网络编程</h2>
-  </header>
-  <section class="entry-content">
-   <p>第一章  本章内容  多线程 线程安全 线程状态   1.1 多线程 现在想要设计一个程序，边打游戏边听歌，怎么设计？
-要解决上述问题,咱们得使用多进程或者多线程来解决.
-并发与并行   并行：指两个或多个事件在同一时刻发生（同时发生）。
-  并发：指两个或多个事件在同一个时间段内发生。
-  线程与进程   进程：是指一个内存中运行的应用程序，每个进程都有一个独立的内存空间，一个应用程序可以同时运行多个进程；进程也是程序的一次执行过程，是系统运行程序的基本单位；系统运行一个程序即是一个进程从创建、运行到消亡的过程。
-  线程：线程是进程中的一个执行单元，负责当前进程中程序的执行，一个进程中至少有一个线程。一个进程中是可以有多个线程的，这个应用程序也可以称之为多线程程序。
-  简而言之：一个程序运行后至少有一个进程，一个进程中可以包含多个线程
-我们可以在电脑底部任务栏，右键&gt;打开任务管理器,可以查看当前任务的进程：
-进程
-线程：
-调度方式   分时调度：所有线程轮流使用 CPU 的使用权，平均分配每个线程占用 CPU 的时间。
-  抢占式调度：优先让优先级高的线程使用 CPU，如果线程的优先级相同，那么会随机选择一个(线程随机性)，Java使用的为抢占式调度。
-  其实，多线程程序并不能提高程序的运行速度，但能够提高程序运行效率，让CPU的使用率更高。
-主线程 回想我们以前学习中写过的代码，当我们在dos命令行中输入java空格类名回车后，启动JVM，并且加载对应的class文件。虚拟机并会从main方法开始执行我们的程序代码，一直把main方法的代码执行结束。如果在执行过程遇到循环时间比较长的代码，那么在循环之后的其他代码是不会被马上执行的。如下代码演示：
-public class A_Thread { void show() { for (int i=1;i&lt;=10000 ;i&#43;&#43; ) { System.out.println(&#34;i=&#34;&#43;i); } } } public class A_MainThread { public static void main(String[] args) { A_Thread t=new A_Thread(); t....</p>
-  </section>
-  <footer class="entry-footer">
-    <time>January 24, 2021</time>
-  </footer>
-  <a class="entry-link" href="https://xshi000.github.io/java_7/"></a>
 </article>
 <footer class="page-footer">
   <nav class="pagination">
