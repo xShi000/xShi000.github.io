@@ -6,10 +6,22 @@
     <description>Recent content on 及时当勉励，岁月不待人！@iNuo</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-cn</language>
-    <lastBuildDate>Wed, 10 Feb 2021 09:37:01 +0800</lastBuildDate>
+    <lastBuildDate>Wed, 10 Feb 2021 17:30:41 +0800</lastBuildDate>
     
 	<atom:link href="https://xshi000.github.io/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>极简Java二十：Linux入门</title>
+      <link>https://xshi000.github.io/java_20/</link>
+      <pubDate>Wed, 10 Feb 2021 17:30:41 +0800</pubDate>
+      
+      <guid>https://xshi000.github.io/java_20/</guid>
+      <description>第一章  本章内容  VMware使用 VMware配置   1.1 VMware使用  步骤一：运行“VMware-workstation-full-10.0.2-1744117.1398244508.exe”   步骤二：引导页面，下一步   步骤三：同意许可，下一步   步骤四：安装类型-自定义   步骤五：修改安装位置   步骤六：组件配置（默认）   步骤七：取消软件更新   步骤八：用户体验改进计划（自定义）   步骤九：创建快捷方式（默认）    步骤十：配置完成，点击“继续”安装
+安装中
+  步骤十一：输入许可证密码
+   步骤十二：完成  1.2 VMware配置  步骤一：新建虚拟机   步骤二：配置类型-典型   步骤三：创建空白磁盘   步骤四：选择安装系统和相应的系统版本   步骤五：选择虚拟机安装位置（自定义）   步骤六：指定磁盘容量（默认）   步骤七：硬件配置  配置完成后点击关闭，然后选择完成</description>
+    </item>
     
     <item>
       <title>极简Java十九：Git入门</title>

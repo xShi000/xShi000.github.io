@@ -1,0 +1,847 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    
+    <title>极简Java二十：Linux入门 - 及时当勉励，岁月不待人！@iNuo</title>
+    
+    <meta name="description" content="第一章  本章内容  VMware使用 VMware配置   1.1 VMware使用  步骤一：运行“VMware-workstation-full-10.0.2-1744117.1398244508.exe”   步骤二：引导页面，下一步   步骤三：同意许可，下一步   步骤四：安装类型-自定义   步骤五：修改安装位置   步骤六：组件配置（默认）   步骤七：取消软件更新   步骤八：用户体验改进计划（自定义）   步骤九：创建快捷方式（默认）    步骤十：配置完成，点击“继续”安装
+安装中
+  步骤十一：输入许可证密码
+   步骤十二：完成  1.2 VMware配置  步骤一：新建虚拟机   步骤二：配置类型-典型   步骤三：创建空白磁盘   步骤四：选择安装系统和相应的系统版本   步骤五：选择虚拟机安装位置（自定义）   步骤六：指定磁盘容量（默认）   步骤七：硬件配置  配置完成后点击关闭，然后选择完成">
+    <meta name="author" content="">
+    
+    <link href="https://xshi000.github.io/an-old-hope.min.css" rel="stylesheet">
+    <link href="https://xshi000.github.io/style.css" rel="stylesheet">
+    <link href="https://xshi000.github.io/custom.css" rel="stylesheet">
+    
+    <link rel="apple-touch-icon" href="https://xshi000.github.io/apple-touch-icon.png">
+    <link rel="icon" href="https://xshi000.github.io/favicon.ico">
+    <meta name="generator" content="Hugo 0.65.3" />
+    
+    
+    
+    <script>
+      function setTheme() {
+        const time = new Date();
+
+        const prev = localStorage.getItem('date');
+        const date = String(time.getMonth() + 1) + '.' + String(time.getDate());
+
+        const now = time.getTime();
+        let sunrise;
+        let sunset;
+
+        function setBodyClass() {
+          if (now > sunrise && now < sunset) return;
+          document.body.classList.add('dark');
+        }
+
+        if (date !== prev) {
+          fetch('https://api.ipgeolocation.io/astronomy?apiKey=5ed37d85103e4defa5df4c5298ed5215')
+            .then(res => res.json())
+            .then(data => {
+              sunrise = data.sunrise.split(':').map(Number);
+              sunset = data.sunset.split(':').map(Number);
+            })
+            .catch(() => {
+              sunrise = [7, 0];
+              sunset = [19, 0];
+            })
+            .finally(() => {
+              sunrise = time.setHours(sunrise[0], sunrise[1], 0);
+              sunset = time.setHours(sunset[0], sunset[1], 0);
+              setBodyClass();
+              localStorage.setItem('sunrise', sunrise);
+              localStorage.setItem('sunset', sunset);
+            });
+          localStorage.setItem('date', date);
+        } else {
+          sunrise = Number(localStorage.getItem('sunrise'));
+          sunset = Number(localStorage.getItem('sunset'));
+          setBodyClass();
+        }
+      }
+    </script>
+  </head>
+  <body class="single">
+    <script>
+      setTheme();
+    </script>
+    <header class="header">
+      <nav class="nav">
+        <p class="logo"><a href="https://xshi000.github.io/">及时当勉励，岁月不待人！@iNuo</a></p>
+      </nav>
+    </header>
+    <main class="main">
+
+
+<article class="post-single">
+  <header class="post-header">
+    <h1 class="post-title">极简Java二十：Linux入门</h1>
+    <div class="post-meta">February 10, 2021</div>
+  </header>
+  <div class="post-content"><hr>
+<h3 id="第一章">第一章</h3>
+<hr>
+<h5 id="本章内容">本章内容</h5>
+<ul>
+<li>VMware使用</li>
+<li>VMware配置</li>
+</ul>
+<hr>
+<h4 id="11-vmware使用">1.1 VMware使用</h4>
+<ul>
+<li>步骤一：运行“VMware-workstation-full-10.0.2-1744117.1398244508.exe”</li>
+</ul>
+<p><img src="/img/image-20201227170100367.png" alt="image-20201227170100367"></p>
+<ul>
+<li>步骤二：引导页面，下一步</li>
+</ul>
+<p><img src="/img/image-20201227170117091.png" alt="image-20201227170117091"></p>
+<ul>
+<li>步骤三：同意许可，下一步</li>
+</ul>
+<p><img src="/img/image-20201227170155809.png" alt="image-20201227170155809"></p>
+<ul>
+<li>步骤四：安装类型-自定义</li>
+</ul>
+<p><img src="/img/image-20201227170402844.png" alt="image-20201227170402844"></p>
+<ul>
+<li>步骤五：修改安装位置</li>
+</ul>
+<p><img src="/img/image-20201227170423596.png" alt="image-20201227170423596"></p>
+<ul>
+<li>步骤六：组件配置（默认）</li>
+</ul>
+<p><img src="/img/image-20201227170448227.png" alt="image-20201227170448227"></p>
+<ul>
+<li>步骤七：取消软件更新</li>
+</ul>
+<p><img src="/img/image-20201227170526940.png" alt="image-20201227170526940"></p>
+<ul>
+<li>步骤八：用户体验改进计划（自定义）</li>
+</ul>
+<p><img src="/img/image-20201227170608976.png" alt="image-20201227170608976"></p>
+<ul>
+<li>步骤九：创建快捷方式（默认）</li>
+</ul>
+<p><img src="/img/image-20201227170645407.png" alt="image-20201227170645407"></p>
+<ul>
+<li>
+<p>步骤十：配置完成，点击“继续”安装</p>
+<p><img src="/img/image-20201227170737843.png" alt="image-20201227170737843"></p>
+<p>安装中</p>
+<p><img src="/img/image-20201227170809601.png" alt="image-20201227170809601"></p>
+</li>
+<li>
+<p>步骤十一：输入许可证密码</p>
+</li>
+</ul>
+<p><img src="/img/image-20201227170953937.png" alt="image-20201227170953937"></p>
+<p><img src="/img/image-20201227171017668.png" alt="image-20201227171017668"></p>
+<ul>
+<li>步骤十二：完成</li>
+</ul>
+<p><img src="/img/image-20201227171047687.png" alt="image-20201227171047687"></p>
+<h4 id="12-vmware配置">1.2 VMware配置</h4>
+<ul>
+<li>步骤一：新建虚拟机</li>
+</ul>
+<p><img src="/img/image-20201227171317064.png" alt="image-20201227171317064"></p>
+<ul>
+<li>步骤二：配置类型-典型</li>
+</ul>
+<p><img src="/img/image-20201227171356045.png" alt="image-20201227171356045"></p>
+<ul>
+<li>步骤三：创建空白磁盘</li>
+</ul>
+<p><img src="/img/image-20201227171424043.png" alt="image-20201227171424043"></p>
+<ul>
+<li>步骤四：选择安装系统和相应的系统版本</li>
+</ul>
+<p><img src="/img/image-20201227171533552.png" alt="image-20201227171533552"></p>
+<ul>
+<li>步骤五：选择虚拟机安装位置（自定义）</li>
+</ul>
+<p><img src="/img/image-20201227171608808.png" alt="image-20201227171608808"></p>
+<ul>
+<li>步骤六：指定磁盘容量（默认）</li>
+</ul>
+<p><img src="/img/image-20201227171654300.png" alt="image-20201227171654300"></p>
+<ul>
+<li>步骤七：硬件配置</li>
+</ul>
+<p><img src="/img/image-20201227171724155.png" alt="image-20201227171724155"></p>
+<p><img src="/img/image-20201227171949776.png" alt="image-20201227171949776"></p>
+<p><img src="/img/image-20201227172014131.png" alt="image-20201227172014131"></p>
+<p><img src="/img/image-20201227172035710.png" alt="image-20201227172035710"></p>
+<p><img src="/img/image-20201227172057603.png" alt="image-20201227172057603"></p>
+<p>配置完成后点击关闭，然后选择完成</p>
+<p><img src="/img/image-20201227172128310.png" alt="image-20201227172128310"></p>
+<p>然后回到主页面</p>
+<p><img src="/img/image-20201227172148657.png" alt="image-20201227172148657"></p>
+<hr>
+<h3 id="第二章">第二章</h3>
+<hr>
+<h5 id="本章内容-1">本章内容</h5>
+<ul>
+<li>Linux安装&amp;登录</li>
+</ul>
+<hr>
+<h4 id="linux安装">Linux安装</h4>
+<h5 id="1-vmware基本操作">1. VMware基本操作</h5>
+<ul>
+<li>释放鼠标</li>
+</ul>
+<p><img src="/img/image-20201227172945421.png" alt="image-20201227172945421"></p>
+<ul>
+<li>第一次使用虚拟机，提供，默认都勾选，点击确定</li>
+</ul>
+<p><img src="/img/image-20201227173118306.png" alt="image-20201227173118306"></p>
+<p><img src="/img/image-20201227173139218.png" alt="image-20201227173139218"></p>
+<h5 id="2-启动虚拟机">2. 启动虚拟机</h5>
+<p><img src="/img/image-20201227173246807.png" alt="image-20201227173246807"></p>
+<h5 id="3-选择安装项">3. 选择安装项</h5>
+<ul>
+<li>选择第一项</li>
+</ul>
+<p><img src="/img/image-20201227173417877.png" alt="image-20201227173417877"></p>
+<p><img src="/img/image-20201227173605831.png" alt="image-20201227173605831"></p>
+<h5 id="4-跳过检查">4. 跳过检查</h5>
+<ul>
+<li>使用tab键，选择skip，回车enter</li>
+</ul>
+<p><img src="/img/image-20201227173741872.png" alt="image-20201227173741872"></p>
+<ul>
+<li>检查安装盘是否完整。一般不用检查。如果点击 ok，比较耗时。</li>
+</ul>
+<h5 id="5-欢迎界面">5. 欢迎界面</h5>
+<p><img src="/img/image-20201227173925599.png" alt="image-20201227173925599"></p>
+<h5 id="6-选择语言环境">6. 选择语言环境</h5>
+<ul>
+<li>此处选择中文</li>
+</ul>
+<p><img src="/img/image-20201227174036259.png" alt="image-20201227174036259"></p>
+<h5 id="7-选择键盘类型默认">7. 选择键盘类型（默认）</h5>
+<p><img src="/img/image-20201227174123815.png" alt="image-20201227174123815"></p>
+<h5 id="8-选择存储设备">8. 选择存储设备</h5>
+<ul>
+<li>选择 基本存储设备 （默认）</li>
+</ul>
+<p><img src="/img/image-20201227174244894.png" alt="image-20201227174244894"></p>
+<h5 id="9-格式化硬盘">9. 格式化硬盘</h5>
+<p>选择 是，忽略所有数据</p>
+<p><img src="/img/image-20201227174403807.png" alt="image-20201227174403807"></p>
+<h5 id="10-设置网络默认">10. 设置网络（默认）</h5>
+<p><img src="/img/image-20201227174505036.png" alt="image-20201227174505036"></p>
+<p><img src="/img/image-20201227174526897.png" alt="image-20201227174526897"></p>
+<p><img src="/img/image-20201227174608810.png" alt="image-20201227174608810"></p>
+<p><img src="/img/image-20201227174629581.png" alt="image-20201227174629581"></p>
+<p><img src="/img/image-20201227174706815.png" alt="image-20201227174706815"></p>
+<h5 id="11-设置时区默认">11. 设置时区（默认）</h5>
+<ul>
+<li>选择 亚洲/上海</li>
+</ul>
+<p><img src="/img/image-20201227174800544.png" alt="image-20201227174800544"></p>
+<h5 id="12-设置密码">12. 设置密码</h5>
+<p><img src="/img/image-20201227174844798.png" alt="image-20201227174844798"></p>
+<p><img src="/img/image-20201227174912479.png" alt="image-20201227174912479"></p>
+<h5 id="13-磁盘分区配置">13. 磁盘分区配置</h5>
+<p>选择安装类型</p>
+<p><img src="/img/image-20201227175020600.png" alt="image-20201227175020600"></p>
+<p><img src="/img/image-20201227175057529.png" alt="image-20201227175057529"></p>
+<p>格式化</p>
+<p><img src="/img/image-20201227175121557.png" alt="image-20201227175121557"></p>
+<h5 id="14-选择系统安装类型">14. 选择系统安装类型</h5>
+<p><img src="/img/image-20201227175228670.png" alt="image-20201227175228670"></p>
+<h5 id="15-安装">15. 安装</h5>
+<p><img src="/img/clip_image034-1609061055566.jpg" alt="img"></p>
+<p><img src="/img/clip_image036-1609061055567.jpg" alt="img"></p>
+<h4 id="登录">登录</h4>
+<p><img src="/img/image-20201227175423053.png" alt="image-20201227175423053"></p>
+<hr>
+<h3 id="第三章">第三章</h3>
+<hr>
+<h5 id="本章内容-2">本章内容</h5>
+<ul>
+<li>Linux的简介</li>
+<li>Linux的安装</li>
+<li>Linux的基本命令</li>
+</ul>
+<hr>
+<h5 id="教学目标">教学目标</h5>
+<p>​	1、了解Linux的简介与安装</p>
+<p>​	2、掌握Linux常用的命令</p>
+<p>​	3、掌握Linux系统上JDK、Mysql、Tomcat的安装</p>
+<h4 id="31-linux的简介">3.1 Linux的简介</h4>
+<h5 id="1linux的概述">1．Linux的概述</h5>
+<p>Linux是基于Unix的开源免费的操作系统，由于系统的稳定性和安全性几乎成为程序代码运行的最佳系统环境。Linux是由Linus Torvalds（林纳斯·托瓦兹）起初开发的，由于源代码的开放性，现在已经衍生出了千上百种不同的Linux系统。Linux系统的应用非常广泛，不仅可以长时间的运行我们编写的程序代码，还可以安装在各种计算机硬件设备中，比如手机、平板电脑、路由器等。尤其在这里提及一下，我们熟知是Android程序最底层就是运行在linux系统上的。</p>
+<p><img src="/img/image-20201227201356196.png" alt="image-20201227201356196"></p>
+<h5 id="2linux的分类">2．Linux的分类</h5>
+<p>(1) Linux根据市场需求不同，基本分为两个方向：</p>
+<p>​	1）图形化界面版：注重用户体验，类似window操作系统，但目前成熟度不够</p>
+<p>​	2）服务器版：以在控制台窗口中输入命令操作系统的，类似于DOS，是架设服务器的最佳选择</p>
+<p>(2) Linux根据原生程度，又分为两种：</p>
+<p>​	1）内核版本：在Linus领导下的内核小组开发维护的系统内核的版本号</p>
+<p>​	2）发行版本：一些组织或公司在内核版基础上进行二次开发而重新发行的版本</p>
+<p>(3) Linux发行版本不同，又可以分为n多种：</p>
+<p><img src="/img/image-20201227201515541.png" alt="image-20201227201515541"></p>
+<h4 id="32-linux的安装">3.2 Linux的安装</h4>
+<h5 id="1虚拟机的安装">1．虚拟机的安装</h5>
+<p>因为Linux也是一个系统，本质上跟我们电脑的Window没有区别，所以我们要学习Linux就首先将我们电脑的Window系统换成Linux系统，或者在我们电脑上安装双系统，听上去是不是很可怕。其实我们可以在我们电脑上安装一个软件，这个软件可以模拟一台或多台虚拟的电脑机器，这就是虚拟机！</p>
+<p>虚拟器常用的有两种：</p>
+<ul>
+<li>
+<p>VMware（威睿）公司的虚拟机软件，功能强大，收费产品</p>
+</li>
+<li>
+<p>VitrualBox 虚拟机软件 Oracle公司的虚拟机软件，免费商品</p>
+</li>
+</ul>
+<p>由于市场上VMware使用率很高，所以我们安装VMware</p>
+<h5 id="2centos的安装">2．CentOS的安装</h5>
+<p>CentOS是一个Linux的发行版本，是目前企业中用来做应用服务器系统的主要版本，CentOS的安装，其实是将该系统安装到VMware虚拟机软件中，让VMware虚拟机软件模拟出一台Linux系统的电脑。</p>
+<p>开启网卡：</p>
+<pre><code class="language-linux" data-lang="linux">ifconfig eth0 up
+dhclient eth0 或 
+dhcpcd eth0
+</code></pre><p>设置eth0的ip：</p>
+<pre><code>Ipconfig eth0 192.168.115.128
+</code></pre><h4 id="33-linux的基本命令">3.3 Linux的基本命令</h4>
+<p>服务器版的Linux安装完毕了，但没有图形化界面，我们只能通过控制台去操作系统，我们就要使用类似DOS命令的Linux命令去操作系统，那么下面我们就进行Linux的命令的学习。Linux命令成百上千，不可能一一涉及，也没有必要一一涉及，根据我们程序员在日常工作中的需求，总结出如下几种：</p>
+<h5 id="1目录切换命令">1．目录切换命令</h5>
+<p>window中通过图形化界面和鼠标可以任意切换需要进入的目录，但Linux必须通过cd命令切换目录。但在学习cd命令之前，我们有必要分清Linux的目录结构：</p>
+<p><img src="/img/clip_image011-1609062912542.jpg" alt="img"></p>
+<p>目录切换命令如下：</p>
+<ul>
+<li>cd /      切换到 系统根目录</li>
+<li>cd usr    切换到 该目录下usr目录</li>
+<li>cd ../     切换到 上一层目录</li>
+<li>cd ~     切换到 用户主目录</li>
+<li>cd -      切换到 上一个所在目录</li>
+</ul>
+<h5 id="2目录的操作命令增删改查">2．目录的操作命令（增删改查）</h5>
+<p>(1) 增加目录操作（增）</p>
+<p>命令：mkdir 目录名称</p>
+<p>示例：在根目录 / 下，使用：mkdir test，就会在根目录 / 下产生一个test问目录</p>
+<p><img src="/img/clip_image013-1609062912542.jpg" alt="img"></p>
+<p>(2) 查看目录（查）</p>
+<p>命令：ls [-al] 父目录</p>
+<p>示例：在根目录 / 下使用：ls，可以看到该目录下的所有的目录和文件</p>
+<p><img src="/img/clip_image015-1609062912542.jpg" alt="img"></p>
+<p>示例：在根目录 / 下使用：ls -a，可以看到该目录下的所有文件和目录，包括隐藏的</p>
+<p><img src="/img/clip_image017-1609062912542.jpg" alt="img"></p>
+<p>示例：在根目录 / 下使用：ls -l，可以看到该目录下的所有目录和文件的详细信息</p>
+<p><img src="/img/clip_image018-1609062912542.png" alt="img"></p>
+<p><strong>注意：ls -l 可以缩写成ll</strong></p>
+<p>(3) 寻找目录（查）</p>
+<p>命令：find 目录 参数</p>
+<p>示例：查找/下的与test相关的目录(文件)，使用：find / -name ‘test*’</p>
+<p>练习：在根目录下创建文件夹 demo,并显示该文件夹的详细信息</p>
+<p>(4) 修改目录的名称（改）</p>
+<p>命令：mv 目录名称 新目录名称</p>
+<p>示例：在test目录下创建一个oldTest目录，使用：mv oldTest newTest</p>
+<p><img src="/img/clip_image019.png" alt="img"></p>
+<p><strong>注意：mv的语法不仅可以对目录进行重命名而且也可以对各种文件，压缩包等进行   重命名的操作</strong></p>
+<p>(5) 移动目录的位置&mdash;剪切（改）</p>
+<p>命令：mv 目录名称 目录的新位置</p>
+<p>示例：在test下将newTest目录剪切到 /usr下面，使用：mv newTest  /usr</p>
+<p><img src="/img/clip_image021-1609062912543.jpg" alt="img"></p>
+<p><strong>注意：mv语法不仅可以对目录进行剪切操作，对文件和压缩包等都可执行剪切操作</strong></p>
+<p>(6) 拷贝目录（改）</p>
+<p>命令：cp -r 目录名称 目录拷贝的目标位置 &mdash;&ndash;r代表递归拷贝</p>
+<p>示例：将/usr下的newTest拷贝到根目录下的test中，使用：cp -r /usr/newTest /test</p>
+<p><img src="/img/clip_image022.png" alt="img"></p>
+<p><strong>注意：cp命令不仅可以拷贝目录还可以拷贝文件，压缩包等，拷贝文件和压缩包时不用写-r递归</strong></p>
+<p>(7) 删除目录（删）</p>
+<p>命令：rm [-rf] 目录</p>
+<p>示例：删除/usr下的newTest，进入/usr下使用：rm -r newTest</p>
+<p><img src="/img/clip_image024-1609062912543.jpg" alt="img"></p>
+<p>示例：删除/test下的newTest而不需要询问强制删除，在/test下使用：rm -rf newTest</p>
+<p><img src="/img/clip_image025-1609062912543.png" alt="img"></p>
+<p><strong>注意：rm不仅可以删除目录，也可以删除其他文件或压缩包，为了增强大家的记忆，无论删除任何目录或文件，都直接使用rm -rf 目录/文件/压缩包</strong></p>
+<h5 id="3文件的操作命令增删改查">3．文件的操作命令（增删改查）</h5>
+<p>(1) 文件的创建（增）</p>
+<p>命令：touch 文件名称 &mdash;&ndash; 空文件</p>
+<p>示例：在test目录下创建一个空文件，</p>
+<p>输入：touch aaa.txt</p>
+<p><img src="/img/clip_image026.png" alt="img"></p>
+<p>(2) 文件的查看（查）</p>
+<p>命令：cat/more/less/tail 文件</p>
+<p>示例：使用cat查看/etc/sudo.conf文件，只能显示最后一屏内容；</p>
+<p>输入：cat  /etc/sudo.conf</p>
+<p><img src="/img/clip_image028-1609062912543.jpg" alt="img"></p>
+<p>示例：使用more查看/etc/sudo.conf文件，可以显示百分比，回车可以向下一行，  空格可以向下一页，q可以退出查看；</p>
+<p>输入：more  /etc/sudo.conf</p>
+<p><img src="/img/clip_image030-1609062912543.jpg" alt="img"></p>
+<p>示例：使用less查看/etc/sudo.conf文件，可以使用键盘上的PgUp和PgDn向上 和向下翻页，q结束查看；</p>
+<p>输入：less  /etc/sudo.conf</p>
+<p><img src="/img/clip_image032-1609062912543.jpg" alt="img"></p>
+<p>示例：使用tail -10 查看/etc/sudo.conf文件的后10行，Ctrl+C结束；</p>
+<p>输入：tail -10 /etc/sudo.conf</p>
+<p><img src="/img/clip_image034-1609062912543.jpg" alt="img"></p>
+<p>注意：命令 tail -f 文件 可以对某个文件进行动态监控，例如tomcat的日志文件，会随着程序的运行，日志会变化，可以使用：tail -f catalina-2016-11-11.log  监控文件的变化</p>
+<p>(3) 修改文件的内容（改）</p>
+<p>命令：vim 文件</p>
+<p>示例：编辑/test下的aaa.txt文件，使用：vim aaa.txt</p>
+<p><img src="/img/clip_image036-1609062912543.jpg" alt="img"></p>
+<p>但此时并不能编辑，因为此时处于命令模式，点击键盘i/a/o进入编辑模式，可编辑文件！</p>
+<p><img src="/img/clip_image038-1609062912543.jpg" alt="img"></p>
+<p>编辑完成后，按下Esc，退回命令模式</p>
+<p><img src="/img/clip_image040-1609062912544.jpg" alt="img"></p>
+<p>此时文件虽然已经编辑完成，但是没有保存，需输入冒号：进入底行模式</p>
+<p>在底行模式下输入：wq 代表 写入内容并退出，即保存；</p>
+<p>输入：q！代表 强制退出不保存！</p>
+<p>​	<img src="/img/clip_image042-1609062912544.jpg" alt="img"></p>
+<p>(4) 删除文件（删）</p>
+<p>同目录删除：熟记 rm -rf 文件 即可</p>
+<p><strong>总结：</strong></p>
+<p>vim编辑器是Linux中的强大组件，是vi编辑器的加强版，vim编辑器的命令和快捷方式有很多，但此处不一一阐述，也无需研究的很透彻，使用vim编辑修改文件的方式基本会使用就可以了。</p>
+<p>关于vim使用过程：</p>
+<p>在实际开发中，使用vim编辑器主要作用就是修改配置文件</p>
+<p>vim 文件&mdash;&gt;进入文件&mdash;&gt;命令模式&mdash;&gt;按i进入编辑模式&mdash;&gt;编辑文件&mdash;&gt;按Esc进入底行模式&mdash;&gt;输入：wq/q!</p>
+<p>练习：在根目录下创建一个文件夹：demo,在该文件夹下创建文件demo1.txt,在文件里写入hello,保存并退出。</p>
+<h5 id="4压缩文件的操作命令">4．压缩文件的操作命令</h5>
+<p>(1) 打包并压缩文件</p>
+<p>Linux中的打包文件一般是以.tar结尾的，压缩的命令一般是以.gz结尾的。而一般情况下打包和压缩是一起进行的，打包并压缩后的文件的后缀名一般.tar.gz。</p>
+<p>命令：tar -zcvf 打包压缩后的文件名 要打包压缩的文件</p>
+<ul>
+<li>
+<p>z：调用gzip压缩命令进行压缩</p>
+</li>
+<li>
+<p>c：打包文件</p>
+</li>
+<li>
+<p>v：显示运行过程</p>
+</li>
+<li>
+<p>f：指定文件名</p>
+</li>
+</ul>
+<p>示例：打包并压缩/test下的所有文件 压缩后的压缩包指定名称为xxx.tar.gz</p>
+<pre><code>tar -zcvf xxx.tar.gz aaa.txt bbb.txt ccc.txt
+tar -zcvf xxx.tar.gz /test/*
+</code></pre><p>​	<img src="/img/clip_image044-1609062912544.jpg" alt="img"></p>
+<p>(2) 解压压缩包**（重点）**</p>
+<p>命令：tar [-xvf] 压缩文件</p>
+<p>其中：x：代表解压</p>
+<p>示例：将/test下的xxx.tar.gz解压到当前目录下</p>
+<p>输入：tar -xvf xxx.tar.gz</p>
+<p><img src="/img/clip_image045-1609062912544.png" alt="img"></p>
+<p>示例：将/test下的xxx.tar.gz解压到根目录/usr下， 其中，-C 代表 指定解压的位置</p>
+<pre><code>tar -xvf xxx.tar.gz -C /usr
+</code></pre><p><img src="/img/clip_image046-1609062912544.png" alt="img"></p>
+<h5 id="5其他命令">5．其他命令</h5>
+<p>(1) 显示当前所在位置</p>
+<pre><code>pwd
+</code></pre><p><img src="/img/clip_image047-1609062912544.png" alt="img"></p>
+<p>(2) 搜索命令</p>
+<p>命令：grep 要搜索的字符串 要搜索的文件</p>
+<p>示例：搜索/usr/sudu.conf文件中包含字符串to的行</p>
+<pre><code>grep to sudo.conf
+</code></pre><p><img src="/img/clip_image049-1609062912544.jpg" alt="img"></p>
+<p>示例：搜索/usr/sudu.conf文件中包含字符串to的行 to要高亮显示</p>
+<pre><code>grep to sudo.conf --color
+</code></pre><p><img src="/img/clip_image051-1609062912544.jpg" alt="img"></p>
+<p>(3) 查看进程</p>
+<p>命令：ps -ef</p>
+<p>示例：查看当前系统中运行的进程</p>
+<p>(4) 管道命令</p>
+<p>命令：|  将前一个命令的输出作为本次目录的输入</p>
+<p>示例：查看当前系统中所有的进程中包括system字符串的进程</p>
+<pre><code>ps -ef | grep system
+</code></pre><p><img src="/img/clip_image053-1609062912545.jpg" alt="img"></p>
+<p>(5) 杀死进程</p>
+<p>命令：kill -9</p>
+<p>其中，-9为进程的pid</p>
+<p>(6) 网络通信命令</p>
+<p>查看当前系统的网卡信息：ifconfig</p>
+<p><img src="/img/clip_image055-1609062912545.jpg" alt="img"></p>
+<p>查看与某台机器的连接情况：ping IP地址</p>
+<p><img src="/img/clip_image057-1609062912545.jpg" alt="img">
+ctrl+c停止ping</p>
+<p>查看当前系统的端口使用：netstat -an</p>
+<p><img src="/img/clip_image059-1609062912545.jpg" alt="img"></p>
+<p>练习:在根目录下创建文件夹 MyFolder 在该文件夹创建一个文件1.txt和2.txt在文件1.txt中输入hello并保存，将这两个文件打包压缩，然后移动到/usr文件夹下并解压。</p>
+<h5 id="6linux的权限命令">6．Linux的权限命令</h5>
+<p>权限是Linux中的重要概念，每个文件/目录等都具有权限，通过 ls -l 命令可以查看某个目录下的文件或目录的权限</p>
+<p>示例：在随意某个目录下ls -l，或直接输入：ll</p>
+<p><img src="/img/clip_image060.png" alt="img"></p>
+<p>第一列的内容的信息解释如下：</p>
+<p><img src="/img/clip_image061.png" alt="img"></p>
+<p>文件的类型：</p>
+<ul>
+<li>
+<p>d：代表目录</p>
+</li>
+<li>
+<p>-：代表文件</p>
+</li>
+<li>
+<p>l：代表链接（可以认为是window中的快捷方式）</p>
+</li>
+</ul>
+<p>后面的9位分为3组，每3位置一组，分别代表 属主的权限，与当前用户同组的用户的权限，其他用户的权限</p>
+<ul>
+<li>
+<p>r：代表权限是可读，r也可以用数字 4 表示</p>
+</li>
+<li>
+<p>w：代表权限是可写，w也可以用数字 2 表示</p>
+</li>
+<li>
+<p>x：代表权限是可执行，x也可以用数字 1 表示</p>
+</li>
+</ul>
+<p>修改文件/目录的权限的命令：chmod</p>
+<p>示例：修改/test下的aaa.txt的权限为属主有全部权限，属主所在的组有读写权限，其他用户只有读的权限</p>
+<pre><code>chmod u=rwx,g=rw,o=r aaa.txt
+</code></pre><p><img src="/img/clip_image062.png" alt="img"></p>
+<p>上述示例还可以使用数字表示：使用 加法 计算！</p>
+<pre><code>chmod 764 aaa.txt
+</code></pre><p>练习：在/usr下创建一个文件hello.txt,设置它的权限为属主可读写执行，数组可读可执行，其它用户可执行。</p>
+<hr>
+<h3 id="第四章">第四章</h3>
+<hr>
+<h5 id="本章内容-3">本章内容</h5>
+<ul>
+<li>Linux网络配置</li>
+<li>SecureCRT连接Linux</li>
+</ul>
+<hr>
+<h4 id="41-linux网络配置">4.1 Linux网络配置</h4>
+<ol>
+<li>查看网络配置</li>
+</ol>
+<ul>
+<li>查看网卡配置，命令：cat  /etc/sysconfig/network-scripts/ifcfg-th0</li>
+<li>概要信息如下：</li>
+</ul>
+<p><img src="/img/image-20201227221421534.png" alt="image-20201227221421534"></p>
+<ol start="2">
+<li>
+<p>setup设置</p>
+<p>命令：setup</p>
+</li>
+</ol>
+<ul>
+<li>1）选择 网络配置</li>
+</ul>
+<p><img src="/img/image-20201227221533890.png" alt="image-20201227221533890"></p>
+<ul>
+<li>2）选择 设备配置</li>
+</ul>
+<p><img src="/img/image-20201227221613926.png" alt="image-20201227221613926"></p>
+<ul>
+<li>3）选择 第一块网卡</li>
+</ul>
+<p><img src="/img/image-20201227221648828.png" alt="image-20201227221648828"></p>
+<ul>
+<li>4）设置IP地址等详细信息</li>
+</ul>
+<p><img src="/img/image-20201227221728194.png" alt="image-20201227221728194"></p>
+<h4 id="42-securecrt连接linux">4.2 SecureCRT连接linux</h4>
+<ul>
+<li>
+<p>在linux获取ip:   ifconfig</p>
+</li>
+<li>
+<p>打开绿色版本的CRT: 点击SecureCRT.exe</p>
+</li>
+<li>
+<p>点击文件&mdash;&gt;连接&mdash;&gt;快速连接</p>
+</li>
+</ul>
+<p><img src="/img/clip_image011-1609072544824.png" alt="img"></p>
+<p><img src="/img/clip_image012-1609072544824.png" alt="img"></p>
+<p>​	依次输入用户名，密码，连接到linux机器上</p>
+<p>解决CRT编码问题:</p>
+<ul>
+<li>
+<p>关闭CRT,重新打开</p>
+</li>
+<li>
+<p>选中待连接的IP,右击&mdash;&gt;属性</p>
+</li>
+</ul>
+<p><img src="/img/clip_image013-1609072544824.png" alt="img"></p>
+<p><img src="/img/clip_image014-1609072544825.png" alt="img"></p>
+<hr>
+<h3 id="第五章">第五章</h3>
+<hr>
+<h5 id="本章内容-4">本章内容</h5>
+<ul>
+<li>Linux系统上安装JDK</li>
+<li>Linux系统上安装MySQL</li>
+<li>Linux系统上安装tomcat</li>
+</ul>
+<hr>
+<h4 id="linux安装软件">Linux安装软件</h4>
+<p>CentOS主要有 rpm 和 yum 这两种软件包的管理。两种包的管理各有用处，其中主要区别是：</p>
+<ul>
+<li>
+<p>YUM使用简单但需要联网，YUM会去网上的YUM包源去获取所需要的软件包，yum的目的是帮助我们收集rpm包的依赖属性并能帮我们自动化解决安装、卸载和升级等操作。</p>
+</li>
+<li>
+<p>RPM需要的操作经度比较细，需要我们做的事情比较多。</p>
+</li>
+</ul>
+<h4 id="51-linux系统上安装jdk">5.1 Linux系统上安装JDK</h4>
+<h5 id="安装步骤">安装步骤：</h5>
+<ol>
+<li>卸载OpenJDK</li>
+</ol>
+<p>查看已经安装的包：</p>
+<pre><code>rpm –qa 
+</code></pre><p>查看和java相关的包：</p>
+<pre><code>rpm –qa | grep java  
+</code></pre><p><img src="/img/clip_image001-1609072567542.png" alt="img"></p>
+<p>卸载OPENJDK软件包：</p>
+<pre><code>rpm -e --nodeps 要卸载的软件包  
+</code></pre><p><img src="/img/clip_image003-1609072567542.jpg" alt="img"></p>
+<ol start="2">
+<li>
+<p>创建JDK的安装路径</p>
+<p>在/usr/local/src 创建文件夹java：</p>
+</li>
+</ol>
+<pre><code>mkdir java
+</code></pre><ol start="3">
+<li>
+<p>上传安装文件到linux</p>
+<p>使用FileZilla软件，建立连接，将本地机的JDK安装包传入Linux的/usr/local/src/java下！</p>
+</li>
+</ol>
+<p><img src="/img/clip_image005-1609072567542.jpg" alt="img"></p>
+<p><img src="/img/clip_image006-1609072567542.png" alt="img"></p>
+<ol start="4">
+<li>
+<p>解压tar.gz</p>
+<p>首先需要安装依赖，联网，输入命令：</p>
+</li>
+</ol>
+<pre><code>yum install glibc.i686
+</code></pre><p>​	  解压命令：</p>
+<pre><code>tar –xvf jdk.tar.gz 
+</code></pre><ol start="5">
+<li>
+<p>配置环境变量：</p>
+<p>进入配置文件：</p>
+</li>
+</ol>
+<pre><code>vim /etc/profile
+</code></pre><p>​		i 进入编辑模式，添加如下内容：</p>
+<pre><code>#set java environment
+JAVA_HOME=/usr/local/src/java/jdk1.7.0_71
+CLASSPATH=.:$JAVA_HOME/lib.tools.jar
+PATH=$JAVA_HOME/bin:$PATH
+export JAVA_HOME CLASSPATH PATH
+</code></pre><p>​		Esc 退出编辑模式，：wq保存并退出配置文件！</p>
+<p>​		重新加载配置文件：</p>
+<pre><code>source /etc/profile
+</code></pre><ol start="6">
+<li>运行 java 命令检测是否安装成功</li>
+</ol>
+<h4 id="52-linux系统上安装mysql">5.2 Linux系统上安装MySQL</h4>
+<h5 id="安装mysql">安装MySQL:</h5>
+<ol>
+<li>检测是否已经安装了mysql</li>
+</ol>
+<pre><code>rpm -qa | grep mysql 
+</code></pre><p>​	如果已经安装了，将其卸载，如：</p>
+<pre><code>rpm -e --nodeps mysql-libs-5.1.73-5.el6_6.i686
+</code></pre><ol start="2">
+<li>
+<p>创建mysql的安装路径</p>
+<p>在/usr/local/src 创建文件夹mysql：</p>
+</li>
+</ol>
+<pre><code>Mkdir mysql
+</code></pre><ol start="3">
+<li>
+<p>上传mysql到Linux</p>
+<p>使用FileZilla软件，建立连接，将本地机的mysql安装包传入Linux的/usr/local/src/mysql下！</p>
+<p><img src="/img/clip_image008-1609072567543.jpg" alt="img"></p>
+</li>
+<li>
+<p>解压mysql</p>
+</li>
+</ol>
+<pre><code>tar -xvf MySQL-5.6.22-1.el6.i686.rpm-bundle.tar -C /usr/local/mysql
+</code></pre><ol start="4">
+<li>安装依赖</li>
+</ol>
+<pre><code>yum -y install libaio.so.1 libgcc_s.so.1 libstdc++.so.6
+yum update libstdc++-4.4.7-4.el6.x86_64
+</code></pre><p>​	如果出错可以</p>
+<pre><code>yum -y install libaio.so.1 libgcc_s.so.1 libstdc++.so.6 --setopt=protected_multilib=false
+</code></pre><ol start="5">
+<li>安装mysql的服务端</li>
+</ol>
+<pre><code>rpm -ivh MySQL-server-5.6.22-1.el6.i686.rpm
+</code></pre><ol start="6">
+<li>
+<p>安装mysql的客户端</p>
+<p>安装依赖：</p>
+</li>
+</ol>
+<pre><code>yum install  libncurses.so.5
+</code></pre><p>​		安装客户端：</p>
+<pre><code>rpm -ivh MySQL-client-5.6.22-1.el6.i686.rpm
+</code></pre><ol start="7">
+<li>启动mysql的服务</li>
+</ol>
+<pre><code>service mysql status
+service mysql start
+</code></pre><ol start="8">
+<li>
+<p>登录mysql</p>
+<p>在安装mysql server时，产生一个随机的密码存放在/root/.mysql_secret中，使用 cat /root/.mysql_secret查看密码，然后根据密码进行登录（在虚拟机上登陆）:</p>
+</li>
+</ol>
+<pre><code>msyql –u root -p
+</code></pre><p>​		修改密码：</p>
+<pre><code>set password = password('123456');
+</code></pre><ol start="9">
+<li>
+<p>设置开机自动启动mysql</p>
+<p>加入到系统服务：</p>
+</li>
+</ol>
+<pre><code>chkconfig --add mysql;
+</code></pre><p>​		自动启动：</p>
+<pre><code>chkconfig mysql on;
+</code></pre><ol start="10">
+<li>
+<p>配置环境变量</p>
+<p>在/etc/profile文件最后加入：</p>
+</li>
+</ol>
+<pre><code>MYSQL_HOME=/usr
+PATH=$MYSQL_HOME/bin:$PATH
+export PATH MYSQL_HOME
+</code></pre><p>​		执行：</p>
+<pre><code>source /etc/profile
+</code></pre><ol start="11">
+<li>
+<p>开启远程服务</p>
+<p>登录mysql授权可以远程访问:</p>
+</li>
+</ol>
+<pre><code>grant all privileges on *.* to 'root' @'%' identified by '123456';
+flush privileges;
+</code></pre><ol start="12">
+<li>
+<p>设置Linux的防火墙</p>
+<p>3306端口放行 且将该设置添加到防火墙的规则中</p>
+</li>
+</ol>
+<pre><code>/sbin/iptables -I INPUT -p tcp --dport 3306 -j ACCEPT
+/etc/rc.d/init.d/iptables save
+</code></pre><h4 id="53-linux系统上安装tomcat">5.3 Linux系统上安装tomcat</h4>
+<h5 id="安装tomcat">安装tomcat:</h5>
+<ol>
+<li>
+<p>创建tomcat的安装路径</p>
+<p>在/usr/local 下，输入：mkdir tomcat</p>
+</li>
+<li>
+<p>上传tomcat的安装文件tomcat</p>
+<p>使用FileZilla软件，建立连接，将本地机的tomcat安装包传入Linux的/usr/local/src/tomcat下！</p>
+<p><img src="/img/clip_image008-1609072567543.jpg" alt="img"></p>
+</li>
+<li>
+<p>解压tomcat</p>
+</li>
+</ol>
+<pre><code>tar –xvf xxx.tar.gz –C /usr/local/tomcat
+</code></pre><ol start="4">
+<li>
+<p>设置防火墙</p>
+<p>打开8080端口并保存设置：</p>
+</li>
+</ol>
+<pre><code>/sbin/iptables -I INPUT -p tcp --dport 8080 -j ACCEPT
+/etc/rc.d/init.d/iptables save
+</code></pre><ol start="5">
+<li>
+<p>启动tomcat</p>
+<p>进入到tomcat/bin，执行：</p>
+</li>
+</ol>
+<pre><code>./startup.sh
+</code></pre><p>​		关闭tomcat，执行：</p>
+<pre><code>./shutdown.sh
+</code></pre><h4 id="54-发布项目到linux">5.4 发布项目到Linux</h4>
+<h5 id="将数据库还原到linux上">将数据库还原到Linux上</h5>
+<ol>
+<li>备份Window上的数据库</li>
+</ol>
+<pre><code>mysqldump –u root -p store_v2.0 &gt; F:/store_v2.0.sql
+</code></pre><ol start="2">
+<li>
+<p>在Linux上还原数据库</p>
+<p>使用filezilla软件将数据库备份文件传至Linux的usr/local/src/mysqlback中<img src="/img/clip_image008-1609072567543.jpg" alt="img"></p>
+<p>登录mysql：</p>
+<pre><code>mysql -u root -p 123456
+</code></pre><p>创建数据库并使用：</p>
+<pre><code>create database store_v2.0;      
+use store_v2.0;
+</code></pre><p>还原数据库：</p>
+<pre><code>source /usr/local/src/mysqlback/store_v2.0.sql
+</code></pre></li>
+</ol>
+<h5 id="将程序的代码发布到linux上">将程序的代码发布到Linux上</h5>
+<ol>
+<li>
+<p>将工程制作为war包</p>
+</li>
+<li>
+<p>将war包上传到linux服务器（使用filezilla软件）</p>
+</li>
+<li>
+<p>将war包copy到linux下的usr/local/src/tomcat/webapps中</p>
+</li>
+<li>
+<p>修改tomcat配置文件conf/server.xml 将端口改为8000</p>
+</li>
+<li>
+<p>设置防火墙 打开8000端口并保存规则</p>
+</li>
+</ol>
+<pre><code>/sbin/iptables -I INPUT -p tcp --dport 8000 -j ACCEPT
+/etc/rc.d/init.d/iptables save
+</code></pre><ol start="6">
+<li>
+<p>启动tomcat</p>
+<p>进入到tomcat/bin</p>
+</li>
+</ol>
+<pre><code>./startup.sh
+</code></pre><ol start="7">
+<li>
+<p>访问项目</p>
+<p>http://ip地址:8000/项目名</p>
+</li>
+</ol>
+</div>
+  
+</article></main>
+<footer class="footer">
+  <span>&copy; 2021 <a href="https://xshi000.github.io/">及时当勉励，岁月不待人！@iNuo</a></span>
+  <span>&middot;</span>
+  <span>Powered by <a href="https://gohugo.io/" rel="noopener" target="_blank">Hugo️️</a>️</span>
+  <span>&middot;</span>
+  <span>Theme️ <a href="https://github.com/nanxiaobei/hugo-paper" rel="noopener" target="_blank">Paper</a></span>
+</footer>
+<script src="https://xshi000.github.io/highlight.min.js"></script>
+<script>
+  hljs.initHighlightingOnLoad();
+</script>
+</body>
+</html>
+
