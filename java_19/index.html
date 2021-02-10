@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    
+    <title>极简Java十九：Git入门 - 及时当勉励，岁月不待人！@iNuo</title>
+    
+    <meta name="description" content="第一章  本章内容  Git与svn对比 git工作流程 Git的安装 使用git管理文件版本 远程仓库 分支管理 在IntelliJ IDEA中使用git   Git历史 同生活中的许多伟大事件一样，Git 诞生于一个极富纷争大举创新的年代。Linux 内核开源项目有着为数众广的参与者。绝大多数的 Linux 内核维护工作都花在了提交补丁和保存归档的繁琐事务上（1991－2002年间）。到2002 年，整个项目组开始启用分布式版本控制系统 BitKeeper 来管理和维护代码。到 2005 年的时候，开发 BitKeeper 的商业公司同 Linux 内核开源社区的合作关系结束，他们收回了免费使用 BitKeeper 的权力。这就迫使 Linux 开源社区（特别是 Linux的缔造者 Linus Torvalds ）不得不吸取教训，只有开发一套属于自己的版本控制系统才不至于重蹈覆辙。他们对新的系统订了若干目标：
+  速度
+  简单的设计
+  对非线性开发模式的强力支持（允许上千个并行开发的分支）
+  完全分布式
+  有能力高效管理类似 Linux 内核一样的超大规模项目（速度和数据量）
+  1. Git与svn对比 Svn SVN是集中式版本控制系统，版本库是集中放在中央服务器的，而干活的时候，用的都是自己的电脑，所以首先要从中央服务器哪里得到最新的版本，然后干活，干完后，需要把自己做完的活推送到中央服务器。集中式版本控制系统是必须联网才能工作，如果在局域网还可以，带宽够大，速度够快，如果在互联网下，如果网速慢的话，就郁闷了。下图就是标准的集中式版本控制工具管理方式：
+集中管理方式在一定程度上看到其他开发人员在干什么，而管理员也可以很轻松掌握每个人的开发权限。
+但是相较于其优点而言，集中式版本控制工具缺点很明显：
+  服务器单点故障
+  容错性差
+  Git Git是分布式版本控制系统，那么它就没有中央服务器的，每个人的电脑就是一个完整的版本库，这样，工作的时候就不需要联网了，因为版本都是在自己的电脑上。既然每个人的电脑都有一个完整的版本库，那多个人如何协作呢？比如说自己在电脑上改了文件A，其他人也在电脑上改了文件A，这时，你们两之间只需把各自的修改推送给对方，就可以互相看到对方的修改了。下图就是分布式版本控制工具管理方式：">
+    <meta name="author" content="">
+    
+    <link href="https://xshi000.github.io/an-old-hope.min.css" rel="stylesheet">
+    <link href="https://xshi000.github.io/style.css" rel="stylesheet">
+    <link href="https://xshi000.github.io/custom.css" rel="stylesheet">
+    
+    <link rel="apple-touch-icon" href="https://xshi000.github.io/apple-touch-icon.png">
+    <link rel="icon" href="https://xshi000.github.io/favicon.ico">
+    <meta name="generator" content="Hugo 0.65.3" />
+    
+    
+    
+    <script>
+      function setTheme() {
+        const time = new Date();
+
+        const prev = localStorage.getItem('date');
+        const date = String(time.getMonth() + 1) + '.' + String(time.getDate());
+
+        const now = time.getTime();
+        let sunrise;
+        let sunset;
+
+        function setBodyClass() {
+          if (now > sunrise && now < sunset) return;
+          document.body.classList.add('dark');
+        }
+
+        if (date !== prev) {
+          fetch('https://api.ipgeolocation.io/astronomy?apiKey=5ed37d85103e4defa5df4c5298ed5215')
+            .then(res => res.json())
+            .then(data => {
+              sunrise = data.sunrise.split(':').map(Number);
+              sunset = data.sunset.split(':').map(Number);
+            })
+            .catch(() => {
+              sunrise = [7, 0];
+              sunset = [19, 0];
+            })
+            .finally(() => {
+              sunrise = time.setHours(sunrise[0], sunrise[1], 0);
+              sunset = time.setHours(sunset[0], sunset[1], 0);
+              setBodyClass();
+              localStorage.setItem('sunrise', sunrise);
+              localStorage.setItem('sunset', sunset);
+            });
+          localStorage.setItem('date', date);
+        } else {
+          sunrise = Number(localStorage.getItem('sunrise'));
+          sunset = Number(localStorage.getItem('sunset'));
+          setBodyClass();
+        }
+      }
+    </script>
+  </head>
+  <body class="single">
+    <script>
+      setTheme();
+    </script>
+    <header class="header">
+      <nav class="nav">
+        <p class="logo"><a href="https://xshi000.github.io/">及时当勉励，岁月不待人！@iNuo</a></p>
+      </nav>
+    </header>
+    <main class="main">
+
+
+<article class="post-single">
+  <header class="post-header">
+    <h1 class="post-title">极简Java十九：Git入门</h1>
+    <div class="post-meta">February 10, 2021</div>
+  </header>
+  <div class="post-content"><hr>
+<h3 id="第一章">第一章</h3>
+<hr>
+<h5 id="本章内容">本章内容</h5>
+<ul>
+<li>Git与svn对比</li>
+<li>git工作流程</li>
+<li>Git的安装</li>
+<li>使用git管理文件版本</li>
+<li>远程仓库</li>
+<li>分支管理</li>
+<li>在IntelliJ IDEA中使用git</li>
+</ul>
+<hr>
+<h4 id="git历史">Git历史</h4>
+<p>同生活中的许多伟大事件一样，Git 诞生于一个极富纷争大举创新的年代。Linux 内核开源项目有着为数众广的参与者。绝大多数的 Linux 内核维护工作都花在了提交补丁和保存归档的繁琐事务上（1991－2002年间）。到2002 年，整个项目组开始启用分布式版本控制系统 BitKeeper 来管理和维护代码。到 2005 年的时候，开发 BitKeeper 的商业公司同 Linux 内核开源社区的合作关系结束，他们收回了免费使用 BitKeeper 的权力。这就迫使 Linux 开源社区（特别是 Linux的缔造者 Linus Torvalds ）不得不吸取教训，只有开发一套属于自己的版本控制系统才不至于重蹈覆辙。他们对新的系统订了若干目标：</p>
+<ul>
+<li>
+<p>速度</p>
+</li>
+<li>
+<p>简单的设计</p>
+</li>
+<li>
+<p>对非线性开发模式的强力支持（允许上千个并行开发的分支）</p>
+</li>
+<li>
+<p>完全分布式</p>
+</li>
+<li>
+<p>有能力高效管理类似 Linux 内核一样的超大规模项目（速度和数据量）</p>
+</li>
+</ul>
+<p><img src="/img/clip_image002-1609043622166.jpg" alt="img"></p>
+<h4 id="1-git与svn对比">1. Git与svn对比</h4>
+<h5 id="svn">Svn</h5>
+<p>SVN是集中式版本控制系统，版本库是集中放在中央服务器的，而干活的时候，用的都是自己的电脑，所以首先要从中央服务器哪里得到最新的版本，然后干活，干完后，需要把自己做完的活推送到中央服务器。集中式版本控制系统是必须联网才能工作，如果在局域网还可以，带宽够大，速度够快，如果在互联网下，如果网速慢的话，就郁闷了。下图就是标准的集中式版本控制工具管理方式：</p>
+<p><img src="/img/clip_image003-1609043622167.jpg" alt="IMG_256"></p>
+<p>集中管理方式在一定程度上看到其他开发人员在干什么，而管理员也可以很轻松掌握每个人的开发权限。</p>
+<p>但是相较于其优点而言，集中式版本控制工具缺点很明显：</p>
+<ul>
+<li>
+<p>服务器单点故障</p>
+</li>
+<li>
+<p>容错性差</p>
+</li>
+</ul>
+<h5 id="git">Git</h5>
+<p>Git是分布式版本控制系统，那么它就没有中央服务器的，每个人的电脑就是一个完整的版本库，这样，工作的时候就不需要联网了，因为版本都是在自己的电脑上。既然每个人的电脑都有一个完整的版本库，那多个人如何协作呢？比如说自己在电脑上改了文件A，其他人也在电脑上改了文件A，这时，你们两之间只需把各自的修改推送给对方，就可以互相看到对方的修改了。下图就是分布式版本控制工具管理方式：</p>
+<p><img src="/img/clip_image005-1609043622167.jpg" alt="img"></p>
+<h4 id="2-git工作流程">2. git工作流程</h4>
+<p>一般工作流程如下：</p>
+<p>​	1．从远程仓库中克隆 Git 资源作为本地仓库。</p>
+<p>​	2．从本地仓库中checkout代码然后进行代码修改</p>
+<p>​	3．在提交前先将代码提交到暂存区。</p>
+<p>​	4．提交修改。提交到本地仓库。本地仓库中保存修改的各个历史版本。</p>
+<p>​	5．在修改完成后，需要和团队成员共享代码时，可以将代码push到远程仓库。</p>
+<p>​	下图展示了 Git 的工作流程：</p>
+<p><img src="/img/clip_image007-1609043622168.jpg" alt="0df9740f9b41522ab12c14dbbf6bbad4_r"></p>
+<h4 id="3-git的安装">3. Git的安装</h4>
+<p>最早Git是在Linux上开发的，很长一段时间内，Git也只能在Linux和Unix系统上跑。不过，慢慢地有人把它移植到了Windows上。现在，Git可以在Linux、Unix、Mac和Windows这几大平台上正常运行了。由于开发机大多数情况都是windows，所以本教程只讲解windows下的git的安装及使用。</p>
+<h5 id="软件下载">软件下载</h5>
+<p>下载地址：https://git-scm.com/download</p>
+<p><img src="/img/clip_image009-1609043622168.jpg" alt="img"></p>
+<p><img src="/img/clip_image011-1609043622168.jpg" alt="img"></p>
+<p>参考资料中安装包已经下载完毕，根据不同的操作系统选择对应的安装包。</p>
+<h5 id="软件安装">软件安装</h5>
+<ol>
+<li>
+<p>安装git for windows</p>
+<p><img src="/img/clip_image013-1609043622168.jpg" alt="img"></p>
+<p><img src="/img/clip_image015-1609043622168.jpg" alt="img"></p>
+</li>
+</ol>
+<p>​	一路“下一步”使用默认选项即可。</p>
+<ol start="2">
+<li>安装TortoiseGit（Git）</li>
+</ol>
+<p><img src="/img/clip_image017-1609043622168.jpg" alt="img"></p>
+<p><img src="/img/clip_image019-1609043622168.jpg" alt="img"></p>
+<p>​	一路“下一步”使用默认选项即可。</p>
+<p>​	默认选项下会启动配置画面：</p>
+<p><img src="/img/clip_image021-1609043622168.jpg" alt="img"></p>
+<p>​	由于目前只有英文语言包，默认即可继续下一步。</p>
+<p>​	配置git.exe，上面已经安装过git-for-windows了，所以在此找到git.exe所在的目录。</p>
+<p><img src="/img/clip_image023-1609043622168.jpg" alt="img"></p>
+<p>​	配置开发者姓名及邮箱，每次提交代码时都会把此信息包含到提交的信息中。</p>
+<p><img src="/img/clip_image025-1609043622168.jpg" alt="img"></p>
+<p><img src="/img/clip_image027-1609043622169.jpg" alt="img"></p>
+<p>​	使用默认配置，点击“完成”按钮完成配置。</p>
+<p>​	完整完毕后在系统右键菜单中会出现git的菜单项。</p>
+<p><img src="/img/image-20201227163534014.png" alt="image-20201227163534014"></p>
+<ol start="3">
+<li>
+<p>安装中文语言包</p>
+<p>安装中文语言包并不是必选项。可以根据个人情况来选择安装。</p>
+</li>
+</ol>
+<p><img src="/img/clip_image032-1609043622169.jpg" alt="img"></p>
+<p><img src="/img/clip_image034-1609043622169.jpg" alt="img"></p>
+<p>​	直接“下一步”完整完毕。</p>
+<p>​	语言包安装完毕后可以在TortoiseGit的设置中调整语言</p>
+<p><img src="/img/clip_image036-1609043622169.jpg" alt="img"></p>
+<h4 id="4-使用git管理文件版本">4. 使用git管理文件版本</h4>
+<h5 id="1-创建版本库">1. 创建版本库</h5>
+<p>什么是版本库呢？版本库又名仓库，英文名repository，你可以简单理解成一个目录，这个目录里面的所有文件都可以被Git管理起来，每个文件的修改、删除，Git都能跟踪，以便任何时刻都可以追踪历史，或者在将来某个时刻可以“还原”。由于git是分布式版本管理工具，所以git在不需要联网的情况下也具有完整的版本管理能力。</p>
+<p>创建一个版本库非常简单，可以使用git bash也可以使用tortoiseGit。首先，选择一个合适的地方，创建一个空目录 F:\git\repository</p>
+<ol>
+<li>使用GitBash</li>
+</ol>
+<p>在当前目录中点击右键中选择Git Bash来启动。</p>
+<p><img src="/img/clip_image038-1609043622169.jpg" alt="img"></p>
+<p><img src="/img/image-20201227163712594.png" alt="image-20201227163712594"></p>
+<p>​	或者在开始菜单中启动。注意如果是从开始菜单启动的gitbash需要切换目录到仓库所在的目录。</p>
+<p><img src="/img/clip_image042-1609043622169.jpg" alt="img"></p>
+<p>​	创建仓库执行命令：</p>
+<pre><code>git init
+</code></pre><ol start="2">
+<li>
+<p>使用TortoiseGit</p>
+<p>使用TortoiseGit时，只需要在目录中点击右键菜单选择“在这里创建版本库”</p>
+</li>
+</ol>
+<p><img src="/img/clip_image044-1609043622169.jpg" alt="img"></p>
+<p><img src="/img/clip_image046.jpg" alt="img"></p>
+<p><img src="/img/clip_image048.jpg" alt="img"></p>
+<p>​	版本库创建成功，会在此目录下创建一个.git的隐藏目录，如下所示：</p>
+<p><img src="/img/clip_image050-1609043622169.jpg" alt="img"></p>
+<h5 id="相关概念">相关概念</h5>
+<p>版本库：“.git”目录就是版本库，将来文件都需要保存到版本库中。</p>
+<p>工作目录：包含“.git”目录的目录，也就是.git目录的上一级目录就是工作目录。只有工作目录中的文件才能保存到版本库中。</p>
+<h5 id="2-添加文件">2. 添加文件</h5>
+<ol>
+<li>
+<p>添加文件过程</p>
+<p>在F:\git\repository目录下创建一个mytest.txt文件</p>
+</li>
+</ol>
+<p><img src="/img/clip_image052.jpg" alt="img"></p>
+<p><img src="/img/clip_image054.jpg" alt="img"></p>
+<p><img src="/img/clip_image056.jpg" alt="img"></p>
+<p>​	文本文件变为带“+”号的图标：</p>
+<p><img src="/img/clip_image058.jpg" alt="img"></p>
+<p>​	提交文件：在mytest.txt上再次点击右键选择“提交”，此时将文件保存至版本库中。</p>
+<p><img src="/img/clip_image060.jpg" alt="img"></p>
+<p><img src="/img/clip_image062.jpg" alt="img"></p>
+<p><img src="/img/clip_image064-1609043622170.jpg" alt="img"></p>
+<ol start="2">
+<li>工作区、暂存区、本地仓库</li>
+</ol>
+<p>Git和其他版本控制系统如SVN的一个不同之处就是有暂存区的概念。</p>
+<p>工作区：在电脑里能看到的目录，比如F:\git\repository的reporstory目录就是一个工作区。</p>
+<p>本地仓库：在F:\git\repository目录中的“.git”隐藏文件夹就是版本库。</p>
+<p>暂存区：Git的版本库里存了很多东西，其中就包含了称为stage（或者叫index）的暂存区。</p>
+<p>其他：Git的版本库中还有Git自动创建的第一个分支master，以及指向master的一个指针叫HEAD。</p>
+<p><img src="/img/clip_image065-1609043622170.jpg" alt="IMG_256"></p>
+<p>Git Bash 把文件往Git版本库里添加的时候，是分两步执行的：</p>
+<p>​	第一步是 把文件修改添加到暂存区；</p>
+<pre><code>git add file
+</code></pre><p>​	第二步是把暂存区的所有内容提交到当前分支。</p>
+<pre><code>git commit -m &quot;提交说明&quot;
+</code></pre><p>创建Git版本库时，Git自动为我们创建了唯一一个master分支，所以，git commit 就是往 master 分支上提交更改。可以理解为，需要提交的文件修改后通通放到暂存区，然后，一次性提交暂存区的所有修改。</p>
+<h5 id="3-修改文件">3. 修改文件</h5>
+<ol>
+<li>提交修改</li>
+</ol>
+<p>被版本库管理的文件不可避免的要发生修改，此时只需要直接对文件修改并将文件的修改提交到版本库。</p>
+<p>在mytest.txt文件上点击右键，然后选择“提交”</p>
+<p><img src="/img/clip_image067.jpg" alt="img"></p>
+<p><img src="/img/clip_image069.jpg" alt="img"></p>
+<p><img src="/img/clip_image071.jpg" alt="img"></p>
+<ol start="2">
+<li>查看修改历史</li>
+</ol>
+<p>在开发过程中可能会经常查看代码的修改历史，或者叫做修改日志。来查看某个版本是谁修改的，什么时间修改的，修改了哪些内容。可以在文件上点击右键选择“显示日志”来查看文件的修改历史。</p>
+<p><img src="/img/clip_image073.jpg" alt="img"></p>
+<p><img src="/img/clip_image075.jpg" alt="img"></p>
+<ol start="3">
+<li>差异比较</li>
+</ol>
+<p>当文件内容修改后，需要和修改之前对比一下修改了哪些内容此时可以使用“比较差异功能”</p>
+<p><img src="/img/clip_image077.jpg" alt="img"></p>
+<p><img src="/img/clip_image079.jpg" alt="img"></p>
+<ol start="4">
+<li>还原修改</li>
+</ol>
+<p>当文件修改后不想把修改的内容提交，还想还原到未修改之前的状态。此时可以使用“还原”功能</p>
+<p><img src="/img/clip_image081.jpg" alt="img"></p>
+<p><img src="/img/clip_image083.jpg" alt="img"></p>
+<p><img src="/img/clip_image085.jpg" alt="img"></p>
+<p>注意：此操作会撤销所有未提交的修改，所以当做还原操作是需要慎重慎重！！！</p>
+<h5 id="4-删除文件">4. 删除文件</h5>
+<p>需要删除无用的文件时可以使用git提供的删除功能直接将文件从版本库中删除。</p>
+<p><img src="/img/clip_image087-1609043622172.jpg" alt="img"></p>
+<h5 id="5-案例将java工程提交到版本库">5. 案例：将java工程提交到版本库</h5>
+<p>​	第一步：将参考资料中的java工程project-test复制到工作目录中</p>
+<p><img src="/img/clip_image089.jpg" alt="img"></p>
+<p>​	第二步：将工程添加到暂存区。</p>
+<p><img src="/img/clip_image091.jpg" alt="img"></p>
+<p><img src="/img/clip_image093.jpg" alt="img"></p>
+<p><img src="/img/clip_image095.jpg" alt="img"></p>
+<p>​	点击确定完成暂存区添加。</p>
+<p>​	第三步：忽略文件或文件夹</p>
+<p>在此工程中，并不是所有文件都需要保存到版本库中的！例如“bin”目录及目录下的文件就可以忽略。好在Git考虑到了大家的感受，这个问题解决起来也很简单，在Git工作区的根目录下创建一个特殊的.gitignore文件，然后把要忽略的文件名填进去，Git就会自动忽略这些文件。</p>
+<p>如果使用TortoiseGit的话可以使用菜单项直接进行忽略。</p>
+<p><img src="/img/clip_image097-1609043622173.jpg" alt="img"></p>
+<p><img src="/img/clip_image099.jpg" alt="img"></p>
+<p><img src="/img/image-20201227164206868.png" alt="image-20201227164206868"></p>
+<p>选择保留本地文件。完成后在此文件夹内会多出一个.gitignore文件，这个文件就是文件忽略文件，当然也可以手工编辑。其中的内容就是把bin目录忽略掉。</p>
+<p><img src="/img/clip_image105.jpg" alt="img"></p>
+<p>​	第四步：提交代码</p>
+<p>将代码添加到master分支上，其中.gitignore文件也需要添加到暂存区，然后提交到版本库。</p>
+<h4 id="5-远程仓库">5. 远程仓库</h4>
+<h5 id="1-添加远程库">1. 添加远程库</h5>
+<p>现在我们已经在本地创建了一个Git仓库，又想让其他人来协作开发，此时就可以把本地仓库同步到远程仓库，同时还增加了本地仓库的一个备份。常用的远程仓库就是github：https://github.com/，接下来，将本地代码同步到github。</p>
+<ol>
+<li>在github上创建仓库</li>
+</ol>
+<p>首先在github上创建一个账号，然后在github上创建一个仓库：</p>
+<p><img src="/img/clip_image107-1609043622173.jpg" alt="img"></p>
+<p><img src="/img/clip_image109.jpg" alt="img"></p>
+<p>点击“create repository”按钮仓库就创建成功了。</p>
+<p>Github支持两种同步方式“https”和“ssh”。如果使用https很简单基本不需要配置就可以使用，但是每次提交代码和下载代码时都需要输入用户名和密码。如果使用ssh方式就需要客户端先生成一个密钥对，即一个公钥一个私钥。然后还需要把公钥放到githib的服务器上。这两种方式在实际开发中都有应用，都需掌握。接下来，先看ssh方式</p>
+<h5 id="2-ssh同步方式">2. ssh同步方式</h5>
+<ul>
+<li>什么是ssh?</li>
+</ul>
+<p>SSH 为 Secure Shell（安全外壳协议）的缩写，由 IETF 的网络小组（Network Working Group）所制定。SSH 是目前较可靠，专为远程登录会话和其他网络服务提供安全性的协议。利用 SSH 协议可以有效防止远程管理过程中的信息泄露问题。</p>
+<ul>
+<li>基于密匙的安全验证</li>
+</ul>
+<p>使用ssh协议通信时，推荐使用基于密钥的验证方式。你必须为自己创建一对密匙，并把公用密匙放在需要访问的服务器上。如果你要连接到SSH服务器上，客户端软件就会向服务器发出请求，请求用你的密匙进行安全验证。服务器收到请求之后，先在该服务器上你的主目录下寻找你的公用密匙，然后把它和你发送过来的公用密匙进行比较。如果两个密匙一致，服务器就用公用密匙加密“质询”（challenge）并把它发送给客户端软件。客户端软件收到“质询”之后就可以用你的私人密匙解密再把它发送给服务器。</p>
+<ul>
+<li>ssh密钥生成</li>
+</ul>
+<p>在windows下可以使用 Git Bash.exe来生成密钥，可以通过开始菜单或者右键菜单打开Git Bash</p>
+<p><img src="/img/image-20201227164452525.png" alt="image-20201227164452525"></p>
+<p>git bash 执行命令,生成公钥和私钥</p>
+<p>命令：</p>
+<pre><code>ssh-keygen -t rsa
+</code></pre><p><img src="/img/clip_image115.jpg" alt="img"></p>
+<p>执行命令完成后，在window本地用户.ssh目录C:\Users\用户名.ssh下面生成如下名称的公钥和私钥:</p>
+<p><img src="/img/clip_image117.jpg" alt="img"></p>
+<ul>
+<li>ssh密钥配置</li>
+</ul>
+<p>密钥生成后需要在github上配置密钥本地才可以顺利访问。</p>
+<p><img src="/img/clip_image119.jpg" alt="img"></p>
+<p><img src="/img/clip_image121.jpg" alt="img"></p>
+<p>在key部分将id_rsa.pub文件内容添加进去，然后点击“Add SSH key”按钮完成配置。</p>
+<ol start="3">
+<li>同步到远程仓库</li>
+</ol>
+<p><img src="/img/clip_image122.jpg" alt="0df9740f9b41522ab12c14dbbf6bbad4_r"></p>
+<p>同步到远程仓库可以使用git bash也可以使用tortoiseGit</p>
+<ul>
+<li>使用git bash</li>
+</ul>
+<p>在仓库所在的目录（F:\git\repository）点击右键选择“Git Bash Here”，启动git bash程序。</p>
+<p><img src="/img/clip_image124.jpg" alt="img"></p>
+<p>然后在git bash中执行如下语句：</p>
+<pre><code>git remote add origin git@github.com:xShi000/xShi000.github.io.git 
+</code></pre><p>其中，git@github.com:xShi000/xShi000.github.io.git  为远程仓库地址，origin为其别名！</p>
+<p>如果出现如下错误：（本地已存在origin这个别名，即别名被占用）</p>
+<p><img src="/img/clip_image126.jpg" alt="img"></p>
+<p>可以先执行如下命令：</p>
+<pre><code>git remote rm origin
+</code></pre><p>将本地仓库中master分支的代码推送到origin对应的远程仓库中，代码如下：要联网！！</p>
+<pre><code>git push -u origin master
+</code></pre><p><img src="/img/clip_image128.jpg" alt="img"></p>
+<ul>
+<li>使用TortoiseGit同步</li>
+</ul>
+<p>一、如果想让TortoiseGit也使用刚才生成的密钥可以做如下配置：</p>
+<p><img src="/img/clip_image130.jpg" alt="img"></p>
+<p><img src="/img/clip_image132.jpg" alt="img"></p>
+<ul>
+<li>
+<p>Url：远程仓库的地址</p>
+</li>
+<li>
+<p>推送URL：也是相同的</p>
+</li>
+<li>
+<p>Putty密钥：选择刚才生成的密钥中的私钥</p>
+</li>
+</ul>
+<p>二、同步。在本地仓库的文件夹中单击右键，选择“Git同步”</p>
+<p><img src="/img/clip_image134.jpg" alt="img"></p>
+<p><img src="/img/image-20201227164821943.png" alt="image-20201227164821943"></p>
+<h5 id="3-https同步方式">3. Https同步方式</h5>
+<p>参考hugo博客</p>
+<h5 id="4-从远程仓库克隆">4. 从远程仓库克隆</h5>
+<p>克隆远程仓库也就是从远程把仓库复制一份到本地，克隆后会创建一个新的本地仓库。选择一个任意部署仓库的目录，然后克隆远程仓库。</p>
+<ol>
+<li>使用TortoiseGit：</li>
+</ol>
+<p>在任意目录点击右键：</p>
+<p><img src="./img/clip_image138.jpg" alt="img"></p>
+<p><img src="/img/image-20201227164920524.png" alt="image-20201227164920524"></p>
+<p><img src="/img/clip_image142.jpg" alt="img"></p>
+<ol start="2">
+<li>使用 Git Bash 从远程仓库取代码</li>
+</ol>
+<p>Git中从远程的分支获取最新的版本到本地有这样2个命令：</p>
+<ul>
+<li>
+<p>git fetch：相当于是从远程获取最新版本到本地，不会自动merge（合并代码）</p>
+</li>
+<li>
+<p>git pull：相当于是从远程获取最新版本并merge到本地，相当于git fetch 和 git merge</p>
+</li>
+</ul>
+<p>在实际使用中，git fetch更安全一些！因为在merge前，我们可以查看更新情况，然后再决定是否合并</p>
+<p>如果使用TortoiseGit的话可以从右键菜单中点击“拉取”（pull）或者“获取”（fetch）</p>
+<p><img src="/img/clip_image144.jpg" alt="img"></p>
+<h5 id="5-解决冲突">5. 解决冲突</h5>
+<p>当客户端A与客户端B同时修改了同一文件的同一位置并推送到远端时，会产生冲突！</p>
+<p>解决：先克隆到本地，文件中会显示冲突的内容，决断后，右键 解决冲突，再次推送远端！</p>
+<h4 id="6-分支管理">6. 分支管理</h4>
+<h5 id="1-创建合并分支">1. 创建合并分支</h5>
+<p>在我们每次的提交，Git都把它们串成一条时间线，这条时间线就是一个分支。截止到目前，只有一条时间线，在Git里，这个分支叫主分支，即master分支。HEAD指针严格来说不是指向提交(当前提交的代码或是代码版本)，而是指向master，master才是指向提交的，所以，HEAD指向的就是当前分支。</p>
+<p>一开始的时候，master分支是一条线，Git用master指向最新的提交，再用HEAD指向master，就能确定当前分支，以及当前分支的提交点：</p>
+<p><img src="/img/clip_image146.gif" alt="IMG_256"></p>
+<p>每次提交，master分支都会向前移动一步，这样，随着你不断提交，master分支的线也越来越长。</p>
+<p>当我们创建新的分支，例如dev时，Git新建了一个指针叫dev，指向master相同的提交，再把HEAD指向dev，就表示当前分支在dev上：</p>
+<p><img src="/img/clip_image148.gif" alt="IMG_256"></p>
+<p>你看，Git创建一个分支很快，因为除了增加一个dev指针，改改HEAD的指向，工作区的文件都没有任何变化！  不过，从现在开始，对工作区的修改和提交就是针对dev分支了，比如新提交一次后，dev指针往前移动一步，而master指针不变：</p>
+<p><img src="/img/clip_image150.gif" alt="IMG_256"></p>
+<p>假如我们在dev上的工作完成了，就可以把dev合并到master上。Git怎么合并呢？最简单的方法，就是直接把master指向dev的当前提交，就完成了合并：</p>
+<p><img src="/img/clip_image152.gif" alt="IMG_256"></p>
+<p>所以Git合并分支也很快！就改改指针，工作区内容也不变！</p>
+<p>合并完分支后，甚至可以删除dev分支。删除dev分支就是把dev指针给删掉，删掉后，我们就剩下了一条master分支：</p>
+<p><img src="/img/clip_image154.gif" alt="IMG_256"></p>
+<h5 id="2-使用tortoisegit实现分支管理">2. 使用TortoiseGit实现分支管理</h5>
+<p>使用TortoiseGit管理分支就很简单了。</p>
+<ol>
+<li>创建分支</li>
+</ol>
+<p>在本地仓库文件夹中点击右键，然后从菜单中选择“创建分支”：</p>
+<p><img src="/img/clip_image156.jpg" alt="img"></p>
+<p>如果想创建完毕后直接切换到新分支可以勾选“切换到新分支”选项或者从菜单中选择“切换/检出”来切换分支：</p>
+<p><img src="/img/clip_image158.jpg" alt="img"></p>
+<ol start="2">
+<li>合并分支</li>
+</ol>
+<p>分支切换到dev后就可以对工作区的文件进行修改，然后提交到dev分支，原来的master分支不受影响。例如我们修改mytest.txt中的内容，然后提交到dev分支。</p>
+<p><img src="/img/clip_image160.jpg" alt="img"></p>
+<p><img src="/img/clip_image162.jpg" alt="img"></p>
+<p>切换到master分支后还是原来的内容：</p>
+<p><img src="/img/clip_image164.jpg" alt="img"></p>
+<p>将dev分支的内容合并到master分支，当前分支为master。从右键菜单中选择“合并”：</p>
+<p><img src="/img/clip_image166.jpg" alt="img"></p>
+<p>再查看mytest.txt的内容就已经更新了：</p>
+<p><img src="/img/clip_image168.jpg" alt="img"></p>
+<h5 id="3-解决冲突">3. 解决冲突</h5>
+<p>两个分支中编辑的内容都是相互独立互不干扰的，那么如果在两个分支中都对同一个文件进行编辑，然后再合并，就有可能会出现冲突。例如在master分支中对mytest.txt进行编辑：</p>
+<p><img src="/img/clip_image170.jpg" alt="img"></p>
+<p>然后提交到版本库。</p>
+<p><img src="/img/clip_image172.jpg" alt="img"></p>
+<p>切换到dev分支，对mytest.txt进行编辑：</p>
+<p><img src="/img/clip_image174.jpg" alt="img"></p>
+<p><img src="/img/clip_image176.jpg" alt="img"></p>
+<p>最后进行分支合并，例如将dev分支合并到master分支。需要先切换到master分支然后进行分支合并。</p>
+<p><img src="/img/clip_image178.jpg" alt="img"></p>
+<p>出现版本冲突。</p>
+<p><img src="/img/clip_image180.jpg" alt="img"></p>
+<p>冲突需要手动解决。</p>
+<p><img src="/img/clip_image182.jpg" alt="img"></p>
+<p>在冲突文件上单机右键选择“解决冲突”菜单项：</p>
+<p><img src="/img/clip_image184.jpg" alt="img"></p>
+<p><img src="/img/clip_image186.jpg" alt="img"></p>
+<p>把冲突解决完毕的文件提交到版本库就可以了。</p>
+<h4 id="7-在intellij-idea中使用git">7. 在IntelliJ IDEA中使用git</h4>
+<h5 id="1-在idea中配置git">1. 在Idea中配置git</h5>
+<p>安装好IntelliJ IDEA后，如果Git安装在默认路径下，那么idea会自动找到git的位置，如果更改了Git的安装位置则需要手动配置下Git的路径。选择File→Settings打开设置窗口，找到Version Control下的git选项：</p>
+<p><img src="/img/clip_image188.jpg" alt="img"></p>
+<p>选择git的安装目录后可以点击“Test”按钮测试是否正确配置。</p>
+<p><img src="/img/clip_image190.jpg" alt="img"></p>
+<h5 id="2-将工程添加至git">2. 将工程添加至git</h5>
+<p>1）在idea中创建一个工程，例如创建一个java工程，名称为idea-git-test，如下图所示：</p>
+<p><img src="/img/clip_image192.jpg" alt="img"></p>
+<p>2）创建本地仓库</p>
+<p>在菜单中选择“vcs”→Import into Version Control→Create Git Repository&hellip;</p>
+<p><img src="/img/clip_image194.jpg" alt="img"></p>
+<p><img src="/img/clip_image196.jpg" alt="img"></p>
+<p>选择工程所在的上级目录。本例中应该选择idea-projects目录，然后点击“OK”按钮，在工程的上级目录创建本地仓库，那么idea-projects目录就是本地仓库的工作目录，此目录中的工程就可以添加到本地仓库中。也就是可以把idea-git-test工程添加到本地仓库中。选择之后在工具栏上就多出了git相关工具按钮：</p>
+<p><img src="/img/clip_image198.jpg" alt="img"></p>
+<p>3）将工程添加至本地仓库</p>
+<p>直接点击commit按钮，将工程提交至本地仓库。</p>
+<p><img src="/img/clip_image200.jpg" alt="img"></p>
+<p><img src="/img/clip_image202.jpg" alt="img"></p>
+<p>4）推送到远程</p>
+<p>在github上创建一个仓库，然后将本地仓库推送到远程。在工程上点击右键，选择git→Repository→push，</p>
+<p>或者在菜单中选择vcs→git→push</p>
+<p><img src="/img/clip_image204.jpg" alt="img"></p>
+<p><img src="/img/clip_image206.jpg" alt="img"></p>
+<p>点击“Define remote”链接，配置https形式的URL，SSH形式的无法通过。然后点击OK</p>
+<p><img src="/img/clip_image208.jpg" alt="img"></p>
+<p><img src="/img/clip_image210.jpg" alt="img"></p>
+<p>点击“push”按钮就将本地仓库推送到远程，如果是第一次配置推送需要输入github的用户名和密码。</p>
+<h5 id="3-从远程仓库克隆">3. 从远程仓库克隆</h5>
+<p>打开工程后，在idea的欢迎页上有“Check out from version control”下拉框，选择git</p>
+<p><img src="/img/clip_image212.jpg" alt="img"></p>
+<p><img src="/img/clip_image214.jpg" alt="img"></p>
+<p>此处仍然推荐使用htts形式的url，点击“test”按钮后显示连接成功。点击OK按钮后根据提示将远程仓库克隆下来，然后导入到idea中。</p>
+<h5 id="4-从服务端拉取代码">4. 从服务端拉取代码</h5>
+<p>如果需要从服务端同步代码可以使用工具条中的“update”按钮</p>
+<p><img src="/img/clip_image216.jpg" alt="img"></p>
+</div>
+  
+</article></main>
+<footer class="footer">
+  <span>&copy; 2021 <a href="https://xshi000.github.io/">及时当勉励，岁月不待人！@iNuo</a></span>
+  <span>&middot;</span>
+  <span>Powered by <a href="https://gohugo.io/" rel="noopener" target="_blank">Hugo️️</a>️</span>
+  <span>&middot;</span>
+  <span>Theme️ <a href="https://github.com/nanxiaobei/hugo-paper" rel="noopener" target="_blank">Paper</a></span>
+</footer>
+<script src="https://xshi000.github.io/highlight.min.js"></script>
+<script>
+  hljs.initHighlightingOnLoad();
+</script>
+</body>
+</html>
+
