@@ -6,10 +6,36 @@
     <description>Recent content on 及时当勉励，岁月不待人！@iNuo</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-cn</language>
-    <lastBuildDate>Wed, 10 Feb 2021 17:30:41 +0800</lastBuildDate>
+    <lastBuildDate>Thu, 11 Feb 2021 09:42:54 +0800</lastBuildDate>
     
 	<atom:link href="https://xshi000.github.io/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>极简Java二十一：SpringBoot</title>
+      <link>https://xshi000.github.io/java_21/</link>
+      <pubDate>Thu, 11 Feb 2021 09:42:54 +0800</pubDate>
+      
+      <guid>https://xshi000.github.io/java_21/</guid>
+      <description>第一章  本章内容  什么是SpringBoot? SpringBoot入门案例 SpringBoot配置文件 SpringBoot项目构建 Thymeleaf   目标
+  理解SpringBoot的特点
+  能使用SpringBoot搭建项目
+  理解SpringBoot的自动配置原理
+  能使用SpringBoot整合常用框架
+  什么是SpringBoot? Springboot是Spring项目中的一个子工程与SpringFramework同属于Spring的产品！
+SpringBoot设计目的是简化Spring应用的搭建以及开发过程，不需要再进行繁琐的模式化配置，做到开箱即用
+Java的痛
+  混乱的依赖管理
+  复杂的配置
+  SpringBoot的特点
+  提供了基于功能模块的依赖，大大简化了依赖的管理
+  提供了对Spring和第三方库的默认配置
+  内嵌web服务器tomcat,jetty和undertow
+  SpringBoot入门案例 SpringBoot项目开发环境：
+第一步：创建工程 创建Maven工程 springboot_quick
+第二步：引入依赖 向pom中导入父工程依赖，web启动器依赖
+&amp;lt;?xml version=&amp;#34;1.0&amp;#34; encoding=&amp;#34;UTF-8&amp;#34;?&amp;gt; &amp;lt;project xmlns=&amp;#34;http://maven.apache.org/POM/4.0.0&amp;#34; xmlns:xsi=&amp;#34;http://www.w3.org/2001/XMLSchema-instance&amp;#34; xsi:schemaLocation=&amp;#34;http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd&amp;#34;&amp;gt; &amp;lt;modelVersion&amp;gt;4.0.0&amp;lt;/modelVersion&amp;gt; &amp;lt;groupId&amp;gt;com.iNuo&amp;lt;/groupId&amp;gt; &amp;lt;artifactId&amp;gt;springboot_quick&amp;lt;/artifactId&amp;gt; &amp;lt;version&amp;gt;1.0-SNAPSHOT&amp;lt;/version&amp;gt; &amp;lt;parent&amp;gt; &amp;lt;groupId&amp;gt;org.</description>
+    </item>
     
     <item>
       <title>极简Java二十：Linux入门</title>
